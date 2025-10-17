@@ -1252,45 +1252,37 @@ database.ref('subscriptions/' + activationCode).once('value').then((snapshot) =>
 });
 },
 
-
 saveData(){
-const activationCode = localStorage.getItem('activationCode');
-
-// حفظ في السحابة
-if(activationCode && activationCode.startsWith('SK-')){
-  database.ref('subscriptions/' + activationCode).set({
-    students: this.students,
-    delays: this.delays,
-    absences: this.absences,
-    notes: this.notes,
-    lastUpdate: Date.now()
-  }).catch((error)=>{
-    console.log('خطأ في الحفظ:', error);
-  });
-}
-
-saveData(){
-  // حفظ محلياً (يعمل أوفلاين)
-  localStorage.setItem('students',JSON.stringify(this.students));
-  localStorage.setItem('delays',JSON.stringify(this.delays));
-  localStorage.setItem('absences',JSON.stringify(this.absences));
-  localStorage.setItem('notes',JSON.stringify(this.notes));
+  // حفظ محلياً أولاً
+  localStorage.setItem('students', JSON.stringify(this.students));
+  localStorage.setItem('delays', JSON.stringify(this.delays));
+  localStorage.setItem('absences', JSON.stringify(this.absences));
+  localStorage.setItem('notes', JSON.stringify(this.notes));
   
-  // محاولة المزامنة مع السحابة إذا أونلاين
-  if(navigator.onLine){
-    // إذا كان عندك Firebase أو أي API للمزامنة، ضعه هنا
-    console.log('✅ البيانات محفوظة ومزامنة');
-  }else{
-    // حفظ للمزامنة لاحقاً
-    this.savePendingData({
-      students: this.students,
-      delays: this.delays,
-      absences: this.absences,
-      notes: this.notes
-    });
-    console.log('💾 البيانات محفوظة محلياً - ستتم المزامنة عند الاتصال');
+  // مزامنة مع Firebase
+  const activationCode = localStorage.getItem('activationCode');
+  if(activationCode && activationCode.startsWith('SK-')){
+    if(navigator.onLine){
+      database.ref('subscriptions/' + activationCode).set({
+        students: this.students,
+        delays: this.delays,
+        absences: this.absences,
+        notes: this.notes,
+        lastUpdate: Date.now()
+      }).catch((error) => {
+        console.log('خطأ في المزامنة:', error);
+      });
+    }else{
+      this.savePendingData({
+        students: this.students,
+        delays: this.delays,
+        absences: this.absences,
+        notes: this.notes
+      });
+    }
   }
 },
+
 
 setToday(){
 const today=new Date().toISOString().split('T')[0];
