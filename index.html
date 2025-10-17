@@ -554,22 +554,7 @@ margin-bottom:15px;
   }
 }
 /* ===== تصميم شاشة القفل متجاوب للجوال ===== */
-#lockScreen {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  box-sizing: border-box;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 .lock-content {
   width: 100%;
@@ -715,15 +700,7 @@ margin-bottom:15px;
 }
 
 /* ===== شاشة القفل الاحترافية ===== */
-#lockScreen, #paymentPage {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 .lock-overlay {
   position: fixed;
@@ -1239,49 +1216,10 @@ margin-bottom:15px;
     
     
 
-/* ===== إصلاح عرض شاشة القفل ===== */
-#lockScreen {
-  display: none !important;
-}
-
-#lockScreen[style*="display: block"],
-#lockScreen[style*="display: flex"] {
-  display: flex !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 999999 !important;
-}
-
-#paymentPage {
-  display: none !important;
-}
-
-#paymentPage[style*="display: block"],
-#paymentPage[style*="display: flex"] {
-  display: flex !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 999999 !important;
-}
-
 /* إخفاء أي عناصر أخرى عند عرض شاشة القفل */
-body:has(#lockScreen[style*="display: flex"]) .container,
-body:has(#lockScreen[style*="display: flex"]) .page,
-body:has(#lockScreen[style*="display: flex"]) nav {
-  display: none !important;
-}
 
-body:has(#paymentPage[style*="display: flex"]) .container,
-body:has(#paymentPage[style*="display: flex"]) .page,
-body:has(#paymentPage[style*="display: flex"]) nav {
-  display: none !important;
-}
+
+
 
 </style>
 </head>
@@ -1299,7 +1237,31 @@ body:has(#paymentPage[style*="display: flex"]) nav {
       <div class="lock-icon-main">🔒</div>
       <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
       <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
-    </div>
+    <
+/* شاشة القفل - محسّن */
+#lockScreen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  overflow-y: auto;
+}
+
+#paymentPage {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  overflow-y: auto;
+}
+
+/div>
     
     <!-- الجزء الثاني: عرض الاشتراك -->
     <div class="subscription-card">
