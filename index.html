@@ -1591,66 +1591,98 @@ this.updateActions();
 },
 
 confirmAction(action){
-if(action==='saveDelay'||action==='saveAndSendDelay'||action==='sendDelay'){
-const key=this.currentTab.delay;
-const count=this.selected[key].size;
-if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-let msg='';
-if(action==='saveDelay')msg=`هل تريد حفظ تأخر ${count} طالب؟`;
-else if(action==='saveAndSendDelay')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-this.showConfirm(msg,()=>{
-if(action==='saveDelay')this.saveDelay();
-else if(action==='saveAndSendDelay'){this.saveDelay();setTimeout(()=>this.sendDelay(),500);}
-else this.sendDelay();
-});
-}else if(action==='saveAbsence'||action==='saveAndSendAbsence'||action==='sendAbsence'){
-const count=this.selected.absence.size;
-if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-let msg='';
-if(action==='saveAbsence')msg=`هل تريد حفظ غياب ${count} طالب؟`;
-else if(action==='saveAndSendAbsence')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-this.showConfirm(msg,()=>{
-if(action==='saveAbsence')this.saveAbsence();
-else if(action==='saveAndSendAbsence'){this.saveAbsence();setTimeout(()=>this.sendAbsence(),500);}
-else this.sendAbsence();
-});
-}else if(action==='saveNote'||action==='saveAndSendNote'||action==='sendNote'){
-const noteText=document.getElementById('noteTextarea').value.trim();
-if(!noteText)return this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
-const count=this.selected.note.size;
-if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-let msg='';
-if(action==='saveNote')msg=`هل تريد حفظ ملاحظة لـ ${count} طالب؟`;
-else if(action==='saveAndSendNote')msg=`هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`;
-else msg=`هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
-this.showConfirm(msg,()=>{
-if(action==='saveNote')this.saveNote();
-else if(action==='saveAndSendNote'){this.saveNote();setTimeout(()=>this.sendNote(),500);}
-else this.sendNote();
-});
-}else if(action==='reset'){
-this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.',()=>this.resetApp());
-}
+  if(action==='saveDelay'||action==='saveAndSendDelay'||action==='sendDelay'){
+    const key=this.currentTab.delay;
+    const count=this.selected[key].size;
+    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+    let msg='';
+    if(action==='saveDelay')msg=`هل تريد حفظ تأخر ${count} طالب؟`;
+    else if(action==='saveAndSendDelay')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
+    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
+    this.showConfirm(msg,()=>{
+      if(action==='saveDelay'){
+        this.saveDelay();
+        this.clearSelection('delay');
+      }
+      else if(action==='saveAndSendDelay'){
+        this.saveDelay();
+        setTimeout(()=>{
+          this.sendDelay();
+          setTimeout(()=>this.clearSelection('delay'),1000);
+        },500);
+      }
+      else this.sendDelay();
+    });
+  }else if(action==='saveAbsence'||action==='saveAndSendAbsence'||action==='sendAbsence'){
+    const count=this.selected.absence.size;
+    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+    let msg='';
+    if(action==='saveAbsence')msg=`هل تريد حفظ غياب ${count} طالب؟`;
+    else if(action==='saveAndSendAbsence')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
+    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
+    this.showConfirm(msg,()=>{
+      if(action==='saveAbsence'){
+        this.saveAbsence();
+        this.clearSelection('absence');
+      }
+      else if(action==='saveAndSendAbsence'){
+        this.saveAbsence();
+        setTimeout(()=>{
+          this.sendAbsence();
+          setTimeout(()=>this.clearSelection('absence'),1000);
+        },500);
+      }
+      else this.sendAbsence();
+    });
+  }else if(action==='saveNote'||action==='saveAndSendNote'||action==='sendNote'){
+    const noteText=document.getElementById('noteTextarea').value.trim();
+    if(!noteText)return this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
+    const count=this.selected.note.size;
+    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+    let msg='';
+    if(action==='saveNote')msg=`هل تريد حفظ ملاحظة لـ ${count} طالب؟`;
+    else if(action==='saveAndSendNote')msg=`هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`;
+    else msg=`هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
+    this.showConfirm(msg,()=>{
+      if(action==='saveNote'){
+        this.saveNote();
+        this.clearSelection('note');
+      }
+      else if(action==='saveAndSendNote'){
+        this.saveNote();
+        setTimeout(()=>{
+          this.sendNote();
+          setTimeout(()=>this.clearSelection('note'),1000);
+        },500);
+      }
+      else this.sendNote();
+    });
+  }else if(action==='reset'){
+    this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.',()=>this.resetApp());
+  }
 },
 
-saveDelay(){
-const key=this.currentTab.delay;
-const T=key.charAt(0).toUpperCase()+key.slice(1);
-const date=new Date(document.getElementById('date'+T).value).toLocaleDateString('ar-SA');
-const typeName=key==='morning'?'تأخر صباحي':key==='break'?'تأخر بعد الفسحة':'تأخر الانصراف';
-this.selected[key].forEach(i=>{
-const civil=this.students[i].civil;
-if(!this.delays[civil])this.delays[civil]=[];
-this.delays[civil].push({type:typeName,date});
-});
-this.selected[key].clear();
-this.renderList(key);
-this.saveData();
-this.updateActions();
-this.showToast('✅ تم الحفظ بنجاح');
+
+    saveDelay(){
+  const key = this.currentTab.delay;
+  const T = key.charAt(0).toUpperCase() + key.slice(1);
+  const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA');
+  const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
+  
+  this.selected[key].forEach(i => {
+    const civil = this.students[i].civil;
+    if(!this.delays[civil]) this.delays[civil] = [];
+    this.delays[civil].push({type: typeName, date});
+  });
+  
+  // لا تمسح selected هنا - سنمسحها بعد الإرسال
+  // this.selected[key].clear(); ← احذف هذا السطر
+  
+  this.renderList(key);
+  this.saveData();
+  this.showToast('✅ تم الحفظ');
 },
+
 
 saveAbsence(){
 const date=new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
@@ -1818,6 +1850,21 @@ sendNote(){
   });
   
   this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+},
+    
+clearSelection(type){
+  if(type === 'delay'){
+    const key = this.currentTab.delay;
+    this.selected[key].clear();
+    this.renderList(key);
+  } else if(type === 'absence'){
+    this.selected.absence.clear();
+    this.renderList('absence');
+  } else if(type === 'note'){
+    this.selected.note.clear();
+    this.renderList('note');
+  }
+  this.updateActions();
 },
 
 
