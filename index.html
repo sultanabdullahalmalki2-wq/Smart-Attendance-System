@@ -553,7 +553,168 @@ margin-bottom:15px;
     color: #333;
   }
 }
+/* ===== تصميم شاشة القفل متجاوب للجوال ===== */
+#lockScreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  box-sizing: border-box;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
 
+.lock-content {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+}
+
+.lock-icon {
+  font-size: 50px !important;
+  margin-bottom: 15px;
+}
+
+.lock-title {
+  font-size: 1.5rem !important;
+  margin-bottom: 10px;
+}
+
+.lock-message {
+  font-size: 0.95rem !important;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* تصغير قسم العرض الخاص */
+#lockScreen [style*="gradient"] {
+  padding: 15px !important;
+  margin: 15px 0 !important;
+}
+
+#lockScreen h3 {
+  font-size: 1.2rem !important;
+  margin-bottom: 15px !important;
+}
+
+#lockScreen ul {
+  margin: 15px 0 !important;
+}
+
+#lockScreen li {
+  padding: 6px 0 !important;
+  font-size: 0.9rem !important;
+}
+
+/* تصغير عرض السعر */
+#lockScreen [style*="font-size: 52px"] {
+  font-size: 2.5rem !important;
+}
+
+#lockScreen [style*="font-size: 20px"] {
+  font-size: 1rem !important;
+}
+
+#lockScreen [style*="font-size: 18px"] {
+  font-size: 0.9rem !important;
+}
+
+/* الأزرار */
+#lockScreen button {
+  width: 100% !important;
+  padding: 14px 20px !important;
+  font-size: 1.1rem !important;
+  margin: 10px 0 !important;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* التحذير */
+#lockScreen [style*="background: #fff3cd"] {
+  padding: 12px !important;
+  margin: 15px 0 !important;
+  font-size: 0.85rem !important;
+}
+
+/* للشاشات الصغيرة جداً */
+@media (max-width: 400px) {
+  .lock-content {
+    padding: 15px;
+    max-height: 85vh;
+  }
+  
+  .lock-icon {
+    font-size: 40px !important;
+  }
+  
+  .lock-title {
+    font-size: 1.3rem !important;
+  }
+  
+  .lock-message {
+    font-size: 0.85rem !important;
+  }
+  
+  #lockScreen h3 {
+    font-size: 1rem !important;
+  }
+  
+  #lockScreen li {
+    font-size: 0.85rem !important;
+  }
+  
+  #lockScreen [style*="font-size: 52px"] {
+    font-size: 2rem !important;
+  }
+  
+  #lockScreen button {
+    font-size: 1rem !important;
+    padding: 12px 15px !important;
+  }
+}
+
+/* للشاشات الأفقية (landscape) */
+@media (max-height: 600px) and (orientation: landscape) {
+  .lock-content {
+    max-height: 95vh;
+    padding: 10px 20px;
+  }
+  
+  .lock-icon {
+    font-size: 35px !important;
+    margin-bottom: 10px;
+  }
+  
+  #lockScreen [style*="gradient"] {
+    padding: 10px !important;
+    margin: 10px 0 !important;
+  }
+  
+  #lockScreen ul {
+    margin: 10px 0 !important;
+  }
+  
+  #lockScreen li {
+    padding: 4px 0 !important;
+  }
+}
+
+    
 </style>
 </head>
     
