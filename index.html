@@ -533,9 +533,30 @@ margin-bottom:15px;
   }
 }
 
-    
+
+/* إصلاح مشاكل Select في iOS Safari */
+.filter-select {
+  -webkit-appearance: menulist;
+  appearance: menulist;
+  min-height: 44px; /* الحد الأدنى لمنطقة اللمس في iOS */
+}
+
+/* إصلاح مشاكل PWA */
+@supports (-webkit-touch-callout: none) {
+  .filter-select {
+    background-color: white !important;
+    border: 2px solid #e0e0e0 !important;
+  }
+  
+  .filter-select option {
+    background-color: white;
+    color: #333;
+  }
+}
+
 </style>
 </head>
+    
 <body>
 <div class="container">
 <!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
@@ -1112,15 +1133,20 @@ notes:{},
 selected:{morning:new Set(),break:new Set(),departure:new Set(),absence:new Set(),note:new Set()},
 currentTab:{delay:'morning',absence:'daily',notes:'add',stats:'daily'},
 
-init(){
+init() {
   this.loadData();
   this.setToday();
-  if(!this.checkSubscription())return;
+  if(!this.checkSubscription()) return;
   this.setupEvents();
   this.renderStudents();
-  this.populateFilters();
   this.loadLevelSettings();
   this.updateAllStats();
+  
+  // تأخير ملء الفلاتر لـ iOS (مهم جداً!)
+  setTimeout(() => {
+    this.populateFilters();
+  }, 300);
+  
   this.setupRealtimeSync();
   this.checkOnlineStatus(); 
   
@@ -1133,6 +1159,7 @@ init(){
     badge.style.cursor = 'pointer';
   }
 },
+
 
 // كشف حالة الاتصال (دالة منفصلة خارج init)
 checkOnlineStatus(){
@@ -1363,16 +1390,69 @@ return`<li class="student-item" onclick="app.showStudent(${idx})">
 }).join('');
 },
 
-populateFilters(){
-const classes=[...new Set(this.students.map(s=>s.class))].sort();
-const classrooms=[...new Set(this.students.map(s=>s.classroom))].sort();
-['Morning','Break','Departure','Absence','Note'].forEach(t=>{
-const cls=document.getElementById('class'+t);
-const clsr=document.getElementById('classroom'+t);
-if(cls)cls.innerHTML='<option value="">جميع الصفوف</option>'+classes.map(c=>`<option>${c}</option>`).join('');
-if(clsr)clsr.innerHTML='<option value="">جميع الفصول</option>'+classrooms.map(c=>`<option>${c}</option>`).join('');
-});
+populateFilters() {
+  // تأكد من وجود بيانات أولاً
+  if (!this.students || this.students.length === 0) {
+    console.log('لا توجد بيانات طلاب');
+    return;
+  }
+  
+  const classes = [...new Set(this.students.map(s => s.class))].filter(c => c).sort();
+  const classrooms = [...new Set(this.students.map(s => s.classroom))].filter(c => c).sort();
+  
+  ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
+    const cls = document.getElementById(`class${t}`);
+    const clsr = document.getElementById(`classroom${t}`);
+    
+    if (cls) {
+      // احذف الخيارات القديمة أولاً
+      cls.innerHTML = '';
+      
+      // أضف الخيار الافتراضي
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'الكل';
+      cls.appendChild(defaultOption);
+      
+      // أضف الصفوف
+      classes.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c;
+        option.textContent = c;
+        cls.appendChild(option);
+      });
+    }
+    
+    if (clsr) {
+      // احذف الخيارات القديمة أولاً
+      clsr.innerHTML = '';
+      
+      // أضف الخيار الافتراضي
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'الكل';
+      clsr.appendChild(defaultOption);
+      
+      // أضف الفصول
+      classrooms.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c;
+        option.textContent = c;
+        clsr.appendChild(option);
+      });
+    }
+  });
+  
+  // إجبار Safari على إعادة الرسم (مهم جداً لـ iOS)
+  setTimeout(() => {
+    document.querySelectorAll('.filter-select').forEach(select => {
+      select.style.display = 'none';
+      select.offsetHeight; // Force reflow
+      select.style.display = '';
+    });
+  }, 100);
 },
+
 
 renderList(type){
 const list=document.getElementById('list'+type.charAt(0).toUpperCase()+type.slice(1));
