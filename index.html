@@ -882,6 +882,25 @@ margin-bottom:15px;
 </a>
 </div>
 
+<!-- زر تفعيل الاشتراك -->
+<div class="settings-card" style="margin-bottom:20px;">
+<h3 style="color:#1976d2;margin-bottom:15px;">🔑 تفعيل الاشتراك</h3>
+<p style="color:#666;margin-bottom:15px;">أدخل كود الاشتراك لتفعيل التطبيق لمدة سنة كاملة</p>
+
+<input 
+  type="text" 
+  id="activationCodeInput" 
+  placeholder="أدخل الكود (مثال: SK-2025-ABC123)"
+  style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
+
+<button 
+  onclick="app.activateSubscription()" 
+  style="width:100%;padding:15px;background:#4caf50;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">
+  ✅ تفعيل الاشتراك الآن
+</button>
+</div>
+
+    
 <!-- معلومات المطور -->
 <div class="developer-info">
 <div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
