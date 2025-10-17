@@ -1123,7 +1123,6 @@ init(){
   this.updateAllStats();
   this.setupRealtimeSync();
   this.checkOnlineStatus(); 
-
   
   // إضافة حدث الضغط على الأيقونة
   const badge = document.getElementById('subscriptionBadge');
@@ -1133,7 +1132,9 @@ init(){
     };
     badge.style.cursor = 'pointer';
   }
-    // كشف حالة الاتصال
+},
+
+// كشف حالة الاتصال (دالة منفصلة خارج init)
 checkOnlineStatus(){
   const updateOnlineStatus = () => {
     const statusBadge = document.getElementById('subscriptionBadge');
@@ -1152,6 +1153,7 @@ checkOnlineStatus(){
   window.addEventListener('offline', updateOnlineStatus);
   updateOnlineStatus();
 },
+
 
 // حفظ البيانات المعلقة للمزامنة
 savePendingData(data){
