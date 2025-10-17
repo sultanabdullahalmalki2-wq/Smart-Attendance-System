@@ -145,6 +145,18 @@ text-align:center;
 border-radius:15px;
 margin:20px 0;
 }
+.app-logo{
+width:100px;
+height:100px;
+background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
+border-radius:22px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:0 auto 15px;
+font-size:50px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
 .subscription-price{
 font-size:48px;
 font-weight:700;
@@ -541,966 +553,211 @@ margin-bottom:15px;
     color: #333;
   }
 }
-/* ===== تصميم شاشة القفل متجاوب للجوال ===== */
-/* شاشة القفل المحسّنة - استخدم هذا فقط */
-#lockScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 99999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
 
-.lock-content {
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  box-sizing: border-box;
-}
-
-.lock-icon {
-  font-size: 50px;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.lock-title {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  text-align: center;
-  color: #333;
-}
-
-.lock-message {
-  font-size: 0.95rem;
-  margin-bottom: 20px;
-  line-height: 1.5;
-  text-align: center;
-  color: #666;
-}
-
-#lockScreen .price-box {
-  padding: 15px;
-  margin: 15px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  color: white;
-}
-
-#lockScreen .price-large {
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-#lockScreen .features-list {
-  margin: 15px 0;
-  list-style: none;
-  padding: 0;
-}
-
-#lockScreen .features-list li {
-  padding: 6px 0;
-  font-size: 0.9rem;
-}
-
-#lockScreen button {
-  width: 100%;
-  padding: 14px 20px;
-  font-size: 1.1rem;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-#lockScreen .warning-box {
-  padding: 12px;
-  margin: 15px 0;
-  font-size: 0.85rem;
-  background: #fff3cd;
-  border-radius: 8px;
-  color: #856404;
-}
-
-/* للشاشات الصغيرة */
-@media (max-width: 400px) {
-  .lock-content {
-    padding: 15px;
-    max-height: 85vh;
-  }
-  
-  .lock-icon {
-    font-size: 40px;
-  }
-  
-  .lock-title {
-    font-size: 1.3rem;
-  }
-  
-  .lock-message {
-    font-size: 0.85rem;
-  }
-  
-  #lockScreen .price-large {
-    font-size: 2rem;
-  }
-  
-  #lockScreen button {
-    font-size: 1rem;
-    padding: 12px 15px;
-  }
-}
-
-/* للشاشات الأفقية */
-@media (max-height: 600px) and (orientation: landscape) {
-  .lock-content {
-    max-height: 95vh;
-    padding: 10px 20px;
-  }
-  
-  .lock-icon {
-    font-size: 35px;
-    margin-bottom: 10px;
-  }
-  
-  #lockScreen .price-box {
-    padding: 10px;
-    margin: 10px 0;
-  }
-  
-  #lockScreen .features-list li {
-    padding: 4px 0;
-  }
-}
-
-
-.lock-content {
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  box-sizing: border-box;
-}
-
-.lock-icon {
-  font-size: 50px !important;
-  margin-bottom: 15px;
-}
-
-.lock-title {
-  font-size: 1.5rem !important;
-  margin-bottom: 10px;
-}
-
-.lock-message {
-  font-size: 0.95rem !important;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-/* تصغير قسم العرض الخاص */
-#lockScreen [style*="gradient"] {
-  padding: 15px !important;
-  margin: 15px 0 !important;
-}
-
-#lockScreen h3 {
-  font-size: 1.2rem !important;
-  margin-bottom: 15px !important;
-}
-
-#lockScreen ul {
-  margin: 15px 0 !important;
-}
-
-#lockScreen li {
-  padding: 6px 0 !important;
-  font-size: 0.9rem !important;
-}
-
-/* تصغير عرض السعر */
-#lockScreen [style*="font-size: 52px"] {
-  font-size: 2.5rem !important;
-}
-
-#lockScreen [style*="font-size: 20px"] {
-  font-size: 1rem !important;
-}
-
-#lockScreen [style*="font-size: 18px"] {
-  font-size: 0.9rem !important;
-}
-
-/* الأزرار */
-#lockScreen button {
-  width: 100% !important;
-  padding: 14px 20px !important;
-  font-size: 1.1rem !important;
-  margin: 10px 0 !important;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* التحذير */
-#lockScreen [style*="background: #fff3cd"] {
-  padding: 12px !important;
-  margin: 15px 0 !important;
-  font-size: 0.85rem !important;
-}
-
-/* للشاشات الصغيرة جداً */
-@media (max-width: 400px) {
-  .lock-content {
-    padding: 15px;
-    max-height: 85vh;
-  }
-  
-  .lock-icon {
-    font-size: 40px !important;
-  }
-  
-  .lock-title {
-    font-size: 1.3rem !important;
-  }
-  
-  .lock-message {
-    font-size: 0.85rem !important;
-  }
-  
-  #lockScreen h3 {
-    font-size: 1rem !important;
-  }
-  
-  #lockScreen li {
-    font-size: 0.85rem !important;
-  }
-  
-  #lockScreen [style*="font-size: 52px"] {
-    font-size: 2rem !important;
-  }
-  
-  #lockScreen button {
-    font-size: 1rem !important;
-    padding: 12px 15px !important;
-  }
-}
-
-/* للشاشات الأفقية (landscape) */
-@media (max-height: 600px) and (orientation: landscape) {
-  .lock-content {
-    max-height: 95vh;
-    padding: 10px 20px;
-  }
-  
-  .lock-icon {
-    font-size: 35px !important;
-    margin-bottom: 10px;
-  }
-  
-  #lockScreen [style*="gradient"] {
-    padding: 10px !important;
-    margin: 10px 0 !important;
-  }
-  
-  #lockScreen ul {
-    margin: 10px 0 !important;
-  }
-  
-  #lockScreen li {
-    padding: 4px 0 !important;
-  }
-}
-
-/* ===== شاشة القفل الاحترافية ===== */
-#lockScreen, #paymentPage {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.lock-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(26,35,126,0.95) 0%, rgba(13,71,161,0.95) 100%);
-  backdrop-filter: blur(10px);
-}
-
-.lock-container, .payment-container {
-  position: relative;
-  z-index: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.lock-header {
-  text-align: center;
-  margin-bottom: 30px;
-  animation: fadeInDown 0.6s ease-out;
-}
-
-.lock-icon-main {
-  font-size: 70px;
-  margin-bottom: 15px;
-  animation: bounce 2s infinite;
-}
-
-.lock-main-title {
-  color: white;
-  font-size: 2rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.lock-subtitle {
-  color: rgba(255,255,255,0.9);
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.subscription-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: fadeInUp 0.6s ease-out 0.2s both;
-}
-
-.card-badge {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #333;
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 50px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-}
-
-.price-section {
-  text-align: center;
-  margin: 25px 0;
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 15px;
-}
-
-.old-price {
-  color: #999;
-  text-decoration: line-through;
-  font-size: 1.2rem;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.new-price-wrapper {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 10px;
-}
-
-.new-price {
-  font-size: 4rem;
-  font-weight: bold;
-  color: #1976d2;
-  line-height: 1;
-}
-
-.currency {
-  font-size: 1.5rem;
-  color: #1976d2;
-}
-
-.duration {
-  color: #666;
-  font-size: 1rem;
-  display: block;
-  margin-top: 5px;
-}
-
-.benefits-list {
-  margin: 25px 0;
-}
-
-.benefit-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.benefit-item:last-child {
-  border-bottom: none;
-}
-
-.benefit-icon {
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-
-.benefit-text {
-  color: #333;
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-.btn-subscribe-main {
-  width: 100%;
-  padding: 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(102,126,234,0.4);
-  transition: all 0.3s;
-  margin-top: 10px;
-}
-
-.btn-subscribe-main:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(102,126,234,0.5);
-}
-
-.btn-subscribe-main:active {
-  transform: translateY(0);
-}
-
-.guarantee {
-  text-align: center;
-  color: #666;
-  font-size: 0.85rem;
-  margin-top: 15px;
-}
-
-.warning-box {
-  background: rgba(255,243,205,0.95);
-  border-radius: 12px;
-  padding: 15px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 20px;
-  animation: fadeInUp 0.6s ease-out 0.4s both;
-}
-
-.warning-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.warning-content {
-  color: #856404;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-/* ===== صفحة الدفع ===== */
-.payment-container {
-  padding-top: 60px;
-}
-
-.btn-back {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255,255,255,0.2);
-  color: white;
-  border: 2px solid rgba(255,255,255,0.3);
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s;
-}
-
-.btn-back:hover {
-  background: rgba(255,255,255,0.3);
-}
-
-.payment-header {
-  text-align: center;
-  margin-bottom: 30px;
-  color: white;
-}
-
-.payment-icon {
-  font-size: 60px;
-  margin-bottom: 15px;
-}
-
-.payment-header h2 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-}
-
-.payment-subtitle {
-  font-size: 1rem;
-  opacity: 0.9;
-}
-
-.payment-methods {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 30px;
-}
-
-.payment-method {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.method-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.method-header:hover {
-  background: #f8f9fa;
-}
-
-.method-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.method-icon {
-  font-size: 1.8rem;
-}
-
-.method-name {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.method-arrow {
-  color: #999;
-  transition: transform 0.3s;
-}
-
-.method-details {
-  padding: 0 20px 20px;
-  animation: slideDown 0.3s ease-out;
-}
-
-.bank-info-card {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.info-row {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 15px;
-}
-
-.info-row:last-child {
-  margin-bottom: 0;
-}
-
-.info-label {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.info-value {
-  color: #333;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.iban-container {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.iban-input {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-family: monospace;
-  font-size: 0.95rem;
-}
-
-.btn-copy {
-  padding: 12px 20px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.btn-copy:hover {
-  background: #45a049;
-}
-
-.qr-section {
-  text-align: center;
-}
-
-.qr-section h4 {
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.qr-placeholder {
-  background: white;
-  border: 2px dashed #ddd;
-  border-radius: 12px;
-  padding: 40px;
-  color: #999;
-}
-
-.activation-section {
-  background: white;
-  border-radius: 15px;
-  padding: 25px;
-  margin-bottom: 20px;
-}
-
-.activation-section h3 {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.activation-hint {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
-}
-
-.activation-input-group {
-  display: flex;
-  gap: 10px;
-}
-
-.activation-input {
-  flex: 1;
-  padding: 14px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  text-transform: uppercase;
-}
-
-.btn-activate {
-  padding: 14px 25px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-activate:hover {
-  background: #45a049;
-}
-
-.support-section {
-  background: rgba(255,255,255,0.95);
-  border-radius: 15px;
-  padding: 20px;
-  text-align: center;
-}
-
-.support-section h4 {
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.support-contacts {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.support-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #333;
-  transition: background 0.3s;
-}
-
-.support-link:hover {
-  background: #e9ecef;
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 1000px;
-  }
-}
-
-@media (max-width: 480px) {
-  .lock-main-title {
-    font-size: 1.5rem;
-  }
-  
-  .new-price {
-    font-size: 3rem;
-  }
-  
-  .subscription-card {
-    padding: 20px;
-  }
-  
-  .benefit-text {
-    font-size: 0.9rem;
-  }
-  
-  .btn-subscribe-main {
-    font-size: 1rem;
-    padding: 15px;
-  }
-  
-  .activation-input-group {
-    flex-direction: column;
-  }
-  
-  .btn-activate {
-    width: 100%;
-  }
-}
-    
-    
 </style>
 </head>
     
 <body>
 <div class="container">
+<!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
+<div id="lockScreen" class="lock-screen" style="display:none">
+    <div class="lock-content">
+        <div class="lock-icon">🔒</div>
+        <h2 class="lock-title">انتهت الفترة التجريبية</h2>
+        <p class="lock-message">
+            شكراً لتجربة <strong>نظام الحضور الذكي</strong>!<br>
+            للاستمرار في استخدام جميع المميزات،<br>
+            يرجى الاشتراك أو إدخال كود التفعيل
+        </p>
 
-<!-- شاشة القفل الاحترافية -->
-<div id="lockScreen" style="display:none">
-  <div class="lock-overlay"></div>
-  <div class="lock-container">
-    
-    <div class="lock-header">
-      <div class="lock-icon-main">🔒</div>
-      <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
-      <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
+        <input 
+            type="text" 
+            id="activationCode" 
+            class="activation-input" 
+            placeholder="أدخل كود التفعيل"
+            maxlength="20">
+
+        <button class="btn btn-primary" onclick="app.activateSubscription()">
+            ✅ تفعيل الاشتراك
+        </button>
+<button class="btn btn-success" onclick="app.showPage('settings')" style="margin-top:10px">
+💳 الاشتراك الآن (100 ريال)
+</button>
+
+
+        <p style="font-size:13px;color:#999;margin-top:20px">
+            لم تحصل على الكود؟ 
+            <a href="https://wa.me/966533371147" style="color:#1976d2;text-decoration:none;font-weight:600">تواصل معنا</a>
+        </p>
     </div>
-    
-    <div class="subscription-card">
-      <div class="card-badge">عرض خاص 🎁</div>
-      
-      <div class="price-section">
-        <span class="old-price">99 ريال</span>
-        <div class="new-price-wrapper">
-          <span class="currency">ريال</span>
-          <span class="new-price">75</span>
-        </div>
-        <span class="duration">/ سنة كاملة</span>
-      </div>
-      
-      <div class="benefits-list">
-        <div class="benefit-item">
-          <span class="benefit-icon">✅</span>
-          <span class="benefit-text">استرجاع جميع بياناتك المحفوظة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">☁️</span>
-          <span class="benefit-text">نسخ احتياطي تلقائي في السحابة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">🔄</span>
-          <span class="benefit-text">تحديثات مجانية مدى الحياة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">💬</span>
-          <span class="benefit-text">دعم فني مجاني 24/7</span>
-        </div>
-      </div>
-      
-      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">
-        🚀 اشترك الآن واسترجع بياناتك
-      </button>
-      
-      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
-    </div>
-    
-    <div class="warning-box">
-      <span class="warning-icon">⚠️</span>
-      <div class="warning-content">
-        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong>
-      </div>
-    </div>
-    
-  </div>
 </div>
 
-<!-- صفحة معلومات الدفع -->
-<div id="paymentPage" style="display:none">
-  <div class="lock-overlay"></div>
-  <div class="payment-container">
-    
-    <button class="btn-back" onclick="app.hidePaymentPage()">← رجوع</button>
-    
-    <div class="payment-header">
-      <div class="payment-icon">💳</div>
-      <h2>معلومات الدفع</h2>
-      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
-    </div>
-    
-    <div class="payment-methods">
-      <div class="payment-method">
-        <div class="method-header" onclick="app.selectPaymentMethod('bank')">
-          <div class="method-info">
-            <span class="method-icon">🏦</span>
-            <span class="method-name">تحويل بنكي</span>
-          </div>
-          <span class="method-arrow">▼</span>
-        </div>
-        
-        <div class="method-details" id="bankDetails" style="display:none">
-          <div class="bank-info-card">
-            <div class="info-row">
-              <span class="info-label">البنك:</span>
-              <span class="info-value">مصرف الراجحي</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">الاسم:</span>
-              <span class="info-value">سلطان عبدالله المالكي</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">رقم الآيبان:</span>
-              <div class="iban-container">
-                <input type="text" id="ibanNumber" value="SA4780000381608010039716" readonly class="iban-input">
-                <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="payment-method">
-        <div class="method-header" onclick="app.contactWhatsApp()">
-          <div class="method-info">
-            <span class="method-icon">💚</span>
-            <span class="method-name">التواصل عبر واتساب</span>
-          </div>
-          <span class="method-arrow">→</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="activation-section">
-      <h3>🔑 لديك كود تفعيل؟</h3>
-      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
-      <div class="activation-input-group">
-        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
-        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
-      </div>
-    </div>
-    
-    <div class="support-section">
-      <h4>💬 بحاجة لمساعدة؟</h4>
-      <div class="support-contacts">
-        <a href="https://wa.me/966533371147" class="support-link" target="_blank">
-          <span>📱</span> واتساب: 966533371147
-        </a>
-      </div>
-    </div>
-    
-  </div>
-</div>
 
 <!-- الصفحة الرئيسية -->
 <div id="mainPage" class="page active">
-<!-- ... باقي الصفحات كما هي -->
+    
+<header>
+<h1>🎓 نظام الحضور الذكي</h1>
+    
+    <!-- أيقونة حالة الاشتراك -->
+<div id="subscriptionBadge" class="subscription-badge">
+  <div class="badge-icon">📦</div>
+  <div class="badge-text">
+    <span class="badge-days">30</span>
+    <span class="badge-label">يوم متبقي</span>
+  </div>
+</div>
+
+
+<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
+</header>
+<div class="content">
+<input type="text" id="searchInput" class="search-input" placeholder="ابحث عن طالب...">
+<ul id="studentsList" class="students-list"></ul>
+<div id="emptyState" style="text-align:center;padding:50px 20px;color:#999">
+<div style="font-size:60px">🔍</div>
+<div style="font-size:16px;margin-top:10px">استخدم البحث للعثور على طالب</div>
+</div>
+</div>
+</div>
+
+<!-- صفحة التأخرات -->
+<div id="delaysPage" class="page">
+<header>
+<h1>⏰ التأخرات</h1>
+<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
+</header>
+<div class="content">
+<div class="tabs">
+<button class="tab active" onclick="app.switchTab('delays','morning')">صباحي</button>
+<button class="tab" onclick="app.switchTab('delays','break')">فسحة</button>
+<button class="tab" onclick="app.switchTab('delays','departure')">انصراف</button>
+<button class="tab" onclick="app.switchTab('delays','view')">استعراض</button>
+</div>
+
+<div id="delayMorningTab" class="tab-content active">
+<input type="date" id="dateMorning" class="date-input">
+<input type="text" id="searchMorning" class="search-input" placeholder="ابحث عن طالب...">
+<div class="filters-container">
+<select id="classMorning" class="filter-select"><option value="">جميع الصفوف</option></select>
+<select id="classroomMorning" class="filter-select"><option value="">جميع الفصول</option></select>
+</div>
+<div id="countMorning" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
+<ul id="listMorning" class="students-list"></ul>
+</div>
+
+<div id="delayBreakTab" class="tab-content">
+<input type="date" id="dateBreak" class="date-input">
+<input type="text" id="searchBreak" class="search-input" placeholder="ابحث عن طالب...">
+<div class="filters-container">
+<select id="classBreak" class="filter-select"><option value="">جميع الصفوف</option></select>
+<select id="classroomBreak" class="filter-select"><option value="">جميع الفصول</option></select>
+</div>
+<div id="countBreak" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
+<ul id="listBreak" class="students-list"></ul>
+</div>
+
+<div id="delayDepartureTab" class="tab-content">
+<input type="date" id="dateDeparture" class="date-input">
+<input type="text" id="searchDeparture" class="search-input" placeholder="ابحث عن طالب...">
+<div class="filters-container">
+<select id="classDeparture" class="filter-select"><option value="">جميع الصفوف</option></select>
+<select id="classroomDeparture" class="filter-select"><option value="">جميع الفصول</option></select>
+</div>
+<div id="countDeparture" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
+<ul id="listDeparture" class="students-list"></ul>
+</div>
+
+<div id="delayViewTab" class="tab-content">
+<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
+<div id="delayViewList"></div>
+</div>
+
+<div id="delayActions" class="action-btns">
+<button class="btn btn-primary" onclick="app.confirmAction('saveDelay')">💾 حفظ</button>
+<button class="btn btn-success" onclick="app.confirmAction('saveAndSendDelay')">💾📤 حفظ وإرسال</button>
+<button class="btn btn-warning" onclick="app.confirmAction('sendDelay')">📤 إرسال</button>
+</div>
+</div>
+</div>
+
+<!-- صفحة الغياب -->
+<div id="absencesPage" class="page">
+<header class="absence">
+<h1>📅 الغياب</h1>
+<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
+</header>
+<div class="content">
+<div class="tabs">
+<button class="tab active" onclick="app.switchTab('absence','daily')">غياب يومي</button>
+<button class="tab" onclick="app.switchTab('absence','view')">استعراض</button>
+</div>
+
+<div id="absenceDailyTab" class="tab-content active">
+<input type="date" id="dateAbsence" class="date-input">
+<input type="text" id="searchAbsence" class="search-input" placeholder="ابحث عن طالب...">
+<div class="filters-container">
+<select id="classAbsence" class="filter-select"><option value="">جميع الصفوف</option></select>
+<select id="classroomAbsence" class="filter-select"><option value="">جميع الفصول</option></select>
+</div>
+<div id="countAbsence" class="selected-count absence hidden">تم اختيار <span>0</span> طالب</div>
+<ul id="listAbsence" class="students-list"></ul>
+</div>
+
+<div id="absenceViewTab" class="tab-content">
+<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
+<div id="absenceViewList"></div>
+</div>
+
+<div id="absenceActions" class="action-btns">
+<button class="btn btn-primary" onclick="app.confirmAction('saveAbsence')">💾 حفظ</button>
+<button class="btn btn-success" onclick="app.confirmAction('saveAndSendAbsence')">💾📤 حفظ وإرسال</button>
+<button class="btn btn-warning" onclick="app.confirmAction('sendAbsence')">📤 إرسال</button>
+</div>
+</div>
+</div>
+
+<!-- صفحة الملاحظات -->
+<div id="notesPage" class="page notes-page">
+<header class="notes">
+<h1>📝 الملاحظات</h1>
+<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
+</header>
+<div class="content">
+<div class="tabs">
+<button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
+<button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
+</div>
+
+<div id="noteAddTab" class="tab-content active">
+<div class="note-container">
+<label class="note-label">📝 اكتب الملاحظة:</label>
+<textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
+<div class="note-char-count"><span id="noteCharCount">0</span> / 500 حرف</div>
+</div>
+
+<input type="date" id="dateNote" class="date-input">
+<input type="text" id="searchNote" class="search-input" placeholder="ابحث عن طالب...">
+<div class="filters-container">
+<select id="classNote" class="filter-select"><option value="">جميع الصفوف</option></select>
+<select id="classroomNote" class="filter-select"><option value="">جميع الفصول</option></select>
+</div>
+<div id="countNote" class="selected-count notes hidden">تم اختيار <span>0</span> طالب</div>
+<ul id="listNote" class="students-list"></ul>
+</div>
+
+<div id="noteViewTab" class="tab-content">
+<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
+<div id="noteViewList"></div>
+</div>
+
+<div id="noteActions" class="action-btns">
+<button class="btn btn-notes" onclick="app.confirmAction('saveNote')">💾 حفظ</button>
+<button class="btn btn-success" onclick="app.confirmAction('saveAndSendNote')">💾📤 حفظ وإرسال</button>
+<button class="btn btn-warning" onclick="app.confirmAction('sendNote')">📤 إرسال</button>
+</div>
+</div>
+</div>
 
 <!-- ═══════════════════════════════════════
      صفحة الإحصائيات - أضف قبل صفحة الإعدادات
@@ -1672,7 +929,7 @@ margin-bottom:15px;
     <h2 style="font-size:24px;margin:10px 0">نظام الحضور الذكي</h2>
     <p style="opacity:0.95;font-size:15px">إدارة احترافية للحضور والغياب</p>
     <div class="subscription-price">
-        75 ر.س
+        100 ر.س
         <small>/ سنوياً</small>
     </div>
 </div>
@@ -1705,7 +962,7 @@ margin-bottom:15px;
 
 <div class="bank-info-row">
 <span class="bank-label">💰 المبلغ:</span>
-<span class="bank-value">75 ريال سعودي</span>
+<span class="bank-value">100 ريال سعودي</span>
 </div>
 </div>
 
@@ -1726,7 +983,7 @@ margin-bottom:15px;
 
 <div class="step-item">
 <div class="step-number">1</div>
-<div class="step-text">قم بتحويل المبلغ (75 ريال) عبر الآيبان أو الباركود أعلاه</div>
+<div class="step-text">قم بتحويل المبلغ (100 ريال) عبر الآيبان أو الباركود أعلاه</div>
 </div>
 
 <div class="step-item">
@@ -1803,9 +1060,9 @@ placeholder="أدخل كود التفعيل الذي حصلت عليه"
 <h3>ℹ️ معلومات التطبيق</h3>
 <p style="font-size:15px;line-height:1.7">
 <strong>الاسم:</strong> نظام الحضور الذكي<br>
-<strong>الإصدار:</strong> 4.0.0<br>
+<strong>الإصدار:</strong> 5.0.0<br>
 <strong>التحديث:</strong> أكتوبر 2025<br>
-<strong>الاشتراك:</strong> 75 ريال سنوياً
+<strong>الاشتراك:</strong> 100 ريال سنوياً
 </p>
 </div>
 
@@ -1873,7 +1130,6 @@ students:[],
 delays:{},
 absences:{},
 notes:{},
-subscriptions:{},
 selected:{morning:new Set(),break:new Set(),departure:new Set(),absence:new Set(),note:new Set()},
 currentTab:{delay:'morning',absence:'daily',notes:'add',stats:'daily'},
 
@@ -1881,7 +1137,6 @@ init() {
   this.loadData();
   this.setToday();
   if(!this.checkSubscription()) return;
-  this.checkExpiredTrials();
   this.setupEvents();
   this.renderStudents();
   this.loadLevelSettings();
@@ -1903,36 +1158,6 @@ init() {
     };
     badge.style.cursor = 'pointer';
   }
-},
-
-// دالة جديدة: إنشاء فترة تجريبية 7 أيام
-initTrialSubscription(){
-  const code = 'SK-TRIAL-' + Date.now();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 7); // ← 7 أيام فقط
-  
-  this.subscriptions[code] = {
-    active: true,
-    startDate: new Date().toISOString(),
-    endDate: endDate.toISOString(),
-    isTrial: true
-  };
-  
-  localStorage.setItem('activationCode', code);
-  this.saveData();
-  
-  this.showToast('🎉 مرحباً! لديك 7 أيام تجربة مجانية', 5000);
-  
-  return code;
-},
-
-getDeviceId(){
-  let deviceId = localStorage.getItem('deviceId');
-  if(!deviceId){
-    deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
-  }
-  return deviceId;
 },
 
 
@@ -2057,29 +1282,35 @@ database.ref('subscriptions/' + activationCode).once('value').then((snapshot) =>
 },
 
 saveData(){
-  // حفظ محلي
-  localStorage.setItem('students',JSON.stringify(this.students));
-  localStorage.setItem('delays',JSON.stringify(this.delays));
-  localStorage.setItem('absences',JSON.stringify(this.absences));
-  localStorage.setItem('notes',JSON.stringify(this.notes));
-  localStorage.setItem('subscriptions',JSON.stringify(this.subscriptions));
+  // حفظ محلياً أولاً
+  localStorage.setItem('students', JSON.stringify(this.students));
+  localStorage.setItem('delays', JSON.stringify(this.delays));
+  localStorage.setItem('absences', JSON.stringify(this.absences));
+  localStorage.setItem('notes', JSON.stringify(this.notes));
   
-  // نسخ احتياطي في Firebase
-  const code = localStorage.getItem('activationCode');
-  if(code && typeof database !== 'undefined'){
-    const deviceId = this.getDeviceId();
-    database.ref('backups/' + deviceId).set({
-      code: code,
-      students: this.students,
-      delays: this.delays,
-      absences: this.absences,
-      notes: this.notes,
-      lastBackup: new Date().toISOString(),
-      studentCount: this.students.length
-    }).catch(error => console.error('خطأ في النسخ الاحتياطي:', error));
+  // مزامنة مع Firebase
+  const activationCode = localStorage.getItem('activationCode');
+  if(activationCode && activationCode.startsWith('SK-')){
+    if(navigator.onLine){
+      database.ref('subscriptions/' + activationCode).set({
+        students: this.students,
+        delays: this.delays,
+        absences: this.absences,
+        notes: this.notes,
+        lastUpdate: Date.now()
+      }).catch((error) => {
+        console.log('خطأ في المزامنة:', error);
+      });
+    }else{
+      this.savePendingData({
+        students: this.students,
+        delays: this.delays,
+        absences: this.absences,
+        notes: this.notes
+      });
+    }
   }
 },
-
 
 
 setToday(){
@@ -2360,101 +1591,65 @@ this.updateActions();
 },
 
 confirmAction(action){
-  if(action==='saveDelay'||action==='saveAndSendDelay'||action==='sendDelay'){
-    const key=this.currentTab.delay;
-    const count=this.selected[key].size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    let msg='';
-    if(action==='saveDelay')msg=`هل تريد حفظ تأخر ${count} طالب؟`;
-    else if(action==='saveAndSendDelay')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveDelay'){
-        this.saveDelay();
-        this.clearSelection('delay');
-      }
-      else if(action==='saveAndSendDelay'){
-        this.saveDelay();
-        setTimeout(()=>{
-          this.sendDelay();
-          setTimeout(()=>this.clearSelection('delay'),1000);
-        },500);
-      }
-      else this.sendDelay();
-    });
-  }else if(action==='saveAbsence'||action==='saveAndSendAbsence'||action==='sendAbsence'){
-    const count=this.selected.absence.size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    let msg='';
-    if(action==='saveAbsence')msg=`هل تريد حفظ غياب ${count} طالب؟`;
-    else if(action==='saveAndSendAbsence')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveAbsence'){
-        this.saveAbsence();
-        this.clearSelection('absence');
-      }
-      else if(action==='saveAndSendAbsence'){
-        this.saveAbsence();
-        setTimeout(()=>{
-          this.sendAbsence();
-          setTimeout(()=>this.clearSelection('absence'),1000);
-        },500);
-      }
-      else this.sendAbsence();
-    });
-  }else if(action==='saveNote'||action==='saveAndSendNote'||action==='sendNote'){
-    const count=this.selected.note.size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    
-    // تحقق من الملاحظة فقط للحفظ أو الحفظ+الإرسال
-    if(action==='saveNote'||action==='saveAndSendNote'){
-      const noteText=document.getElementById('noteTextarea').value.trim();
-      if(!noteText)return this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
-    }
-    
-    let msg='';
-    if(action==='saveNote')msg=`هل تريد حفظ ملاحظة لـ ${count} طالب؟`;
-    else if(action==='saveAndSendNote')msg=`هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveNote'){
-        this.saveNote();
-        this.clearSelection('note');
-      }
-      else if(action==='saveAndSendNote'){
-        this.saveNote();
-        setTimeout(()=>{
-          this.sendNote();
-          setTimeout(()=>this.clearSelection('note'),1000);
-        },500);
-      }
-      else this.sendNote();
-    });
-  }else if(action==='reset'){
-    this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.',()=>this.resetApp());
-  }
+if(action==='saveDelay'||action==='saveAndSendDelay'||action==='sendDelay'){
+const key=this.currentTab.delay;
+const count=this.selected[key].size;
+if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+let msg='';
+if(action==='saveDelay')msg=`هل تريد حفظ تأخر ${count} طالب؟`;
+else if(action==='saveAndSendDelay')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
+else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
+this.showConfirm(msg,()=>{
+if(action==='saveDelay')this.saveDelay();
+else if(action==='saveAndSendDelay'){this.saveDelay();setTimeout(()=>this.sendDelay(),500);}
+else this.sendDelay();
+});
+}else if(action==='saveAbsence'||action==='saveAndSendAbsence'||action==='sendAbsence'){
+const count=this.selected.absence.size;
+if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+let msg='';
+if(action==='saveAbsence')msg=`هل تريد حفظ غياب ${count} طالب؟`;
+else if(action==='saveAndSendAbsence')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
+else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
+this.showConfirm(msg,()=>{
+if(action==='saveAbsence')this.saveAbsence();
+else if(action==='saveAndSendAbsence'){this.saveAbsence();setTimeout(()=>this.sendAbsence(),500);}
+else this.sendAbsence();
+});
+}else if(action==='saveNote'||action==='saveAndSendNote'||action==='sendNote'){
+const noteText=document.getElementById('noteTextarea').value.trim();
+if(!noteText)return this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
+const count=this.selected.note.size;
+if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
+let msg='';
+if(action==='saveNote')msg=`هل تريد حفظ ملاحظة لـ ${count} طالب؟`;
+else if(action==='saveAndSendNote')msg=`هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`;
+else msg=`هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
+this.showConfirm(msg,()=>{
+if(action==='saveNote')this.saveNote();
+else if(action==='saveAndSendNote'){this.saveNote();setTimeout(()=>this.sendNote(),500);}
+else this.sendNote();
+});
+}else if(action==='reset'){
+this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.',()=>this.resetApp());
+}
 },
 
-
 saveDelay(){
-  const key = this.currentTab.delay;
-  const T = key.charAt(0).toUpperCase() + key.slice(1);
-  const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA');
-  const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-  
-  this.selected[key].forEach(i => {
-    const civil = this.students[i].civil;
-    if(!this.delays[civil]) this.delays[civil] = [];
-    this.delays[civil].push({type: typeName, date});
-  });
-  
-  // لا تمسح selected هنا - سنمسحها بعد الإرسال
-  // this.selected[key].clear(); ← احذف هذا السطر
-  
-  this.renderList(key);
-  this.saveData();
-  this.showToast('✅ تم الحفظ');
+const key=this.currentTab.delay;
+const T=key.charAt(0).toUpperCase()+key.slice(1);
+const date=new Date(document.getElementById('date'+T).value).toLocaleDateString('ar-SA');
+const typeName=key==='morning'?'تأخر صباحي':key==='break'?'تأخر بعد الفسحة':'تأخر الانصراف';
+this.selected[key].forEach(i=>{
+const civil=this.students[i].civil;
+if(!this.delays[civil])this.delays[civil]=[];
+this.delays[civil].push({type:typeName,date});
+});
+this.selected[key].clear();
+this.renderList(key);
+this.saveData();
+this.updateActions();
+this.showToast('✅ تم الحفظ بنجاح');
 },
 
 saveAbsence(){
@@ -2464,7 +1659,7 @@ const civil=this.students[i].civil;
 if(!this.absences[civil])this.absences[civil]=[];
 this.absences[civil].push({date});
 });
-//this.selected.absence.clear();
+this.selected.absence.clear();
 this.renderList('absence');
 this.saveData();
 this.updateActions();
@@ -2472,30 +1667,20 @@ this.showToast('✅ تم الحفظ بنجاح');
 },
 
 saveNote(){
-  const noteText=document.getElementById('noteTextarea').value.trim();
-  
-  // تحقق من وجود نص
-  if(!noteText) {
-    this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
-    return;
-  }
-  
-  const date=new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
-  this.selected.note.forEach(i=>{
-    const civil=this.students[i].civil;
-    if(!this.notes[civil])this.notes[civil]=[];
-    this.notes[civil].push({text:noteText,date});
-  });
-  
-  // لا تمسح selected هنا - سيتم المسح في clearSelection بعد الإرسال
-  // this.selected.note.clear();
-  
-  document.getElementById('noteTextarea').value='';
-  document.getElementById('noteCharCount').textContent='0';
-  this.renderList('note');
-  this.saveData();
-  this.updateActions();
-  this.showToast('✅ تم حفظ الملاحظة بنجاح');
+const noteText=document.getElementById('noteTextarea').value.trim();
+const date=new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
+this.selected.note.forEach(i=>{
+const civil=this.students[i].civil;
+if(!this.notes[civil])this.notes[civil]=[];
+this.notes[civil].push({text:noteText,date});
+});
+this.selected.note.clear();
+document.getElementById('noteTextarea').value='';
+document.getElementById('noteCharCount').textContent='0';
+this.renderList('note');
+this.saveData();
+this.updateActions();
+this.showToast('✅ تم حفظ الملاحظة بنجاح');
 },
 
 sendDelay(){
@@ -2586,28 +1771,17 @@ sendAbsence(){
 },
 
 
- sendNote(){
+sendNote(){
+  const noteText = document.getElementById('noteTextarea').value.trim();
   const selected = Array.from(this.selected.note);
   
-  if(selected.length === 0) {
-    this.showToast('⚠️ لم يتم اختيار أي طالب');
+  if(!noteText) {
+    this.showToast('⚠️ الرجاء كتابة الملاحظة أولاً');
     return;
   }
   
-  // احصل على النص من آخر ملاحظة محفوظة أو من textarea
-  let noteText = document.getElementById('noteTextarea').value.trim();
-  
-  // إذا كان textarea فارغ، خذ النص من آخر ملاحظة محفوظة
-  if(!noteText && selected.length > 0) {
-    const firstStudent = this.students[selected[0]];
-    const civil = firstStudent.civil;
-    if(this.notes[civil] && this.notes[civil].length > 0) {
-      noteText = this.notes[civil][this.notes[civil].length - 1].text;
-    }
-  }
-  
-  if(!noteText) {
-    this.showToast('⚠️ لا توجد ملاحظة للإرسال');
+  if(selected.length === 0) {
+    this.showToast('⚠️ لم يتم اختيار أي طالب');
     return;
   }
   
@@ -2645,23 +1819,6 @@ sendAbsence(){
   
   this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
 },
-   
-    
-    clearSelection(type){
-  if(type === 'delay'){
-    const key = this.currentTab.delay;
-    this.selected[key].clear();
-    this.renderList(key);
-  } else if(type === 'absence'){
-    this.selected.absence.clear();
-    this.renderList('absence');
-  } else if(type === 'note'){
-    this.selected.note.clear();
-    this.renderList('note');
-  }
-  this.updateActions();
-},
-
 
 
 renderDelayView(){
@@ -2936,110 +2093,43 @@ subscription: {
 },
 
 // تحقق من حالة الاشتراك
-checkSubscription(){
-  let code = localStorage.getItem('activationCode');
-  
-  // إذا لم يوجد كود - أنشئ تجربة 7 أيام
-  if(!code){
-    code = this.initTrialSubscription();
-  }
-  
-  // تحميل الاشتراكات من localStorage
-  const storedSubs = localStorage.getItem('subscriptions');
-  if(storedSubs){
-    this.subscriptions = JSON.parse(storedSubs);
-  }
-  
-  const subscription = this.subscriptions[code];
-  
-  if(!subscription || !subscription.active){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-  
-  const days = this.calculateRemainingDays(subscription.endDate);
-  
-  // تنبيهات الفترة التجريبية
-  if(subscription.isTrial){
-    if(days === 2){
-      this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000);
-    } else if(days === 1){
-      this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000);
-    } else if(days === 0){
-      this.showToast('⚠️ انتهت الفترة التجريبية', 5000);
+checkSubscription() {
+    const firstUse = localStorage.getItem('firstUse');
+    const activationDate = localStorage.getItem('activationDate');
+    const now = new Date().getTime();
+
+    // إذا مفعّل
+    if (activationDate) {
+        const activated = parseInt(activationDate);
+        const daysLeft = Math.floor((activated + 365 * 24 * 60 * 60 * 1000 - now) / (24 * 60 * 60 * 1000));
+        if (daysLeft > 0) {
+            this.updateTrialBanner(daysLeft, true);
+            return true;
+        } else {
+            this.showLockScreen();
+            return false;
+        }
     }
-  }
-  
-  this.updateSubscriptionBadge(days);
-  
-  if(days <= 0){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-  
-  return true;
-},
 
-calculateRemainingDays(endDate){
-  const now = new Date();
-  const end = new Date(endDate);
-  const diff = end - now;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-},
-
-updateSubscriptionBadge(days){
-  const badge = document.getElementById('subscriptionBadge');
-  if(!badge) return;
-  
-  const daysEl = badge.querySelector('.badge-days');
-  const labelEl = badge.querySelector('.badge-label');
-  
-  if(daysEl) daysEl.textContent = days;
-  if(labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
-  
-  // تغيير اللون حسب الأيام المتبقية
-  badge.classList.remove('trial', 'warning', 'active');
-  if(days <= 3){
-    badge.classList.add('warning');
-  } else if(days <= 7){
-    badge.classList.add('trial');
-  } else {
-    badge.classList.add('active');
-  }
-},
-    async checkExpiredTrials(){
-  const deviceId = this.getDeviceId();
-  if(typeof database === 'undefined') return;
-  
-  try {
-    const code = localStorage.getItem('activationCode');
-    if(!code || !code.includes('TRIAL')) return;
-    
-    const subscription = this.subscriptions[code];
-    if(!subscription) return;
-    
-    const endDate = new Date(subscription.endDate);
-    const now = new Date();
-    const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
-    
-    // تحذير قبل الحذف بـ 5 أيام
-    if(daysSinceExpiry === 18){
-      this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
+    // إذا فترة تجريبية
+    if (!firstUse) {
+        localStorage.setItem('firstUse', now);
+        this.updateTrialBanner(this.subscription.trialDays, false);
+        return true;
     }
-    
-    // حذف بعد 30 يوم
-    if(daysSinceExpiry >= 23){
-      await database.ref('backups/' + deviceId).remove();
-      localStorage.clear();
-      alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.');
-      location.reload();
+
+    const first = parseInt(firstUse);
+    const elapsed = Math.floor((now - first) / (24 * 60 * 60 * 1000));
+    const remaining = this.subscription.trialDays - elapsed;
+
+    if (remaining > 0) {
+        this.updateTrialBanner(remaining, false);
+        return true;
+    } else {
+        this.showLockScreen();
+        return false;
     }
-  } catch(error){
-    console.error('خطأ في فحص التجارب:', error);
-  }
 },
-
-
 
 // تحديث بانر الأيام المتبقية
 
@@ -3100,57 +2190,29 @@ hideLockScreen() {
 
 // تفعيل الاشتراك
 activateSubscription(){
-  let code = document.getElementById('activationCode')?.value?.trim().toUpperCase();
-  
-  // إذا لم يوجد العنصر، جرب العنصر من صفحة الإعدادات
-  if(!code){
-    code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
-  }
-  
-  if(!code){
-    this.showToast('⚠️ الرجاء إدخال كود التفعيل');
-    return;
-  }
-  
-  if(!code.startsWith('SK-')){
-    this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-');
-    return;
-  }
-  
-  // حدد نوع الاشتراك
-  const isTrial = code.includes('TRIAL');
-  const endDate = new Date();
-  
-  if(isTrial){
-    endDate.setDate(endDate.getDate() + 7); // 7 أيام
-  } else {
-    endDate.setFullYear(endDate.getFullYear() + 1); // سنة كاملة
-  }
-  
-  this.subscriptions[code] = {
-    active: true,
-    startDate: new Date().toISOString(),
-    endDate: endDate.toISOString(),
-    isTrial: isTrial,
-    paid: !isTrial
-  };
-  
-  localStorage.setItem('activationCode', code);
-  localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-  this.saveData();
-  
-  // إخفاء شاشة القفل
-  document.getElementById('lockScreen').style.display = 'none';
-  
-  this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
-  
-  setTimeout(() => {
-    this.showPage('main');
-    location.reload();
-  }, 2000);
+const input=document.getElementById('activationCodeInput') || document.getElementById('activationCode');
+
+    if (!input) return;
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+        this.showToast('⚠️ يرجى إدخال كود التفعيل');
+        return;
+    }
+
+    // تحقق من صحة الكود (يبدأ بـ SK-)
+    if (!code.startsWith('SK-')) {
+        this.showToast('❌ كود غير صحيح');
+        return;
+    }
+
+    // حفظ تاريخ التفعيل (سنة كاملة من الآن)
+    const now = new Date().getTime();
+    localStorage.setItem('activationDate', now);
+    localStorage.setItem('activationCode', code);
+    this.hideLockScreen();
+    this.showToast('🎉 تم تفعيل الاشتراك بنجاح!');
+    this.checkSubscription();
 },
-
-
 
 // إضافة كود تفعيل جديد (للمطور)
 addActivationCode(code) {
@@ -3379,10 +2441,6 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
 
     
 </script>
-<button onclick="document.getElementById('lockScreen').style.display='flex'" 
-        style="position:fixed; bottom:20px; right:20px; z-index:999999; background:#f44336; color:white; border:none; padding:20px; border-radius:50%; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,0.4); cursor:pointer;">
-  🔒
-</button>
 
 </body>
 </html>
