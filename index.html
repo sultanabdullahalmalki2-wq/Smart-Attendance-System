@@ -1130,6 +1130,7 @@ students:[],
 delays:{},
 absences:{},
 notes:{},
+subscriptions:{},
 selected:{morning:new Set(),break:new Set(),departure:new Set(),absence:new Set(),note:new Set()},
 currentTab:{delay:'morning',absence:'daily',notes:'add',stats:'daily'},
 
@@ -2197,10 +2198,16 @@ checkSubscription(){
     code = this.initTrialSubscription();
   }
   
+  // تحميل الاشتراكات من localStorage
+  const storedSubs = localStorage.getItem('subscriptions');
+  if(storedSubs){
+    this.subscriptions = JSON.parse(storedSubs);
+  }
+  
   const subscription = this.subscriptions[code];
   
   if(!subscription || !subscription.active){
-    this.showPage('lock');
+    document.getElementById('lockScreen').style.display = 'flex';
     return false;
   }
   
@@ -2220,11 +2227,39 @@ checkSubscription(){
   this.updateSubscriptionBadge(days);
   
   if(days <= 0){
-    this.showPage('lock');
+    document.getElementById('lockScreen').style.display = 'flex';
     return false;
   }
   
   return true;
+},
+
+calculateRemainingDays(endDate){
+  const now = new Date();
+  const end = new Date(endDate);
+  const diff = end - now;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+},
+
+updateSubscriptionBadge(days){
+  const badge = document.getElementById('subscriptionBadge');
+  if(!badge) return;
+  
+  const daysEl = badge.querySelector('.badge-days');
+  const labelEl = badge.querySelector('.badge-label');
+  
+  if(daysEl) daysEl.textContent = days;
+  if(labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
+  
+  // تغيير اللون حسب الأيام المتبقية
+  badge.classList.remove('trial', 'warning', 'active');
+  if(days <= 3){
+    badge.classList.add('warning');
+  } else if(days <= 7){
+    badge.classList.add('trial');
+  } else {
+    badge.classList.add('active');
+  }
 },
 
 
@@ -2287,7 +2322,12 @@ hideLockScreen() {
 
 // تفعيل الاشتراك
 activateSubscription(){
-  const code = document.getElementById('activationInput').value.trim().toUpperCase();
+  let code = document.getElementById('activationCode')?.value?.trim().toUpperCase();
+  
+  // إذا لم يوجد العنصر، جرب العنصر من صفحة الإعدادات
+  if(!code){
+    code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
+  }
   
   if(!code){
     this.showToast('⚠️ الرجاء إدخال كود التفعيل');
@@ -2318,15 +2358,20 @@ activateSubscription(){
   };
   
   localStorage.setItem('activationCode', code);
+  localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
   this.saveData();
+  
+  // إخفاء شاشة القفل
+  document.getElementById('lockScreen').style.display = 'none';
   
   this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
   
   setTimeout(() => {
-    this.showPage('students');
+    this.showPage('main');
     location.reload();
   }, 2000);
 },
+
 
 
 // إضافة كود تفعيل جديد (للمطور)
