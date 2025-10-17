@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>نظام الحضور الذكي  v4.0</title>
+<title>نظام الحضور الذكي v4.0</title>
     
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -24,14 +24,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <style>
+/* =================== Base & Reset =================== */
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333;-webkit-font-smoothing:antialiased}
 .container{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;padding-bottom:70px}
+
+/* =================== Headers =================== */
 header{background:linear-gradient(135deg,#1976d2 0%,#1565c0 100%);color:white;padding:22px;text-align:center;position:sticky;top:0;z-index:100}
 header.absence{background:linear-gradient(135deg,#d32f2f 0%,#c62828 100%)}
 header.notes{background:linear-gradient(135deg,#00897b 0%,#00796b 100%)}
 header h1{font-size:22px;font-weight:600;letter-spacing:0.3px}
 header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
+
+/* =================== Content & Inputs =================== */
 .content{padding:20px}
 .search-input{width:100%;padding:16px;border:2px solid #e0e0e0;border-radius:12px;font-size:17px;font-family:inherit;margin:12px 0;font-weight:500}
 .search-input:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1)}
@@ -42,8 +47,10 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .note-textarea:focus{outline:none;border-color:#00897b;box-shadow:0 0 0 3px rgba(0,137,123,0.1)}
 .note-char-count{text-align:left;font-size:13px;color:#666;margin-top:6px;font-weight:600}
 .filters-container{display:flex;gap:12px;margin:15px 0}
-.filter-select{flex:1;padding:14px 12px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;font-family:inherit;background:white;cursor:pointer;font-weight:500}
+.filter-select{flex:1;padding:14px 12px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;font-family:inherit;background:white;cursor:pointer;font-weight:500;-webkit-appearance: menulist;appearance: menulist;min-height: 44px;}
 .filter-select:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1)}
+
+/* =================== Components =================== */
 .students-list{list-style:none;padding:0}
 .student-item{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin:12px 0;cursor:pointer;transition:all 0.3s}
 .student-item:active{transform:translateY(2px)}
@@ -104,6 +111,8 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .action-btns.show{display:flex}
 .action-btns .btn{margin:0;padding:13px;font-size:15px}
 .hidden{display:none}
+
+/* =================== Stats Page =================== */
 .stats-page{background:#f5f5f5}
 .stats-card{background:white;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 2px 4px rgba(0,0,0,0.08)}
 .stats-card h3{font-size:18px;font-weight:600;color:#333;margin-bottom:15px;border-bottom:2px solid #e0e0e0;padding-bottom:10px}
@@ -136,528 +145,243 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .percentage-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:700;color:#1976d2}
 .settings-card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:22px;margin:16px 0}
 .settings-card h3{margin-bottom:12px;font-size:18px;font-weight:600}
-/* CSS للاشتراك والدعم */
-.subscription-hero{
-background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-color:white;
-padding:30px;
-text-align:center;
-border-radius:15px;
-margin:20px 0;
-}
-.app-logo{
-width:100px;
-height:100px;
-background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
-border-radius:22px;
-display:flex;
-align-items:center;
-justify-content:center;
-margin:0 auto 15px;
-font-size:50px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-.subscription-price{
-font-size:48px;
-font-weight:700;
-margin:15px 0;
-}
-.subscription-price small{
-font-size:18px;
-opacity:0.9;
-}
-.payment-card{
-background:white;
-border-radius:15px;
-padding:25px;
-margin:20px 0;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-border:2px solid #e0e0e0;
-}
-.payment-card h3{
-color:#1976d2;
-font-size:20px;
-margin-bottom:20px;
-display:flex;
-align-items:center;
-gap:10px;
-}
-.bank-info{
-background:#f8f9fa;
-padding:18px;
-border-radius:10px;
-margin:15px 0;
-border-right:4px solid #1976d2;
-}
-.bank-info-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin:12px 0;
-padding:10px 0;
-border-bottom:1px solid #e0e0e0;
-}
-.bank-info-row:last-child{
-border-bottom:none;
-}
-.bank-label{
-font-weight:600;
-color:#666;
-font-size:14px;
-}
-.bank-value{
-font-weight:700;
-color:#1976d2;
-font-size:15px;
-direction:ltr;
-text-align:left;
-}
-.copy-btn{
-background:#4caf50;
-color:white;
-border:none;
-padding:6px 12px;
-border-radius:6px;
-font-size:12px;
-cursor:pointer;
-margin-right:8px;
-font-weight:600;
-}
-.copy-btn:active{
-transform:scale(0.95);
-}
-.qr-container{
-text-align:center;
-padding:20px;
-background:#f8f9fa;
-border-radius:10px;
-margin:15px 0;
-}
-.qr-code{
-width:200px;
-height:200px;
-margin:15px auto;
-border:3px solid #1976d2;
-border-radius:10px;
-padding:10px;
-background:white;
-}
-.qr-code img{
-width:100%;
-height:100%;
-object-fit:contain;
-}
-.activation-steps{
-background:#e3f2fd;
-padding:20px;
-border-radius:10px;
-margin:20px 0;
-}
-.activation-steps h4{
-color:#1976d2;
-margin-bottom:15px;
-font-size:18px;
-}
-.step-item{
-display:flex;
-align-items:flex-start;
-margin:15px 0;
-}
-.step-number{
-background:#1976d2;
-color:white;
-width:30px;
-height:30px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:700;
-font-size:14px;
-margin-left:12px;
-flex-shrink:0;
-}
-.step-text{
-flex:1;
-font-size:15px;
-line-height:1.6;
-color:#333;
-}
-.developer-info{
-background:#f5f5f5;
-padding:20px;
-border-radius:10px;
-text-align:center;
-margin:20px 0;
-border:2px solid #e0e0e0;
-}
-.developer-name{
-font-size:18px;
-font-weight:600;
-color:#333;
-margin:10px 0;
-}
-.developer-role{
-color:#666;
-font-size:14px;
-margin-bottom:15px;
-}
 .settings-card p{color:#666;font-size:15px;margin-bottom:16px;line-height:1.6}
-.app-logo {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #0A84FF 0%, #5AC8FA 100%);
-    border-radius: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-    box-shadow: 0 10px 30px rgba(10, 132, 255, 0.3),
-                0 5px 15px rgba(10, 132, 255, 0.2);
-    position: relative;
-    overflow: hidden;
-}
 
-.app-logo::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-}
-
-.app-logo-icon {
-    font-size: 50px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-/* CSS الخاص بنظام الفترة التجريبية */
-.lock-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.lock-content {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.lock-icon {
-    font-size: 60px;
-    margin-bottom: 20px;
-}
-
-.lock-title {
-    font-size: 24px;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-.lock-message {
-    font-size: 16px;
-    margin-bottom: 25px;
-    color: #666;
-    line-height: 1.5;
-}
-
-.activation-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.trial-banner {
-    background: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
-    color: #333;
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 16px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
-.trial-banner.warning {
-    background: linear-gradient(135deg, #ff5722 0%, #f44336 100%);
-    color: white;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
+/* =================== Subscription & Payment UI =================== */
+.subscription-hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center;border-radius:15px;margin:20px 0}
+.app-logo{width:100px;height:100px;background:linear-gradient(135deg,#0A84FF 0%,#5AC8FA 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;box-shadow:0 10px 30px rgba(10,132,255,0.3),0 5px 15px rgba(10,132,255,0.2);position:relative;overflow:hidden}
+.app-logo::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)}
+.app-logo-icon{font-size:50px;position:relative;z-index:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2))}
+.subscription-price{font-size:48px;font-weight:700;margin:15px 0}
+.subscription-price small{font-size:18px;opacity:0.9}
+.payment-card{background:white;border-radius:15px;padding:25px;margin:20px 0;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:2px solid #e0e0e0}
+.payment-card h3{color:#1976d2;font-size:20px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.bank-info{background:#f8f9fa;padding:18px;border-radius:10px;margin:15px 0;border-right:4px solid #1976d2}
+.bank-info-row{display:flex;justify-content:space-between;align-items:center;margin:12px 0;padding:10px 0;border-bottom:1px solid #e0e0e0}
+.bank-info-row:last-child{border-bottom:none}
+.bank-label{font-weight:600;color:#666;font-size:14px}
+.bank-value{font-weight:700;color:#1976d2;font-size:15px;direction:ltr;text-align:left}
+.copy-btn{background:#4caf50;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:8px;font-weight:600}
+.copy-btn:active{transform:scale(0.95)}
+.qr-container{text-align:center;padding:20px;background:#f8f9fa;border-radius:10px;margin:15px 0}
+.qr-code{width:200px;height:200px;margin:15px auto;border:3px solid #1976d2;border-radius:10px;padding:10px;background:white}
+.qr-code img{width:100%;height:100%;object-fit:contain}
+.activation-steps{background:#e3f2fd;padding:20px;border-radius:10px;margin:20px 0}
+.activation-steps h4{color:#1976d2;margin-bottom:15px;font-size:18px}
+.step-item{display:flex;align-items:flex-start;margin:15px 0}
+.step-number{background:#1976d2;color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-left:12px;flex-shrink:0}
+.step-text{flex:1;font-size:15px;line-height:1.6;color:#333}
+.developer-info{background:#f5f5f5;padding:20px;border-radius:10px;text-align:center;margin:20px 0;border:2px solid #e0e0e0}
+.developer-name{font-size:18px;font-weight:600;color:#333;margin:10px 0}
+.developer-role{color:#666;font-size:14px;margin-bottom:15px}
 .whatsapp-link{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:white;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;margin-top:10px}
 .whatsapp-link:active{transform:scale(0.97)}
 
-.app-logo {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #0A84FF 0%, #5AC8FA 100%);
-    border-radius: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-    box-shadow: 0 10px 30px rgba(10, 132, 255, 0.3),
-                0 5px 15px rgba(10, 132, 255, 0.2);
-    position: relative;
-    overflow: hidden;
+/* =================== Subscription Badge =================== */
+.subscription-badge{position:fixed;top:15px;right:15px;background:white;border-radius:12px;padding:10px 15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;z-index:1000;animation:slideInRight 0.5s ease;cursor:pointer}
+.badge-icon{font-size:24px;line-height:1}
+.badge-text{display:flex;flex-direction:column;line-height:1.2}
+.badge-days{font-size:18px;font-weight:700;color:#333}
+.badge-label{font-size:11px;color:#666}
+.subscription-badge.trial{border-left:4px solid #ff9800}
+.subscription-badge.active{border-left:4px solid #4caf50}
+.subscription-badge.warning{border-left:4px solid #f44336;animation:pulse 2s infinite}
+
+/* =================== Lock Screen & Payment Page =================== */
+#lockScreen, #paymentPage{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.lock-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg, rgba(26,35,126,0.95) 0%, rgba(13,71,161,0.95) 100%);backdrop-filter:blur(10px)}
+.lock-container, .payment-container{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.lock-header{text-align:center;margin-bottom:30px;animation:fadeInDown 0.6s ease-out}
+.lock-icon-main{font-size:70px;margin-bottom:15px;animation:bounce 2s infinite}
+.lock-main-title{color:white;font-size:2rem;margin-bottom:10px;font-weight:bold}
+.lock-subtitle{color:rgba(255,255,255,0.9);font-size:1.1rem;margin:0}
+.subscription-card{background:white;border-radius:20px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:fadeInUp 0.6s ease-out 0.2s both}
+.card-badge{background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;display:inline-block;padding:8px 20px;border-radius:50px;font-weight:bold;font-size:0.9rem;margin-bottom:20px}
+.price-section{text-align:center;margin:25px 0;padding:20px;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);border-radius:15px}
+.old-price{color:#999;text-decoration:line-through;font-size:1.2rem;display:block;margin-bottom:10px}
+.new-price-wrapper{display:flex;align-items:baseline;justify-content:center;gap:10px}
+.new-price{font-size:4rem;font-weight:bold;color:#1976d2;line-height:1}
+.currency{font-size:1.5rem;color:#1976d2}
+.duration{color:#666;font-size:1rem;display:block;margin-top:5px}
+.benefits-list{margin:25px 0}
+.benefit-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.benefit-item:last-child{border-bottom:none}
+.benefit-icon{font-size:1.3rem;flex-shrink:0}
+.benefit-text{color:#333;font-size:1rem;line-height:1.4}
+.btn-subscribe-main{width:100%;padding:18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:12px;font-size:1.2rem;font-weight:bold;cursor:pointer;box-shadow:0 10px 30px rgba(102,126,234,0.4);transition:all 0.3s;margin-top:10px}
+.btn-subscribe-main:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(102,126,234,0.5)}
+.btn-subscribe-main:active{transform:translateY(0)}
+.guarantee{text-align:center;color:#666;font-size:0.85rem;margin-top:15px}
+.warning-box{background:rgba(255,243,205,0.95);border-radius:12px;padding:15px;display:flex;align-items:flex-start;gap:12px;margin-top:20px;animation:fadeInUp 0.6s ease-out 0.4s both}
+.warning-icon{font-size:1.5rem;flex-shrink:0}
+.warning-content{color:#856404;font-size:0.9rem;line-height:1.5}
+.payment-container{padding-top:60px}
+.btn-back{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.3);padding:10px 20px;border-radius:8px;font-size:1rem;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.3s}
+.btn-back:hover{background:rgba(255,255,255,0.3)}
+.payment-header{text-align:center;margin-bottom:30px;color:white}
+.payment-icon{font-size:60px;margin-bottom:15px}
+.payment-header h2{font-size:2rem;margin-bottom:10px}
+.payment-subtitle{font-size:1rem;opacity:0.9}
+.payment-methods{display:flex;flex-direction:column;gap:15px;margin-bottom:30px}
+.payment-method{background:white;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.method-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:background 0.3s}
+.method-header:hover{background:#f8f9fa}
+.method-info{display:flex;align-items:center;gap:15px}
+.method-icon{font-size:1.8rem}
+.method-name{font-size:1.1rem;font-weight:bold;color:#333}
+.method-arrow{color:#999;transition:transform 0.3s}
+.method-details{padding:0 20px 20px;animation:slideDown 0.3s ease-out}
+.bank-info-card{background:#f8f9fa;border-radius:12px;padding:20px;margin-bottom:20px}
+.info-row{display:flex;flex-direction:column;gap:5px;margin-bottom:15px}
+.info-row:last-child{margin-bottom:0}
+.info-label{color:#666;font-size:0.9rem}
+.info-value{color:#333;font-size:1.1rem;font-weight:bold}
+.iban-container{display:flex;gap:10px;margin-top:10px}
+.iban-input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-family:monospace;font-size:0.95rem}
+.qr-section{text-align:center}
+.qr-section h4{margin-bottom:15px;color:#333}
+.qr-placeholder{background:white;border:2px dashed #ddd;border-radius:12px;padding:40px;color:#999}
+.activation-section{background:white;border-radius:15px;padding:25px;margin-bottom:20px}
+.activation-section h3{margin-bottom:10px;color:#333}
+.activation-hint{color:#666;font-size:0.9rem;margin-bottom:15px}
+.activation-input-group{display:flex;gap:10px}
+.activation-input{flex:1;padding:14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1rem;text-transform:uppercase}
+.btn-activate{padding:14px 25px;background:#4CAF50;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;transition:background 0.3s}
+.btn-activate:hover{background:#45a049}
+.support-section{background:rgba(255,255,255,0.95);border-radius:15px;padding:20px;text-align:center}
+.support-section h4{margin-bottom:15px;color:#333}
+.support-contacts{display:flex;flex-direction:column;gap:10px}
+.support-link{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#f8f9fa;border-radius:8px;text-decoration:none;color:#333;transition:background 0.3s}
+.support-link:hover{background:#e9ecef}
+
+/* =================== Animations =================== */
+@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:1000px}}
+
+/* =================== Responsive =================== */
+@media (max-width: 768px){
+  .subscription-badge{top:10px;right:10px;padding:8px 12px}
+  .badge-icon{font-size:20px}
+  .badge-days{font-size:16px}
+  .badge-label{font-size:10px}
 }
-
-.app-logo::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+@media (max-width: 480px){
+  .lock-main-title{font-size:1.5rem}
+  .new-price{font-size:3rem}
+  .subscription-card{padding:20px}
+  .benefit-text{font-size:0.9rem}
+  .btn-subscribe-main{font-size:1rem;padding:15px}
+  .activation-input-group{flex-direction:column}
+  .btn-activate{width:100%}
 }
-
-.app-logo-icon {
-    font-size: 50px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-/* أيقونة حالة الاشتراك */
-.subscription-badge{
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  background: white;
-  border-radius: 12px;
-  padding: 10px 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 1000;
-  animation: slideInRight 0.5s ease;
-}
-
-.badge-icon{
-  font-size: 24px;
-  line-height: 1;
-}
-
-.badge-text{
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.badge-days{
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
-}
-
-.badge-label{
-  font-size: 11px;
-  color: #666;
-}
-
-/* حالات مختلفة */
-.subscription-badge.trial{
-  border-left: 4px solid #ff9800;
-}
-
-.subscription-badge.active{
-  border-left: 4px solid #4caf50;
-}
-
-.subscription-badge.warning{
-  border-left: 4px solid #f44336;
-  animation: pulse 2s infinite;
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-/* للجوال */
-@media (max-width: 768px) {
-  .subscription-badge{
-    top: 10px;
-    right: 10px;
-    padding: 8px 12px;
-  }
-  .badge-icon{
-    font-size: 20px;
-  }
-  .badge-days{
-    font-size: 16px;
-  }
-  .badge-label{
-    font-size: 10px;
-  }
-}
-
-
-/* إصلاح مشاكل Select في iOS Safari */
-.filter-select {
-  -webkit-appearance: menulist;
-  appearance: menulist;
-  min-height: 44px; /* الحد الأدنى لمنطقة اللمس في iOS */
-}
-
-/* إصلاح مشاكل PWA */
-@supports (-webkit-touch-callout: none) {
-  .filter-select {
-    background-color: white !important;
-    border: 2px solid #e0e0e0 !important;
-  }
-  
-  .filter-select option {
-    background-color: white;
-    color: #333;
-  }
-}
-
 </style>
 </head>
     
 <body>
 <div class="container">
-<!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
-<div id="lockScreen" class="lock-screen" style="display:none">
-    <div class="lock-content">
-        <div class="lock-icon">🔒</div>
-        <h2 class="lock-title">انتهت الفترة التجريبية</h2>
-        <p class="lock-message">
-    شكراً لتجربة <strong>نظام الحضور الذكي</strong>!<br>
-    لقد استمتعت بـ <strong>7 أيام</strong> تجربة مجانية<br>
-    للاستمرار واستعادة بياناتك، اشترك الآن
-</p>
 
-<!-- قسم عرض السعر (جديد) -->
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px; margin: 30px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-    <h3 style="font-size: 24px; margin-bottom: 20px; font-weight: bold;">🎁 عرض خاص لك!</h3>
-    
-    <!-- قائمة المميزات -->
-    <ul style="list-style: none; padding: 0; margin: 25px 0; text-align: right;">
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ استرجاع جميع بياناتك المحفوظة فوراً
-        </li>
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ نسخ احتياطي تلقائي في السحابة
-        </li>
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ تحديثات مجانية طوال السنة
-        </li>
-        <li style="padding: 10px 0; font-size: 17px;">
-            ✅ دعم فني مجاني على مدار الساعة
-        </li>
-    </ul>
-    
-    <!-- عرض السعر -->
-    <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
-        <div style="font-size: 20px; margin-bottom: 10px; color: rgba(255,255,255,0.8);">
-            السعر العادي: <span style="text-decoration: line-through;">99 ريال</span>
-        </div>
-        <div style="font-size: 52px; font-weight: bold; color: #ffd700; text-shadow: 0 4px 8px rgba(0,0,0,0.3); margin: 15px 0;">
-            75 ريال
-        </div>
-        <div style="font-size: 18px; color: rgba(255,255,255,0.9);">
-            اشتراك سنة كاملة • وفّر 24 ريال
-        </div>
+<!-- شاشة القفل الاحترافية -->
+<div id="lockScreen" style="display:none">
+  <div class="lock-overlay"></div>
+  <div class="lock-container">
+    <div class="lock-header">
+      <div class="lock-icon-main">🔒</div>
+      <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
+      <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
     </div>
-    
-    <!-- زر الاشتراك -->
-    <button onclick="app.showSubscriptionInfo ? app.showSubscriptionInfo() : app.showPaymentDetails()" style="background: #ffd700; color: #333; border: none; padding: 18px 50px; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 8px 20px rgba(255,215,0,0.4); transition: all 0.3s; width: 100%; margin-top: 10px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        🚀 اشترك الآن واسترجع بياناتك
-    </button>
-    
-    <p style="margin-top: 15px; font-size: 14px; color: rgba(255,255,255,0.7);">
-        💡 ضمان استرجاع الأموال خلال 14 يوم
-    </p>
-</div>
-
-<!-- تنبيه حذف البيانات -->
-<div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; border-right: 4px solid #ffc107;">
-    <strong>⚠️ تحذير مهم:</strong><br>
-    سيتم حذف جميع بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
-</div>
-
-        <input 
-            type="text" 
-            id="activationCode" 
-            class="activation-input" 
-            placeholder="أدخل كود التفعيل"
-            maxlength="20">
-
-        <button class="btn btn-primary" onclick="app.activateSubscription()">
-            ✅ تفعيل الاشتراك
-        </button>
-<button class="btn btn-success" onclick="app.showPage('settings')" style="margin-top:10px">
-💳 الاشتراك الآن (75 ريال)
-</button>
-
-
-        <p style="font-size:13px;color:#999;margin-top:20px">
-            لم تحصل على الكود؟ 
-            <a href="https://wa.me/966533371147" style="color:#1976d2;text-decoration:none;font-weight:600">تواصل معنا</a>
-        </p>
+    <div class="subscription-card">
+      <div class="card-badge">عرض خاص 🎁</div>
+      <div class="price-section">
+        <span class="old-price">99 ريال</span>
+        <div class="new-price-wrapper">
+          <span class="currency">ريال</span>
+          <span class="new-price">75</span>
+        </div>
+        <span class="duration">/ سنة كاملة</span>
+      </div>
+      <div class="benefits-list">
+        <div class="benefit-item"><span class="benefit-icon">✅</span><span class="benefit-text">استرجاع جميع بياناتك المحفوظة</span></div>
+        <div class="benefit-item"><span class="benefit-icon">☁️</span><span class="benefit-text">نسخ احتياطي تلقائي في السحابة</span></div>
+        <div class="benefit-item"><span class="benefit-icon">🔄</span><span class="benefit-text">تحديثات مجانية مدى الحياة</span></div>
+        <div class="benefit-item"><span class="benefit-icon">💬</span><span class="benefit-text">دعم فني مجاني على مدار الساعة</span></div>
+      </div>
+      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">🚀 اشترك الآن واسترجع بياناتك</button>
+      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
     </div>
-</div>
-
-
-<!-- الصفحة الرئيسية -->
-<div id="mainPage" class="page active">
-    
-<header>
-<h1>🎓 نظام الحضور الذكي</h1>
-    
-    <!-- أيقونة حالة الاشتراك -->
-<div id="subscriptionBadge" class="subscription-badge">
-  <div class="badge-icon">📦</div>
-  <div class="badge-text">
-    <span class="badge-days">30</span>
-    <span class="badge-label">يوم متبقي</span>
+    <div class="warning-box">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-content"><strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية</div>
+    </div>
   </div>
 </div>
 
+<!-- صفحة معلومات الدفع -->
+<div id="paymentPage" style="display:none">
+  <div class="lock-overlay"></div>
+  <div class="payment-container">
+    <button class="btn-back" onclick="app.hidePaymentPage()">← رجوع</button>
+    <div class="payment-header">
+      <div class="payment-icon">💳</div>
+      <h2>معلومات الدفع</h2>
+      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
+    </div>
+    <div class="payment-methods">
+      <div class="payment-method" id="bankTransferSection">
+        <div class="method-header" onclick="app.selectPaymentMethod('bank')">
+          <div class="method-info"><span class="method-icon">🏦</span><span class="method-name">تحويل بنكي</span></div>
+          <span class="method-arrow">▼</span>
+        </div>
+        <div class="method-details" id="bankDetails" style="display:none">
+          <div class="bank-info-card">
+            <div class="info-row"><span class="info-label">البنك:</span><span class="info-value">مصرف الراجحي</span></div>
+            <div class="info-row"><span class="info-label">الاسم:</span><span class="info-value">سلطان عبدالله المالكي</span></div>
+            <div class="info-row">
+              <span class="info-label">رقم الآيبان:</span>
+              <div class="iban-container">
+                <input type="text" id="ibanNumber" value="SA4780000381608010039716" readonly class="iban-input">
+                <button onclick="app.copyText('SA4780000381608010039716')" class="btn-copy">📋 نسخ</button>
+              </div>
+            </div>
+          </div>
+          <div class="qr-section">
+            <h4>📱 أو امسح رمز QR</h4>
+            <div class="qr-placeholder"><p>QR Code هنا</p><small>استخدم تطبيق الراجحي المباشر</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="payment-method">
+        <div class="method-header" onclick="app.contactWhatsApp()">
+          <div class="method-info"><span class="method-icon">💚</span><span class="method-name">التواصل عبر واتساب</span></div>
+          <span class="method-arrow">→</span>
+        </div>
+      </div>
+    </div>
+    <div class="activation-section">
+      <h3>🔑 لديك كود تفعيل؟</h3>
+      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
+      <div class="activation-input-group">
+        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
+        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
+      </div>
+    </div>
+    <div class="support-section">
+      <h4>💬 بحاجة لمساعدة؟</h4>
+      <div class="support-contacts">
+        <a href="https://wa.me/966533371147" class="support-link" target="_blank"><span>📱</span> واتساب: 966533371147</a>
+        <a href="mailto:support@attendance.app" class="support-link"><span>📧</span> البريد: support@attendance.app</a>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- الصفحة الرئيسية -->
+<div id="mainPage" class="page active">
+<header>
+<h1>🎓 نظام الحضور الذكي</h1>
 <p>ذكاء في التنظيم… ووضوح في المتابعة</p>
 </header>
 <div class="content">
@@ -672,10 +396,7 @@ margin-bottom:15px;
 
 <!-- صفحة التأخرات -->
 <div id="delaysPage" class="page">
-<header>
-<h1>⏰ التأخرات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
+<header><h1>⏰ التأخرات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('delays','morning')">صباحي</button>
@@ -683,45 +404,31 @@ margin-bottom:15px;
 <button class="tab" onclick="app.switchTab('delays','departure')">انصراف</button>
 <button class="tab" onclick="app.switchTab('delays','view')">استعراض</button>
 </div>
-
 <div id="delayMorningTab" class="tab-content active">
 <input type="date" id="dateMorning" class="date-input">
 <input type="text" id="searchMorning" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classMorning" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomMorning" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
+<div class="filters-container"><select id="classMorning" class="filter-select"><option value="">جميع الصفوف</option></select><select id="classroomMorning" class="filter-select"><option value="">جميع الفصول</option></select></div>
 <div id="countMorning" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listMorning" class="students-list"></ul>
 </div>
-
 <div id="delayBreakTab" class="tab-content">
 <input type="date" id="dateBreak" class="date-input">
 <input type="text" id="searchBreak" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classBreak" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomBreak" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
+<div class="filters-container"><select id="classBreak" class="filter-select"><option value="">جميع الصفوف</option></select><select id="classroomBreak" class="filter-select"><option value="">جميع الفصول</option></select></div>
 <div id="countBreak" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listBreak" class="students-list"></ul>
 </div>
-
 <div id="delayDepartureTab" class="tab-content">
 <input type="date" id="dateDeparture" class="date-input">
 <input type="text" id="searchDeparture" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classDeparture" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomDeparture" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
+<div class="filters-container"><select id="classDeparture" class="filter-select"><option value="">جميع الصفوف</option></select><select id="classroomDeparture" class="filter-select"><option value="">جميع الفصول</option></select></div>
 <div id="countDeparture" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listDeparture" class="students-list"></ul>
 </div>
-
 <div id="delayViewTab" class="tab-content">
 <input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="delayViewList"></div>
 </div>
-
 <div id="delayActions" class="action-btns">
 <button class="btn btn-primary" onclick="app.confirmAction('saveDelay')">💾 حفظ</button>
 <button class="btn btn-success" onclick="app.confirmAction('saveAndSendDelay')">💾📤 حفظ وإرسال</button>
@@ -732,32 +439,23 @@ margin-bottom:15px;
 
 <!-- صفحة الغياب -->
 <div id="absencesPage" class="page">
-<header class="absence">
-<h1>📅 الغياب</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
+<header class="absence"><h1>📅 الغياب</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('absence','daily')">غياب يومي</button>
 <button class="tab" onclick="app.switchTab('absence','view')">استعراض</button>
 </div>
-
 <div id="absenceDailyTab" class="tab-content active">
 <input type="date" id="dateAbsence" class="date-input">
 <input type="text" id="searchAbsence" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classAbsence" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomAbsence" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
+<div class="filters-container"><select id="classAbsence" class="filter-select"><option value="">جميع الصفوف</option></select><select id="classroomAbsence" class="filter-select"><option value="">جميع الفصول</option></select></div>
 <div id="countAbsence" class="selected-count absence hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listAbsence" class="students-list"></ul>
 </div>
-
 <div id="absenceViewTab" class="tab-content">
 <input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="absenceViewList"></div>
 </div>
-
 <div id="absenceActions" class="action-btns">
 <button class="btn btn-primary" onclick="app.confirmAction('saveAbsence')">💾 حفظ</button>
 <button class="btn btn-success" onclick="app.confirmAction('saveAndSendAbsence')">💾📤 حفظ وإرسال</button>
@@ -768,38 +466,28 @@ margin-bottom:15px;
 
 <!-- صفحة الملاحظات -->
 <div id="notesPage" class="page notes-page">
-<header class="notes">
-<h1>📝 الملاحظات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
+<header class="notes"><h1>📝 الملاحظات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
 <button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
 </div>
-
 <div id="noteAddTab" class="tab-content active">
 <div class="note-container">
 <label class="note-label">📝 اكتب الملاحظة:</label>
 <textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
 <div class="note-char-count"><span id="noteCharCount">0</span> / 500 حرف</div>
 </div>
-
 <input type="date" id="dateNote" class="date-input">
 <input type="text" id="searchNote" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classNote" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomNote" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
+<div class="filters-container"><select id="classNote" class="filter-select"><option value="">جميع الصفوف</option></select><select id="classroomNote" class="filter-select"><option value="">جميع الفصول</option></select></div>
 <div id="countNote" class="selected-count notes hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listNote" class="students-list"></ul>
 </div>
-
 <div id="noteViewTab" class="tab-content">
 <input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="noteViewList"></div>
 </div>
-
 <div id="noteActions" class="action-btns">
 <button class="btn btn-notes" onclick="app.confirmAction('saveNote')">💾 حفظ</button>
 <button class="btn btn-success" onclick="app.confirmAction('saveAndSendNote')">💾📤 حفظ وإرسال</button>
@@ -808,15 +496,9 @@ margin-bottom:15px;
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     صفحة الإحصائيات - أضف قبل صفحة الإعدادات
-     ═══════════════════════════════════════ -->
-
+<!-- صفحة الإحصائيات -->
 <div id="statsPage" class="page stats-page">
-<header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
-<h1>📊 الإحصائيات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
+<header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"><h1>📊 الإحصائيات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('stats','daily')">اليومية</button>
@@ -824,320 +506,134 @@ margin-bottom:15px;
 <button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
 <button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
 </div>
-
 <div id="statsDailyTab" class="tab-content active">
-<div class="stats-card">
-<h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
+<div class="stats-card"><h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
 <div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="dailyTotal">0</div>
-<div class="stat-label">إجمالي الطلاب</div>
+<div class="stat-box info"><div class="stat-number" id="dailyTotal">0</div><div class="stat-label">إجمالي الطلاب</div></div>
+<div class="stat-box success"><div class="stat-number" id="dailyPresent">0</div><div class="stat-label">الحاضرون</div></div>
+<div class="stat-box danger"><div class="stat-number" id="dailyAbsent">0</div><div class="stat-label">الغائبون</div></div>
+<div class="stat-box warning"><div class="stat-number" id="dailyLate">0</div><div class="stat-label">المتأخرون</div></div>
 </div>
-<div class="stat-box success">
-<div class="stat-number" id="dailyPresent">0</div>
-<div class="stat-label">الحاضرون</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="dailyAbsent">0</div>
-<div class="stat-label">الغائبون</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="dailyLate">0</div>
-<div class="stat-label">المتأخرون</div>
+<div style="background:#e3f2fd;padding:20px;border-radius:10px;text-align:center;margin-top:15px"><div style="font-size:14px;color:#1976d2;margin-bottom:8px;font-weight:600">نسبة الحضور</div><div style="font-size:42px;font-weight:700;color:#1976d2" id="dailyPercentage">0%</div></div>
 </div>
 </div>
-<div style="background:#e3f2fd;padding:20px;border-radius:10px;text-align:center;margin-top:15px">
-<div style="font-size:14px;color:#1976d2;margin-bottom:8px;font-weight:600">نسبة الحضور</div>
-<div style="font-size:42px;font-weight:700;color:#1976d2" id="dailyPercentage">0%</div>
-</div>
-</div>
-</div>
-
 <div id="statsWeeklyTab" class="tab-content">
-<div class="stats-card">
-<h3>📊 إحصائيات الأسبوع</h3>
+<div class="stats-card"><h3>📊 إحصائيات الأسبوع</h3>
 <div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="weeklyDays">7</div>
-<div class="stat-label">أيام</div>
-</div>
-<div class="stat-box success">
-<div class="stat-number" id="weeklyAvgPresent">0</div>
-<div class="stat-label">متوسط الحضور</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="weeklyTotalAbsent">0</div>
-<div class="stat-label">إجمالي الغياب</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="weeklyTotalLate">0</div>
-<div class="stat-label">إجمالي التأخرات</div>
+<div class="stat-box info"><div class="stat-number" id="weeklyDays">7</div><div class="stat-label">أيام</div></div>
+<div class="stat-box success"><div class="stat-number" id="weeklyAvgPresent">0</div><div class="stat-label">متوسط الحضور</div></div>
+<div class="stat-box danger"><div class="stat-number" id="weeklyTotalAbsent">0</div><div class="stat-label">إجمالي الغياب</div></div>
+<div class="stat-box warning"><div class="stat-number" id="weeklyTotalLate">0</div><div class="stat-label">إجمالي التأخرات</div></div>
 </div>
 </div>
 </div>
-</div>
-
 <div id="statsMonthlyTab" class="tab-content">
-<div class="stats-card">
-<h3>📅 إحصائيات الشهر</h3>
+<div class="stats-card"><h3>📅 إحصائيات الشهر</h3>
 <div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="monthlyDays">30</div>
-<div class="stat-label">أيام الدراسة</div>
+<div class="stat-box info"><div class="stat-number" id="monthlyDays">30</div><div class="stat-label">أيام الدراسة</div></div>
+<div class="stat-box success"><div class="stat-number" id="monthlyAvgPresent">0</div><div class="stat-label">متوسط الحضور</div></div>
+<div class="stat-box danger"><div class="stat-number" id="monthlyTotalAbsent">0</div><div class="stat-label">إجمالي الغياب</div></div>
+<div class="stat-box warning"><div class="stat-number" id="monthlyTotalLate">0</div><div class="stat-label">إجمالي التأخرات</div></div>
 </div>
-<div class="stat-box success">
-<div class="stat-number" id="monthlyAvgPresent">0</div>
-<div class="stat-label">متوسط الحضور</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="monthlyTotalAbsent">0</div>
-<div class="stat-label">إجمالي الغياب</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="monthlyTotalLate">0</div>
-<div class="stat-label">إجمالي التأخرات</div>
+<div class="stats-card"><h3>🏆 الطلاب الأكثر غياباً</h3><div id="topAbsentList"></div></div>
 </div>
 </div>
-<div class="stats-card">
-<h3>🏆 الطلاب الأكثر غياباً</h3>
-<div id="topAbsentList"></div>
-</div>
-</div>
-</div>
-
 <div id="statsLevelsTab" class="tab-content">
-<div class="stats-card">
-<h3>⚙️ إعدادات المستويات</h3>
-<div class="settings-input">
-<label>🟢 المستوى الأول: من</label>
-<input type="number" id="level1Min" value="1" min="1">
-<span>إلى</span>
-<input type="number" id="level1Max" value="5" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🟡 المستوى الثاني: من</label>
-<input type="number" id="level2Min" value="6" min="1">
-<span>إلى</span>
-<input type="number" id="level2Max" value="10" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🟠 المستوى الثالث: من</label>
-<input type="number" id="level3Min" value="11" min="1">
-<span>إلى</span>
-<input type="number" id="level3Max" value="15" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🔴 المستوى الرابع: من</label>
-<input type="number" id="level4Min" value="16" min="1">
-<span>إلى</span>
-<input type="number" id="level4Max" value="20" min="1">
-<span>أيام</span>
-</div>
+<div class="stats-card"><h3>⚙️ إعدادات المستويات</h3>
+<div class="settings-input"><label>🟢 المستوى الأول: من</label><input type="number" id="level1Min" value="1" min="1"><span>إلى</span><input type="number" id="level1Max" value="5" min="1"><span>أيام</span></div>
+<div class="settings-input"><label>🟡 المستوى الثاني: من</label><input type="number" id="level2Min" value="6" min="1"><span>إلى</span><input type="number" id="level2Max" value="10" min="1"><span>أيام</span></div>
+<div class="settings-input"><label>🟠 المستوى الثالث: من</label><input type="number" id="level3Min" value="11" min="1"><span>إلى</span><input type="number" id="level3Max" value="15" min="1"><span>أيام</span></div>
+<div class="settings-input"><label>🔴 المستوى الرابع: من</label><input type="number" id="level4Min" value="16" min="1"><span>إلى</span><input type="number" id="level4Max" value="20" min="1"><span>أيام</span></div>
 <button class="btn btn-primary" onclick="app.saveLevelSettings()">💾 حفظ الإعدادات</button>
 </div>
-
-<div class="level-card level-1" id="level1Card">
-<div class="level-title">🟢 المستوى الأول (آمن)</div>
-<div id="level1Students"></div>
-</div>
-
-<div class="level-card level-2" id="level2Card">
-<div class="level-title">🟡 المستوى الثاني (انتباه)</div>
-<div id="level2Students"></div>
-</div>
-
-<div class="level-card level-3" id="level3Card">
-<div class="level-title">🟠 المستوى الثالث (تحذير)</div>
-<div id="level3Students"></div>
-</div>
-
-<div class="level-card level-4" id="level4Card">
-<div class="level-title">🔴 المستوى الرابع (خطر!)</div>
-<div id="level4Students"></div>
-</div>
+<div class="level-card level-1" id="level1Card"><div class="level-title">🟢 المستوى الأول (آمن)</div><div id="level1Students"></div></div>
+<div class="level-card level-2" id="level2Card"><div class="level-title">🟡 المستوى الثاني (انتباه)</div><div id="level2Students"></div></div>
+<div class="level-card level-3" id="level3Card"><div class="level-title">🟠 المستوى الثالث (تحذير)</div><div id="level3Students"></div></div>
+<div class="level-card level-4" id="level4Card"><div class="level-title">🔴 المستوى الرابع (خطر!)</div><div id="level4Students"></div></div>
 </div>
 </div>
 </div>
 
-<!-- صفحة الإعدادات المحدثة -->
+<!-- صفحة الإعدادات -->
 <div id="settingsPage" class="page">
-<header>
-<h1>⚙️ الإعدادات</h1>
-<p>نظام الحضور الذكي - إدارة احترافية</p>
-</header>
+<header><h1>⚙️ الإعدادات</h1><p>نظام الحضور الذكي - إدارة احترافية</p></header>
 <div class="content">
-
-<!-- بطاقة الاشتراك والدعم -->
 <div class="subscription-hero">
-    <div class="app-logo">
-        <div class="app-logo-icon">👨‍🎓</div>
-    </div>
-    <h2 style="font-size:24px;margin:10px 0">نظام الحضور الذكي</h2>
-    <p style="opacity:0.95;font-size:15px">إدارة احترافية للحضور والغياب</p>
-    <div class="subscription-price">
-        75 ر.س
-        <small>/ سنوياً</small>
-    </div>
+<div class="app-logo"><div class="app-logo-icon">👨‍🎓</div></div>
+<h2 style="font-size:24px;margin:10px 0">نظام الحضور الذكي</h2>
+<p style="opacity:0.95;font-size:15px">إدارة احترافية للحضور والغياب</p>
+<div class="subscription-price">75 ر.س<small>/ سنوياً</small></div>
 </div>
-
-<!-- معلومات الدفع -->
 <div class="payment-card">
 <h3>💳 معلومات الدفع</h3>
-
 <div class="bank-info">
-<div class="bank-info-row">
-<span class="bank-label">🏦 البنك:</span>
-<span class="bank-value">مصرف الراجحي</span>
+<div class="bank-info-row"><span class="bank-label">🏦 البنك:</span><span class="bank-value">مصرف الراجحي</span></div>
+<div class="bank-info-row"><span class="bank-label">📋 رقم الآيبان:</span><div style="display:flex;align-items:center;gap:8px"><button class="copy-btn" onclick="app.copyText('SA4780000381608010039716')">نسخ</button><span class="bank-value" dir="ltr">SA47 8000 0381 6080 1003 9716</span></div></div>
+<div class="bank-info-row"><span class="bank-label">🔢 رقم الحساب:</span><div style="display:flex;align-items:center;gap:8px"><button class="copy-btn" onclick="app.copyText('381000010006080039716')">نسخ</button><span class="bank-value" dir="ltr">381000010006080039716</span></div></div>
+<div class="bank-info-row"><span class="bank-label">💰 المبلغ:</span><span class="bank-value">75 ريال سعودي</span></div>
 </div>
-
-<div class="bank-info-row">
-<span class="bank-label">📋 رقم الآيبان:</span>
-<div style="display:flex;align-items:center;gap:8px">
-<button class="copy-btn" onclick="app.copyText('SA4780000381608010039716')">نسخ</button>
-<span class="bank-value" dir="ltr">SA47 8000 0381 6080 1003 9716</span>
-</div>
-</div>
-
-<div class="bank-info-row">
-<span class="bank-label">🔢 رقم الحساب:</span>
-<div style="display:flex;align-items:center;gap:8px">
-<button class="copy-btn" onclick="app.copyText('381000010006080039716')">نسخ</button>
-<span class="bank-value" dir="ltr">381000010006080039716</span>
-</div>
-</div>
-
-<div class="bank-info-row">
-<span class="bank-label">💰 المبلغ:</span>
-<span class="bank-value">100 ريال سعودي</span>
-</div>
-</div>
-
-<!-- باركود التحويل السريع -->
 <div class="qr-container">
 <h4 style="color:#1976d2;font-size:18px;margin-bottom:10px">📱 امسح للتحويل السريع</h4>
 <p style="color:#666;font-size:14px;margin-bottom:15px">استخدم تطبيق الراجحي المباشر</p>
-<div class="qr-code">
-<img src="brkwd.jpg" alt="باركود التحويل السريع" style="width:100%;height:100%;object-fit:contain">
-</div>
+<div class="qr-code"><img src="brkwd.jpg" alt="باركود التحويل السريع" style="width:100%;height:100%;object-fit:contain"></div>
 <p style="color:#999;font-size:13px;margin-top:10px">امسح الباركود باستخدام كاميرا الجوال</p>
 </div>
 </div>
-
-<!-- خطوات التفعيل -->
 <div class="activation-steps">
 <h4>🚀 خطوات التفعيل</h4>
-
-<div class="step-item">
-<div class="step-number">1</div>
-<div class="step-text">قم بتحويل المبلغ (75 ريال) عبر الآيبان أو الباركود أعلاه</div>
+<div class="step-item"><div class="step-number">1</div><div class="step-text">قم بتحويل المبلغ (75 ريال) عبر الآيبان أو الباركود أعلاه</div></div>
+<div class="step-item"><div class="step-number">2</div><div class="step-text">التقط صورة لإيصال التحويل من تطبيق البنك</div></div>
+<div class="step-item"><div class="step-number">3</div><div class="step-text">أرسل الإيصال عبر واتساب للدعم الفني: <strong>0533371147</strong></div></div>
+<div class="step-item"><div class="step-number">4</div><div class="step-text">ستحصل على <strong>كود التفعيل</strong> خلال دقائق</div></div>
+<a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" class="whatsapp-link" target="_blank" style="width:100%;margin-top:15px;justify-content:center"><span style="font-size:22px">📱</span><span>تواصل مع الدعم الفني</span></a>
 </div>
-
-<div class="step-item">
-<div class="step-number">2</div>
-<div class="step-text">التقط صورة لإيصال التحويل من تطبيق البنك</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">3</div>
-<div class="step-text">أرسل الإيصال عبر واتساب للدعم الفني: <strong>0533371147</strong></div>
-</div>
-
-<div class="step-item">
-<div class="step-number">4</div>
-<div class="step-text">ستحصل على <strong>كود التفعيل</strong> خلال دقائق</div>
-</div>
-
-<a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" 
-   class="whatsapp-link" 
-   target="_blank"
-   style="width:100%;margin-top:15px;justify-content:center">
-<span style="font-size:22px">📱</span>
-<span>تواصل مع الدعم الفني</span>
-</a>
-</div>
-
-<!-- زر تفعيل الاشتراك -->
 <div class="settings-card" style="margin-bottom:20px;">
 <h3 style="color:#1976d2;margin-bottom:15px;">🔑 تفعيل الاشتراك</h3>
 <p style="color:#666;margin-bottom:15px;">أدخل كود الاشتراك لتفعيل التطبيق لمدة سنة كاملة</p>
-
-<input 
-  type="text" 
-  id="activationCodeInput" 
-placeholder="أدخل كود التفعيل الذي حصلت عليه"
-  style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
-
-<button 
-  onclick="app.activateSubscription()" 
-  style="width:100%;padding:15px;background:#4caf50;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">
-  ✅ تفعيل الاشتراك الآن
-</button>
+<input type="text" id="activationCodeSettings" placeholder="أدخل كود التفعيل الذي حصلت عليه" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
+<button onclick="app.activateSubscriptionFromSettings()" style="width:100%;padding:15px;background:#4caf50;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">✅ تفعيل الاشتراك الآن</button>
 </div>
-
-    
-<!-- معلومات المطور -->
 <div class="developer-info">
 <div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
 <div class="developer-name">أ. سلطان عبدالله المالكي</div>
 <div class="developer-role">مطور التطبيق</div>
-<p style="font-size:14px;color:#666;line-height:1.6">
-متخصص في تطوير أنظمة إدارة التعليم<br>
-جودة عالية • دعم مستمر • تحديثات دورية
-</p>
+<p style="font-size:14px;color:#666;line-height:1.6">متخصص في تطوير أنظمة إدارة التعليم<br>جودة عالية • دعم مستمر • تحديثات دورية</p>
 </div>
-
-<!-- استيراد البيانات -->
 <div class="settings-card">
 <h3>📥 استيراد بيانات الطلاب</h3>
 <p>قم برفع ملف Excel يحتوي على: الاسم - السجل المدني - الجوال - الصف - الفصل</p>
 <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none">
 <button class="btn btn-primary" onclick="document.getElementById('excelFile').click()">📂 اختر ملف Excel</button>
 </div>
-
-<!-- إعادة تعيين -->
 <div class="settings-card">
 <h3>🗑️ إعادة تعيين التطبيق</h3>
 <p>سيتم حذف جميع البيانات بشكل نهائي</p>
 <button class="btn btn-danger" onclick="app.confirmAction('reset')">مسح جميع البيانات</button>
 </div>
-
-<!-- معلومات التطبيق -->
 <div class="settings-card">
 <h3>ℹ️ معلومات التطبيق</h3>
-<p style="font-size:15px;line-height:1.7">
-<strong>الاسم:</strong> نظام الحضور الذكي<br>
-<strong>الإصدار:</strong> 5.0.0<br>
-<strong>التحديث:</strong> أكتوبر 2025<br>
-<strong>الاشتراك:</strong> 75 ريال سنوياً
-</p>
+<p style="font-size:15px;line-height:1.7"><strong>الاسم:</strong> نظام الحضور الذكي<br><strong>الإصدار:</strong> 5.0.0<br><strong>التحديث:</strong> أكتوبر 2025<br><strong>الاشتراك:</strong> 75 ريال سنوياً</p>
+</div>
+</div>
 </div>
 
-</div>
+<!-- أيقونة حالة الاشتراك -->
+<div id="subscriptionBadge" class="subscription-badge">
+  <div class="badge-icon">📦</div>
+  <div class="badge-text">
+    <span class="badge-days">30</span>
+    <span class="badge-label">يوم متبقي</span>
+  </div>
 </div>
 
 <!-- Navigation Bar -->
 <div class="bottom-nav">
-<button class="nav-item active" onclick="app.showPage('main')">
-<span class="nav-icon">🏠</span>الرئيسية
-</button>
-<button class="nav-item" onclick="app.showPage('delays')">
-<span class="nav-icon">⏰</span>التأخرات
-</button>
-<button class="nav-item" onclick="app.showPage('absences')">
-<span class="nav-icon">📅</span>الغياب
-</button>
-<button class="nav-item" onclick="app.showPage('notes')">
-<span class="nav-icon">📝</span>الملاحظات
-</button>
-<button class="nav-item" onclick="app.showPage('stats')">
-<span class="nav-icon">📊</span>الإحصائيات
-</button>
-<button class="nav-item" onclick="app.showPage('settings')">
-<span class="nav-icon">⚙️</span>الإعدادات
-</button>
+<button class="nav-item active" onclick="app.showPage('main')"><span class="nav-icon">🏠</span>الرئيسية</button>
+<button class="nav-item" onclick="app.showPage('delays')"><span class="nav-icon">⏰</span>التأخرات</button>
+<button class="nav-item" onclick="app.showPage('absences')"><span class="nav-icon">📅</span>الغياب</button>
+<button class="nav-item" onclick="app.showPage('notes')"><span class="nav-icon">📝</span>الملاحظات</button>
+<button class="nav-item" onclick="app.showPage('stats')"><span class="nav-icon">📊</span>الإحصائيات</button>
+<button class="nav-item" onclick="app.showPage('settings')"><span class="nav-icon">⚙️</span>الإعدادات</button>
 </div>
 
 <!-- Modals -->
@@ -1148,7 +644,6 @@ placeholder="أدخل كود التفعيل الذي حصلت عليه"
 <button class="btn btn-primary" onclick="app.closeModal()">إغلاق</button>
 </div>
 </div>
-
 <div id="confirmModal" class="modal" onclick="if(event.target.id==='confirmModal')app.closeConfirm()">
 <div class="modal-content" onclick="event.stopPropagation()">
 <h3 id="confirmTitle" style="text-align:center;margin-bottom:12px;font-size:19px">تأكيد العملية</h3>
@@ -1159,7 +654,6 @@ placeholder="أدخل كود التفعيل الذي حصلت عليه"
 </div>
 </div>
 </div>
-
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1170,1577 +664,545 @@ const firebaseConfig = {
   databaseURL: "https://smart-attendance-system-63a71-default-rtdb.firebaseio.com",
   projectId: "smart-attendance-system-63a71"
 };
-
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const app={
-students:[],
-delays:{},
-absences:{},
-notes:{},
-subscriptions:{},
-selected:{morning:new Set(),break:new Set(),departure:new Set(),absence:new Set(),note:new Set()},
-currentTab:{delay:'morning',absence:'daily',notes:'add',stats:'daily'},
+const app = {
+    // =================== Data & State ===================
+    students: [],
+    delays: {},
+    absences: {},
+    notes: {},
+    subscriptions: {},
+    selected: { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() },
+    currentTab: { delay: 'morning', absence: 'daily', notes: 'add', stats: 'daily' },
+    levelSettings: { level1: { min: 1, max: 5 }, level2: { min: 6, max: 10 }, level3: { min: 11, max: 15 }, level4: { min: 16, max: 20 } },
+    lastUpdate: 0,
 
-init() {
-  this.loadData();
-  this.setToday();
-  if(!this.checkSubscription()) return;
-  this.checkExpiredTrials();
-  this.setupEvents();
-  this.renderStudents();
-  this.loadLevelSettings();
-  this.updateAllStats();
-  
-  // تأخير ملء الفلاتر لـ iOS (مهم جداً!)
-  setTimeout(() => {
-    this.populateFilters();
-  }, 300);
-  
-  this.setupRealtimeSync();
-  this.checkOnlineStatus(); 
-  
-  // إضافة حدث الضغط على الأيقونة
-  const badge = document.getElementById('subscriptionBadge');
-  if(badge){
-    badge.onclick = () => {
-      this.showPage('settings');
-    };
-    badge.style.cursor = 'pointer';
-  }
-},
+    // =================== Initialization ===================
+    init() {
+        this.loadData();
+        this.setToday();
+        if (!this.checkSubscription()) return;
+        this.checkExpiredTrials();
+        this.setupEvents();
+        this.renderStudents();
+        this.loadLevelSettings();
+        this.updateAllStats();
+        setTimeout(() => this.populateFilters(), 300);
+        this.setupRealtimeSync();
+        this.checkOnlineStatus();
+        const badge = document.getElementById('subscriptionBadge');
+        if (badge) { badge.onclick = () => this.showPage('settings'); badge.style.cursor = 'pointer'; }
+    },
 
-    // دالة جديدة: إنشاء فترة تجريبية 7 أيام
-initTrialSubscription(){
-  const code = 'SK-TRIAL-' + Date.now();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 7); // ← 7 أيام فقط
-  
-  this.subscriptions[code] = {
-    active: true,
-    startDate: new Date().toISOString(),
-    endDate: endDate.toISOString(),
-    isTrial: true
-  };
-  
-  localStorage.setItem('activationCode', code);
-  this.saveData();
-  
-  this.showToast('🎉 مرحباً! لديك 7 أيام تجربة مجانية', 5000);
-  
-  return code;
-},
-    getDeviceId(){
-  let deviceId = localStorage.getItem('deviceId');
-  if(!deviceId){
-    deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
-  }
-  return deviceId;
-},
+    // =================== Subscription & Trial Management ===================
+    initTrialSubscription() {
+        const code = 'SK-TRIAL-' + Date.now();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 7);
+        this.subscriptions = this.subscriptions || {};
+        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: true };
+        localStorage.setItem('activationCode', code);
+        localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+        this.saveData();
+        this.showToast('🎉 مرحباً! لديك 7 أيام تجربة مجانية', 5000);
+        return code;
+    },
 
+    getDeviceId() {
+        let deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) { deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9); localStorage.setItem('deviceId', deviceId); }
+        return deviceId;
+    },
 
+    checkSubscription() {
+        let code = localStorage.getItem('activationCode');
+        if (!code) { code = this.initTrialSubscription(); }
+        try { this.subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '{}'); } catch (e) { console.error('Error parsing subscriptions:', e); this.subscriptions = {}; }
+        const subscription = this.subscriptions[code];
+        if (!subscription || !subscription.active) { document.getElementById('lockScreen').style.display = 'flex'; return false; }
+        const days = this.calculateRemainingDays(subscription.endDate);
+        if (subscription.isTrial) { if (days === 2) this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000); else if (days === 1) this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000); else if (days === 0) this.showToast('⚠️ انتهت الفترة التجريبية', 5000); }
+        this.updateSubscriptionBadge(days);
+        if (days <= 0) { document.getElementById('lockScreen').style.display = 'flex'; return false; }
+        return true;
+    },
 
+    calculateRemainingDays(endDate) {
+        const now = new Date(); const end = new Date(endDate); const diff = end - now;
+        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    },
 
-// كشف حالة الاتصال (دالة منفصلة خارج init)
-checkOnlineStatus(){
-  const updateOnlineStatus = () => {
-    const statusBadge = document.getElementById('subscriptionBadge');
-    if(statusBadge){
-      if(navigator.onLine){
-        statusBadge.style.borderLeft = '4px solid #4caf50';
-        this.syncPendingData(); // مزامنة عند العودة أونلاين
-      }else{
-        statusBadge.style.borderLeft = '4px solid #ff9800';
-        this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال');
-      }
+    updateSubscriptionBadge(days) {
+        const badge = document.getElementById('subscriptionBadge');
+        if (!badge) return;
+        const daysEl = badge.querySelector('.badge-days'); const labelEl = badge.querySelector('.badge-label');
+        if (daysEl) daysEl.textContent = days;
+        if (labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
+        badge.classList.remove('trial', 'warning', 'active');
+        if (days <= 3) badge.classList.add('warning');
+        else if (days <= 7) badge.classList.add('trial');
+        else badge.classList.add('active');
+    },
+
+    async checkExpiredTrials() {
+        const deviceId = this.getDeviceId(); if (typeof database === 'undefined') return;
+        try {
+            const code = localStorage.getItem('activationCode'); if (!code || !code.includes('TRIAL')) return;
+            const subscription = this.subscriptions[code]; if (!subscription) return;
+            const endDate = new Date(subscription.endDate); const now = new Date(); const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
+            if (daysSinceExpiry === 18) this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
+            if (daysSinceExpiry >= 23) { await database.ref('backups/' + deviceId).remove(); localStorage.clear(); alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.'); location.reload(); }
+        } catch (error) { console.error('خطأ في فحص التجارب:', error); }
+    },
+
+    activateSubscription() {
+        let code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
+        if (!code) { this.showToast('⚠️ الرجاء إدخال كود التفعيل'); return; }
+        if (!code.startsWith('SK-')) { this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-'); return; }
+        const isTrial = code.includes('TRIAL'); const endDate = new Date();
+        if (isTrial) endDate.setDate(endDate.getDate() + 7); else endDate.setFullYear(endDate.getFullYear() + 1);
+        this.subscriptions = this.subscriptions || {};
+        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: isTrial, paid: !isTrial };
+        localStorage.setItem('activationCode', code); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); this.saveData();
+        document.getElementById('lockScreen').style.display = 'none'; this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
+        setTimeout(() => { this.showPage('main'); location.reload(); }, 2000);
+    },
+    
+    activateSubscriptionFromSettings() {
+        let code = document.getElementById('activationCodeSettings')?.value?.trim().toUpperCase();
+        if (!code) { this.showToast('⚠️ الرجاء إدخال كود التفعيل'); return; }
+        if (!code.startsWith('SK-')) { this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-'); return; }
+        const isTrial = code.includes('TRIAL'); const endDate = new Date();
+        if (isTrial) endDate.setDate(endDate.getDate() + 7); else endDate.setFullYear(endDate.getFullYear() + 1);
+        this.subscriptions = this.subscriptions || {};
+        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: isTrial, paid: !isTrial };
+        localStorage.setItem('activationCode', code); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); this.saveData();
+        this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
+        setTimeout(() => { this.showPage('main'); location.reload(); }, 2000);
+    },
+
+    showPaymentPage() { document.getElementById('lockScreen').style.display = 'none'; document.getElementById('paymentPage').style.display = 'block'; },
+    hidePaymentPage() { document.getElementById('paymentPage').style.display = 'none'; document.getElementById('lockScreen').style.display = 'flex'; },
+    selectPaymentMethod(method) { const details = document.getElementById('bankDetails'); const arrow = event.currentTarget.querySelector('.method-arrow'); if (details.style.display === 'none') { details.style.display = 'block'; arrow.style.transform = 'rotate(180deg)'; } else { details.style.display = 'none'; arrow.style.transform = 'rotate(0deg)'; } },
+    contactWhatsApp() { window.open('https://wa.me/966533371147?text=مرحباً، أريد الاشتراك في نظام الحضور الذكي', '_blank'); },
+
+    // =================== Data Management & Sync ===================
+    loadData() {
+        const activationCode = localStorage.getItem('activationCode');
+        if (!activationCode || !activationCode.startsWith('SK-')) {
+            try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; }
+            return;
+        }
+        if (typeof database !== 'undefined') {
+            database.ref('subscriptions/' + activationCode).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (data) { this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); this.renderStudents(); }
+                else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
+            }).catch((error) => { console.log('خطأ في التحميل:', error); try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } });
+        } else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
+    },
+
+    saveData() {
+        try { localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); } catch (e) { console.error('Error saving local data:', e); }
+        const code = localStorage.getItem('activationCode');
+        if (code && typeof database !== 'undefined') {
+            const deviceId = this.getDeviceId();
+            database.ref('backups/' + deviceId).set({ code: code, students: this.students, delays: this.delays, absences: this.absences, notes: this.notes, lastBackup: new Date().toISOString(), studentCount: this.students.length }).catch(error => console.error('خطأ في النسخ الاحتياطي:', error));
+        }
+    },
+
+    setupRealtimeSync() {
+        const activationCode = localStorage.getItem('activationCode');
+        if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
+        try {
+            database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || {}; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
+            });
+        } catch (error) { console.error('Error setting up realtime sync:', error); }
+    },
+
+    checkOnlineStatus() {
+        const updateOnlineStatus = () => {
+            const statusBadge = document.getElementById('subscriptionBadge');
+            if (statusBadge) { if (navigator.onLine) { statusBadge.style.borderLeft = '4px solid #4caf50'; this.syncPendingData(); } else { statusBadge.style.borderLeft = '4px solid #ff9800'; this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال'); } }
+        };
+        window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus); updateOnlineStatus();
+    },
+
+    savePendingData(data) {
+        const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]'); pending.push({ ...data, timestamp: Date.now() }); localStorage.setItem('pendingSync', JSON.stringify(pending));
+    },
+
+    syncPendingData() {
+        const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]'); if (pending.length === 0) return;
+        const activationCode = localStorage.getItem('activationCode'); if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
+        this.showToast('🔄 جارٍ المزامنة...');
+        database.ref('subscriptions/' + activationCode).set({ students: this.students, delays: this.delays, absences: this.absences, notes: this.notes, lastUpdate: Date.now() }).then(() => { localStorage.setItem('pendingSync', '[]'); this.showToast('✅ تمت المزامنة بنجاح'); }).catch((error) => { console.log('خطأ في المزامنة:', error); this.showToast('❌ فشلت المزامنة، سيتم المحاولة لاحقاً'); });
+    },
+
+    // =================== UI & Navigation ===================
+    setToday() {
+        const today = new Date().toISOString().split('T')[0];
+        ['dateMorning', 'dateBreak', 'dateDeparture', 'dateAbsence', 'dateNote'].forEach(id => { const el = document.getElementById(id); if (el) el.value = today; });
+    },
+
+    setupEvents() {
+        const self = this;
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const q = e.target.value.toLowerCase(); if (!q) { document.getElementById('studentsList').innerHTML = ''; document.getElementById('emptyState').style.display = 'block'; return; }
+            document.getElementById('emptyState').style.display = 'none';
+            const filtered = self.students.filter(s => s.name.toLowerCase().includes(q) || s.phone.includes(q) || s.class.toLowerCase().includes(q));
+            self.renderStudents(filtered);
+        });
+        ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
+            const search = document.getElementById('search' + t); if (search) search.addEventListener('input', function () { self.filterList(t.toLowerCase()); });
+            const cls = document.getElementById('class' + t); if (cls) cls.addEventListener('change', function () { self.filterList(t.toLowerCase()); });
+            const clsr = document.getElementById('classroom' + t); if (clsr) clsr.addEventListener('change', function () { self.filterList(t.toLowerCase()); });
+        });
+        const views = ['DelayView', 'AbsenceView', 'NoteView']; views.forEach(v => { const el = document.getElementById('search' + v); if (el) el.addEventListener('input', function () { if (v === 'DelayView') self.renderDelayView(); else if (v === 'AbsenceView') self.renderAbsenceView(); else if (v === 'NoteView') self.renderNoteView(); }); });
+        const noteTextarea = document.getElementById('noteTextarea'); if (noteTextarea) { noteTextarea.addEventListener('input', function (e) { document.getElementById('noteCharCount').textContent = e.target.value.length; }); }
+        const excelFile = document.getElementById('excelFile'); if (excelFile) { excelFile.addEventListener('change', function (e) { self.importExcel(e); }); }
+    },
+
+    showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const pages = ['main', 'delays', 'absences', 'notes', 'stats', 'settings']; const idx = pages.indexOf(page);
+        document.getElementById(page + 'Page').classList.add('active'); document.querySelectorAll('.nav-item')[idx].classList.add('active');
+        if (page === 'delays') this.renderList(this.currentTab.delay);
+        if (page === 'absences') this.currentTab.absence === 'daily' ? this.renderList('absence') : this.renderAbsenceView();
+        if (page === 'notes') this.currentTab.notes === 'add' ? this.renderList('note') : this.renderNoteView();
+        if (page === 'stats') { this.currentTab.stats = 'daily'; document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active')); document.querySelector('#statsPage .tab').classList.add('active'); document.getElementById('statsDailyTab').classList.add('active'); this.updateAllStats(); }
+        this.updateActions();
+    },
+
+    switchTab(page, tab) {
+        const container = page === 'delays' ? 'delaysPage' : page === 'absence' ? 'absencesPage' : page === 'notes' ? 'notesPage' : 'statsPage';
+        document.querySelectorAll(`#${container} .tab`).forEach(t => t.classList.remove('active')); document.querySelectorAll(`#${container} .tab-content`).forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        if (page === 'delays') { this.currentTab.delay = tab; document.getElementById('delay' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderDelayView(); else this.renderList(tab); }
+        else if (page === 'absence') { this.currentTab.absence = tab; document.getElementById('absence' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderAbsenceView(); else this.renderList('absence'); }
+        else if (page === 'notes') { this.currentTab.notes = tab; document.getElementById('note' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderNoteView(); else this.renderList('note'); }
+        else if (page === 'stats') { this.currentTab.stats = tab; document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active')); event.target.classList.add('active'); document.getElementById('stats' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); this.updateAllStats(); }
+        this.updateActions();
+    },
+
+    showToast(msg, duration = 3000) {
+        const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show');
+        setTimeout(function () { toast.classList.remove('show'); }, duration);
+    },
+
+    showModal(title, content) {
+        document.getElementById('confirmTitle').textContent = title; document.getElementById('confirmMsg').innerHTML = content; document.getElementById('confirmModal').classList.add('active');
+    },
+
+    closeModal() { document.getElementById('studentModal').classList.remove('active'); },
+
+    showConfirm(msg, onYes) {
+        document.getElementById('confirmMsg').textContent = msg; document.getElementById('confirmYes').onclick = function () { app.closeConfirm(); onYes(); }; document.getElementById('confirmModal').classList.add('active');
+    },
+
+    closeConfirm() { document.getElementById('confirmModal').classList.remove('active'); },
+
+    // =================== Data Rendering & Filtering ===================
+    renderStudents(list = []) {
+        const ul = document.getElementById('studentsList');
+        ul.innerHTML = list.map((s, i) => {
+            const idx = this.students.indexOf(s); const dCount = (this.delays[s.civil] || []).length; const aCount = (this.absences[s.civil] || []).length; const nCount = (this.notes[s.civil] || []).length;
+            let badges = ''; if (dCount > 0) badges += `<span class="badge delay">${dCount} تأخر</span>`; if (aCount > 0) badges += `<span class="badge absence">${aCount} غياب</span>`; if (nCount > 0) badges += `<span class="badge note">${nCount} ملاحظة</span>`;
+            return `<li class="student-item" onclick="app.showStudent(${idx})"><div class="student-name">${badges}${s.name}</div><div style="font-size:15px;color:#666;margin-top:4px">${s.class} - ${s.classroom} | 📞 ${s.phone}</div></li>`;
+        }).join('');
+    },
+
+    populateFilters() {
+        if (!this.students || this.students.length === 0) return;
+        const classes = [...new Set(this.students.map(s => s.class))].filter(c => c).sort();
+        const classrooms = [...new Set(this.students.map(s => s.classroom))].filter(c => c).sort();
+        ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
+            const cls = document.getElementById(`class${t}`); const clsr = document.getElementById(`classroom${t}`);
+            if (cls) { cls.innerHTML = ''; const defaultOption = document.createElement('option'); defaultOption.value = ''; defaultOption.textContent = 'الكل'; cls.appendChild(defaultOption); classes.forEach(c => { const option = document.createElement('option'); option.value = c; option.textContent = c; cls.appendChild(option); }); }
+            if (clsr) { clsr.innerHTML = ''; const defaultOption = document.createElement('option'); defaultOption.value = ''; defaultOption.textContent = 'الكل'; clsr.appendChild(defaultOption); classrooms.forEach(c => { const option = document.createElement('option'); option.value = c; option.textContent = c; clsr.appendChild(option); }); }
+        });
+        setTimeout(() => { document.querySelectorAll('.filter-select').forEach(select => { select.style.display = 'none'; select.offsetHeight; select.style.display = ''; }); }, 100);
+    },
+
+    renderList(type) {
+        const list = document.getElementById('list' + type.charAt(0).toUpperCase() + type.slice(1));
+        const key = type === 'absence' ? 'absence' : type === 'note' ? 'note' : type;
+        list.innerHTML = this.students.map((s, i) => {
+            const idx = this.students.indexOf(s); const checked = this.selected[key].has(idx) ? 'checked' : '';
+            return `<li class="student-item"><label style="display:flex;align-items:center;gap:12px;cursor:pointer"><input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer"><div style="flex:1"><div style="font-weight:600;font-size:16px">${s.name}</div><div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div></div></label></li>`;
+        }).join('');
+        this.updateCount(key);
+    },
+
+    filterList(type) {
+        const T = type.charAt(0).toUpperCase() + type.slice(1);
+        const search = document.getElementById('search' + T).value.toLowerCase();
+        const cls = document.getElementById('class' + T).value;
+        const clsr = document.getElementById('classroom' + T).value;
+        const filtered = this.students.filter(s => {
+            const matchSearch = !search || s.name.toLowerCase().includes(search);
+            const matchClass = !cls || s.class === cls;
+            const matchClassroom = !clsr || s.classroom === clsr;
+            return matchSearch && matchClass && matchClassroom;
+        });
+        const list = document.getElementById('list' + T);
+        const key = type === 'absence' ? 'absence' : type === 'note' ? 'note' : type;
+        list.innerHTML = filtered.map((s) => {
+            const idx = this.students.indexOf(s); const checked = this.selected[key].has(idx) ? 'checked' : '';
+            return `<li class="student-item"><label style="display:flex;align-items:center;gap:12px;cursor:pointer"><input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer"><div style="flex:1"><div style="font-weight:600;font-size:16px">${s.name}</div><div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div></div></label></li>`;
+        }).join('');
+    },
+
+    renderDelayView() {
+        const search = document.getElementById('searchDelayView').value.toLowerCase(); const all = [];
+        for (const civil in this.delays) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.delays[civil].forEach((d, i) => all.push({ s, d, civil, i })); } }
+        all.sort((a, b) => new Date(b.d.date) - new Date(a.d.date));
+        const div = document.getElementById('delayViewList');
+        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد تأخرات</div>'; return; }
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #ff9800;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#e65100;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">${item.d.type} - 📅 ${item.d.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('delay','${item.civil}',${item.i})">🗑️</button></div>`).join('');
+    },
+
+    renderAbsenceView() {
+        const search = document.getElementById('searchAbsenceView').value.toLowerCase(); const all = [];
+        for (const civil in this.absences) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.absences[civil].forEach((a, i) => all.push({ s, a, civil, i })); } }
+        all.sort((a, b) => new Date(b.a.date) - new Date(a.a.date));
+        const div = document.getElementById('absenceViewList');
+        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا يوجد غياب</div>'; return; }
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #f44336;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#c62828;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">غياب يومي - 📅 ${item.a.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('absence','${item.civil}',${item.i})">🗑️</button></div>`).join('');
+    },
+
+    renderNoteView() {
+        const search = document.getElementById('searchNoteView').value.toLowerCase(); const all = [];
+        for (const civil in this.notes) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.notes[civil].forEach((n, i) => all.push({ s, n, civil, i })); } }
+        all.sort((a, b) => new Date(b.n.date) - new Date(a.n.date));
+        const div = document.getElementById('noteViewList');
+        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد ملاحظات</div>'; return; }
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #00897b;padding:14px"><div class="record-item-header"><div style="flex:1"><div style="font-weight:600;color:#00695c;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">📅 ${item.n.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('note','${item.civil}',${item.i})">🗑️</button></div><div class="record-note-text">${item.n.text}</div></div>`).join('');
+    },
+
+    showStudent(idx) {
+        const s = this.students[idx]; const delays = this.delays[s.civil] || []; const absences = this.absences[s.civil] || []; const notes = this.notes[s.civil] || [];
+        const modal = document.getElementById('studentModal'); const body = document.getElementById('modalBody');
+        body.innerHTML = `<div style="margin-bottom:18px"><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">👤 الاسم:</strong> <span style="font-size:16px">${s.name}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">🆔 السجل المدني:</strong> <span style="font-size:16px">${s.civil}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📱 الجوال:</strong> <span style="font-size:16px">${s.phone}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📚 الصف:</strong> <span style="font-size:16px">${s.class}</span></div><div style="margin:12px 0;padding:12px 0"><strong style="color:#666;font-size:15px">🏫 الفصل:</strong> <span style="font-size:16px">${s.classroom}</span></div></div><div class="record-grid"><div class="record-card delays"><h4>⏰ التأخرات (${delays.length})</h4><div class="record-list">${delays.length > 0 ? delays.map((d, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">${d.type}</div><div class="record-date">📅 ${d.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('delay','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد تأخرات</div>'}</div></div><div class="record-card absences"><h4>📅 الغياب (${absences.length})</h4><div class="record-list">${absences.length > 0 ? absences.map((a, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div style="font-weight:600;color:#c62828;font-size:12px">غياب يومي</div><div class="record-date">📅 ${a.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('absence','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا يوجد غياب</div>'}</div></div><div class="record-card notes"><h4>📝 الملاحظات (${notes.length})</h4><div class="record-list">${notes.length > 0 ? notes.map((n, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">ملاحظة</div><div class="record-date">📅 ${n.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('note','${s.civil}',${i})">🗑️</button></div><div class="record-note-text">${n.text}</div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد ملاحظات</div>'}</div></div></div>`;
+        modal.classList.add('active');
+    },
+
+    // =================== User Actions (CRUD) ===================
+    toggleStudent(key, idx) { this.selected[key].has(idx) ? this.selected[key].delete(idx) : this.selected[key].add(idx); this.updateCount(key); this.updateActions(); },
+
+    updateCount(key) {
+        const T = key === 'absence' ? 'Absence' : key === 'note' ? 'Note' : key.charAt(0).toUpperCase() + key.slice(1);
+        const div = document.getElementById('count' + T); const count = this.selected[key].size;
+        if (count > 0) { div.classList.remove('hidden'); div.querySelector('span').textContent = count; } else { div.classList.add('hidden'); }
+    },
+
+    updateActions() {
+        const page = document.querySelector('.page.active').id;
+        if (page === 'delaysPage') { const key = this.currentTab.delay; const actions = document.getElementById('delayActions'); this.selected[key].size > 0 && this.currentTab.delay !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
+        else if (page === 'absencesPage') { const actions = document.getElementById('absenceActions'); this.selected.absence.size > 0 && this.currentTab.absence !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
+        else if (page === 'notesPage') { const actions = document.getElementById('noteActions'); this.selected.note.size > 0 && this.currentTab.notes !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
+    },
+
+    confirmAction(action) {
+        if (action === 'saveDelay' || action === 'saveAndSendDelay' || action === 'sendDelay') {
+            const key = this.currentTab.delay; const count = this.selected[key].size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
+            let msg = ''; if (action === 'saveDelay') msg = `هل تريد حفظ تأخر ${count} طالب؟`; else if (action === 'saveAndSendDelay') msg = `هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`; else msg = `هل تريد إرسال إشعار لـ ${count} طالب؟`;
+            this.showConfirm(msg, () => { if (action === 'saveDelay') { this.saveDelay(); this.clearSelection('delay'); } else if (action === 'saveAndSendDelay') { this.saveDelay(); setTimeout(() => { this.sendDelay(); setTimeout(() => this.clearSelection('delay'), 1000); }, 500); } else this.sendDelay(); });
+        } else if (action === 'saveAbsence' || action === 'saveAndSendAbsence' || action === 'sendAbsence') {
+            const count = this.selected.absence.size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
+            let msg = ''; if (action === 'saveAbsence') msg = `هل تريد حفظ غياب ${count} طالب؟`; else if (action === 'saveAndSendAbsence') msg = `هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`; else msg = `هل تريد إرسال إشعار لـ ${count} طالب؟`;
+            this.showConfirm(msg, () => { if (action === 'saveAbsence') { this.saveAbsence(); this.clearSelection('absence'); } else if (action === 'saveAndSendAbsence') { this.saveAbsence(); setTimeout(() => { this.sendAbsence(); setTimeout(() => this.clearSelection('absence'), 1000); }, 500); } else this.sendAbsence(); });
+        } else if (action === 'saveNote' || action === 'saveAndSendNote' || action === 'sendNote') {
+            const count = this.selected.note.size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
+            if (action === 'saveNote' || action === 'saveAndSendNote') { const noteText = document.getElementById('noteTextarea').value.trim(); if (!noteText) return this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); }
+            let msg = ''; if (action === 'saveNote') msg = `هل تريد حفظ ملاحظة لـ ${count} طالب؟`; else if (action === 'saveAndSendNote') msg = `هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`; else msg = `هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
+            this.showConfirm(msg, () => { if (action === 'saveNote') { this.saveNote(); this.clearSelection('note'); } else if (action === 'saveAndSendNote') { this.saveNote(); setTimeout(() => { this.sendNote(); setTimeout(() => this.clearSelection('note'), 1000); }, 500); } else this.sendNote(); });
+        } else if (action === 'reset') { this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.', () => this.resetApp()); }
+    },
+
+    saveDelay() {
+        const key = this.currentTab.delay; const T = key.charAt(0).toUpperCase() + key.slice(1); const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA'); const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
+        this.selected[key].forEach(i => { const civil = this.students[i].civil; if (!this.delays[civil]) this.delays[civil] = []; this.delays[civil].push({ type: typeName, date }); });
+        this.renderList(key); this.saveData(); this.showToast('✅ تم الحفظ');
+    },
+
+    saveAbsence() {
+        const date = new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
+        this.selected.absence.forEach(i => { const civil = this.students[i].civil; if (!this.absences[civil]) this.absences[civil] = []; this.absences[civil].push({ date }); });
+        this.renderList('absence'); this.saveData(); this.updateActions(); this.showToast('✅ تم الحفظ بنجاح');
+    },
+
+    saveNote() {
+        const noteText = document.getElementById('noteTextarea').value.trim(); if (!noteText) { this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); return; }
+        const date = new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
+        this.selected.note.forEach(i => { const civil = this.students[i].civil; if (!this.notes[civil]) this.notes[civil] = []; this.notes[civil].push({ text: noteText, date }); });
+        document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.renderList('note'); this.saveData(); this.updateActions(); this.showToast('✅ تم حفظ الملاحظة بنجاح');
+    },
+
+    sendDelay() {
+        const key = this.currentTab.delay; const selected = Array.from(this.selected[key]); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
+        const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
+        selected.forEach((i, index) => {
+            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
+            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\nنود إعلامكم بأن ابنكم/ابنتكم سجل *${typeName}*\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n🕐 الوقت: ${new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}\n\nنأمل منكم المتابعة والتعاون\n\n_نظام الحضور الذكي_`;
+            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
+        });
+        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+    },
+
+    sendAbsence() {
+        const selected = Array.from(this.selected.absence); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
+        selected.forEach((i, index) => {
+            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
+            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\nنود إعلامكم بأن ابنكم/ابنتكم *غائب/ة اليوم*\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\nنأمل منكم المتابعة والاطمئنان على الطالب/ة\n\n_نظام الحضور الذكي_`;
+            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
+        });
+        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+    },
+
+    sendNote() {
+        const selected = Array.from(this.selected.note); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
+        let noteText = document.getElementById('noteTextarea').value.trim();
+        if (!noteText && selected.length > 0) { const firstStudent = this.students[selected[0]]; const civil = firstStudent.civil; if (this.notes[civil] && this.notes[civil].length > 0) { noteText = this.notes[civil][this.notes[civil].length - 1].text; } }
+        if (!noteText) { this.showToast('⚠️ لا توجد ملاحظة للإرسال'); return; }
+        selected.forEach((i, index) => {
+            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
+            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\n📝 *ملاحظة مهمة:*\n${noteText}\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\nنشكر لكم تعاونكم\n\n_نظام الحضور الذكي_`;
+            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
+        });
+        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+    },
+
+    clearSelection(type) {
+        if (type === 'delay') { const key = this.currentTab.delay; this.selected[key].clear(); this.renderList(key); }
+        else if (type === 'absence') { this.selected.absence.clear(); this.renderList('absence'); }
+        else if (type === 'note') { this.selected.note.clear(); this.renderList('note'); }
+        this.updateActions();
+    },
+
+    deleteRecord(type, civil, idx) {
+        if (!confirm('هل تريد حذف هذا السجل؟')) return;
+        if (type === 'delay') { this.delays[civil].splice(idx, 1); if (this.delays[civil].length === 0) delete this.delays[civil]; this.renderDelayView(); }
+        else if (type === 'absence') { this.absences[civil].splice(idx, 1); if (this.absences[civil].length === 0) delete this.absences[civil]; this.renderAbsenceView(); }
+        else if (type === 'note') { this.notes[civil].splice(idx, 1); if (this.notes[civil].length === 0) delete this.notes[civil]; this.renderNoteView(); }
+        this.saveData(); this.showToast('✅ تم الحذف');
+    },
+
+    deleteFromModal(type, civil, idx) {
+        if (!confirm('هل تريد حذف هذا السجل؟')) return;
+        if (type === 'delay') { this.delays[civil].splice(idx, 1); if (this.delays[civil].length === 0) delete this.delays[civil]; }
+        else if (type === 'absence') { this.absences[civil].splice(idx, 1); if (this.absences[civil].length === 0) delete this.absences[civil]; }
+        else if (type === 'note') { this.notes[civil].splice(idx, 1); if (this.notes[civil].length === 0) delete this.notes[civil]; }
+        this.saveData(); this.closeModal(); this.renderStudents(); this.showToast('✅ تم الحذف');
+    },
+
+    // =================== Statistics ===================
+    updateAllStats() { try { this.calculateDailyStats(); this.calculateWeeklyStats(); this.calculateMonthlyStats(); this.renderAbsenceLevels(); } catch (error) { console.error('Error updating stats:', error); } },
+
+    calculateDailyStats() {
+        const today = new Date().toLocaleDateString('ar-SA'); let absentToday = 0; let lateToday = 0;
+        for (const civil in this.absences) { if (this.absences[civil].some(a => a.date === today)) absentToday++; }
+        for (const civil in this.delays) { if (this.delays[civil].some(d => d.date === today)) lateToday++; }
+        const total = this.students.length; const present = total - absentToday; const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+        document.getElementById('dailyDate').textContent = today; document.getElementById('dailyTotal').textContent = total; document.getElementById('dailyPresent').textContent = present; document.getElementById('dailyAbsent').textContent = absentToday; document.getElementById('dailyLate').textContent = lateToday; document.getElementById('dailyPercentage').textContent = percentage + '%';
+    },
+
+    calculateWeeklyStats() {
+        const now = new Date(); const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)); let totalAbsent = 0; let totalLate = 0;
+        for (const civil in this.absences) { totalAbsent += this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
+        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
+        const avgPresent = this.students.length > 0 ? Math.round((this.students.length * 7 - totalAbsent) / 7) : 0;
+        document.getElementById('weeklyDays').textContent = '7'; document.getElementById('weeklyAvgPresent').textContent = avgPresent; document.getElementById('weeklyTotalAbsent').textContent = totalAbsent; document.getElementById('weeklyTotalLate').textContent = totalLate;
+    },
+
+    calculateMonthlyStats() {
+        const now = new Date(); const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1); let totalAbsent = 0; let totalLate = 0; const absentCounts = {};
+        for (const civil in this.absences) {
+            const count = this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length;
+            totalAbsent += count; if (count > 0) absentCounts[civil] = count;
+        }
+        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length; }
+        const days = now.getDate(); const avgPresent = this.students.length > 0 ? Math.round((this.students.length * days - totalAbsent) / days) : 0;
+        document.getElementById('monthlyDays').textContent = days; document.getElementById('monthlyAvgPresent').textContent = avgPresent; document.getElementById('monthlyTotalAbsent').textContent = totalAbsent; document.getElementById('monthlyTotalLate').textContent = totalLate;
+        const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5); const listDiv = document.getElementById('topAbsentList');
+        if (sorted.length === 0) { listDiv.innerHTML = '<div class="level-empty">✅ لا يوجد غياب هذا الشهر</div>'; }
+        else { listDiv.innerHTML = sorted.map(([civil, count]) => { const s = this.students.find(st => st.civil === civil); return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : ''; }).join(''); }
+    },
+
+    loadLevelSettings() {
+        const stored = localStorage.getItem('levelSettings'); if (stored) { try { this.levelSettings = JSON.parse(stored); this.applyLevelSettings(); } catch (e) { console.error('Error loading level settings:', e); } }
+    },
+
+    applyLevelSettings() {
+        document.getElementById('level1Min').value = this.levelSettings.level1.min; document.getElementById('level1Max').value = this.levelSettings.level1.max;
+        document.getElementById('level2Min').value = this.levelSettings.level2.min; document.getElementById('level2Max').value = this.levelSettings.level2.max;
+        document.getElementById('level3Min').value = this.levelSettings.level3.min; document.getElementById('level3Max').value = this.levelSettings.level3.max;
+        document.getElementById('level4Min').value = this.levelSettings.level4.min; document.getElementById('level4Max').value = this.levelSettings.level4.max;
+    },
+
+    saveLevelSettings() {
+        this.levelSettings = {
+            level1: { min: parseInt(document.getElementById('level1Min').value), max: parseInt(document.getElementById('level1Max').value) },
+            level2: { min: parseInt(document.getElementById('level2Min').value), max: parseInt(document.getElementById('level2Max').value) },
+            level3: { min: parseInt(document.getElementById('level3Min').value), max: parseInt(document.getElementById('level3Max').value) },
+            level4: { min: parseInt(document.getElementById('level4Min').value), max: parseInt(document.getElementById('level4Max').value) }
+        };
+        localStorage.setItem('levelSettings', JSON.stringify(this.levelSettings)); this.renderAbsenceLevels(); this.showToast('✅ تم حفظ الإعدادات');
+    },
+
+    renderAbsenceLevels() {
+        const levels = { 1: [], 2: [], 3: [], 4: [] };
+        for (const civil in this.absences) {
+            const count = this.absences[civil].length; const s = this.students.find(st => st.civil === civil); if (!s) continue;
+            if (count >= this.levelSettings.level1.min && count <= this.levelSettings.level1.max) { levels[1].push({ student: s, days: count }); }
+            else if (count >= this.levelSettings.level2.min && count <= this.levelSettings.level2.max) { levels[2].push({ student: s, days: count }); }
+            else if (count >= this.levelSettings.level3.min && count <= this.levelSettings.level3.max) { levels[3].push({ student: s, days: count }); }
+            else if (count >= this.levelSettings.level4.min && count <= this.levelSettings.level4.max) { levels[4].push({ student: s, days: count }); }
+        }
+        for (let i = 1; i <= 4; i++) {
+            const div = document.getElementById(`level${i}Students`);
+            if (levels[i].length === 0) { div.innerHTML = '<div class="level-empty">✅ لا يوجد طلاب في هذا المستوى</div>'; }
+            else { div.innerHTML = levels[i].map(item => `<div class="level-student"><span class="student-name-stat">${item.student.name}</span><span class="student-days">${item.days} يوم</span></div>`).join(''); }
+        }
+    },
+
+    // =================== Utilities ===================
+    importExcel(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader(); const self = this;
+        reader.onload = function (ev) {
+            try {
+                const data = new Uint8Array(ev.target.result); const wb = XLSX.read(data, { type: 'array' }); const sheet = wb.Sheets[wb.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(sheet);
+                self.students = json.map(r => ({ name: r['الاسم'] || r['Name'] || '', civil: String(r['السجل المدني'] || r['Civil'] || ''), phone: String(r['الجوال'] || r['Phone'] || ''), class: r['الصف'] || r['Class'] || '', classroom: r['الفصل'] || r['Classroom'] || '' }));
+                self.saveData(); self.populateFilters(); self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`); e.target.value = '';
+            } catch (err) { self.showToast('❌ خطأ في قراءة الملف'); }
+        };
+        reader.readAsArrayBuffer(file);
+    },
+
+    resetApp() {
+        localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
+        document.getElementById('studentsList').innerHTML = ''; document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.showToast('✅ تم مسح جميع البيانات'); this.showPage('main');
+    },
+
+    copyText(text) {
+        if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.showToast('✅ تم النسخ بنجاح')).catch(() => this.showToast('❌ فشل النسخ')); }
+        else {
+            const textarea = document.createElement('textarea'); textarea.value = text; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select();
+            try { document.execCommand('copy'); this.showToast('✅ تم النسخ بنجاح'); } catch (err) { this.showToast('❌ فشل النسخ'); }
+            document.body.removeChild(textarea);
+        }
     }
-  };
-  
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
-  updateOnlineStatus();
-},
-
-
-// حفظ البيانات المعلقة للمزامنة
-savePendingData(data){
-  const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
-  pending.push({...data, timestamp: Date.now()});
-  localStorage.setItem('pendingSync', JSON.stringify(pending));
-},
-
-// مزامنة البيانات المعلقة
-syncPendingData(){
-  const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
-  if(pending.length === 0) return;
-  
-  const activationCode = localStorage.getItem('activationCode');
-  if(!activationCode || !activationCode.startsWith('SK-')) return;
-  
-  this.showToast('🔄 جارٍ المزامنة...');
-  
-  // مزامنة مع Firebase
-  database.ref('subscriptions/' + activationCode).set({
-    students: this.students,
-    delays: this.delays,
-    absences: this.absences,
-    notes: this.notes,
-    lastUpdate: Date.now()
-  }).then(() => {
-    localStorage.setItem('pendingSync', '[]');
-    this.showToast('✅ تمت المزامنة بنجاح');
-  }).catch((error) => {
-    console.log('خطأ في المزامنة:', error);
-  });
-},
-
-
-
-setupRealtimeSync(){
-const activationCode = localStorage.getItem('activationCode');
-if(!activationCode || !activationCode.startsWith('SK-')) return;
-
-database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
-  const data = snapshot.val();
-  if(data && data.lastUpdate && data.lastUpdate !== this.lastUpdate){
-    this.lastUpdate = data.lastUpdate;
-    this.students = data.students || [];
-    this.delays = data.delays || {};
-    this.absences = data.absences || {};
-    this.notes = data.notes || {};
-    this.renderStudents();
-    this.showToast('✅ تم تحديث البيانات');
-  }
-});
-},
-
-lastUpdate: 0,
-
-loadData(){
-const activationCode = localStorage.getItem('activationCode');
-
-if(!activationCode || !activationCode.startsWith('SK-')){
-  // تحميل محلياً
-  this.students=JSON.parse(localStorage.getItem('students')||'[]');
-  this.delays=JSON.parse(localStorage.getItem('delays')||'{}');
-  this.absences=JSON.parse(localStorage.getItem('absences')||'{}');
-  this.notes=JSON.parse(localStorage.getItem('notes')||'{}');
-  return;
-}
-
-// تحميل من السحابة
-database.ref('subscriptions/' + activationCode).once('value').then((snapshot) => {
-  const data = snapshot.val();
-  if(data){
-    this.students = data.students || [];
-    this.delays = data.delays || {};
-    this.absences = data.absences || {};
-    this.notes = data.notes || {};
-
-    // حفظ محلياً
-    localStorage.setItem('students',JSON.stringify(this.students));
-    localStorage.setItem('delays',JSON.stringify(this.delays));
-    localStorage.setItem('absences',JSON.stringify(this.absences));
-    localStorage.setItem('notes',JSON.stringify(this.notes));
-
-    this.renderStudents();
-  }else{
-    // إذا لم توجد بيانات في السحابة، حمّل محلياً
-    this.students=JSON.parse(localStorage.getItem('students')||'[]');
-    this.delays=JSON.parse(localStorage.getItem('delays')||'{}');
-    this.absences=JSON.parse(localStorage.getItem('absences')||'{}');
-    this.notes=JSON.parse(localStorage.getItem('notes')||'{}');
-  }
-}).catch((error)=>{
-  console.log('خطأ في التحميل:', error);
-  // في حال الخطأ، حمّل محلياً
-  this.students=JSON.parse(localStorage.getItem('students')||'[]');
-  this.delays=JSON.parse(localStorage.getItem('delays')||'{}');
-  this.absences=JSON.parse(localStorage.getItem('absences')||'{}');
-  this.notes=JSON.parse(localStorage.getItem('notes')||'{}');
-});
-},
-
-saveData(){
-  // حفظ محلي
-  localStorage.setItem('students',JSON.stringify(this.students));
-  localStorage.setItem('delays',JSON.stringify(this.delays));
-  localStorage.setItem('absences',JSON.stringify(this.absences));
-  localStorage.setItem('notes',JSON.stringify(this.notes));
-  localStorage.setItem('subscriptions',JSON.stringify(this.subscriptions));
-  
-  // نسخ احتياطي في Firebase
-  const code = localStorage.getItem('activationCode');
-  if(code && typeof database !== 'undefined'){
-    const deviceId = this.getDeviceId();
-    database.ref('backups/' + deviceId).set({
-      code: code,
-      students: this.students,
-      delays: this.delays,
-      absences: this.absences,
-      notes: this.notes,
-      lastBackup: new Date().toISOString(),
-      studentCount: this.students.length
-    }).catch(error => console.error('خطأ في النسخ الاحتياطي:', error));
-  }
-},
-
-
-
-setToday(){
-const today=new Date().toISOString().split('T')[0];
-['dateMorning','dateBreak','dateDeparture','dateAbsence','dateNote'].forEach(id=>{
-const el=document.getElementById(id);
-if(el)el.value=today;
-});
-
-    
-},
-
-setupEvents(){
-const self=this;
-
-document.getElementById('searchInput').addEventListener('input',function(e){
-const q=e.target.value.toLowerCase();
-if(!q){
-document.getElementById('studentsList').innerHTML='';
-document.getElementById('emptyState').style.display='block';
-return;
-}
-document.getElementById('emptyState').style.display='none';
-const filtered=self.students.filter(s=>
-s.name.toLowerCase().includes(q)||s.phone.includes(q)||s.class.toLowerCase().includes(q)
-);
-self.renderStudents(filtered);
-});
-
-['Morning','Break','Departure','Absence','Note'].forEach(t=>{
-const search=document.getElementById('search'+t);
-if(search)search.addEventListener('input',function(){self.filterList(t.toLowerCase());});
-const cls=document.getElementById('class'+t);
-if(cls)cls.addEventListener('change',function(){self.filterList(t.toLowerCase());});
-const clsr=document.getElementById('classroom'+t);
-if(clsr)clsr.addEventListener('change',function(){self.filterList(t.toLowerCase());});
-});
-
-const views=['DelayView','AbsenceView','NoteView'];
-views.forEach(v=>{
-const el=document.getElementById('search'+v);
-if(el)el.addEventListener('input',function(){
-if(v==='DelayView')self.renderDelayView();
-else if(v==='AbsenceView')self.renderAbsenceView();
-else if(v==='NoteView')self.renderNoteView();
-});
-});
-
-const noteTextarea=document.getElementById('noteTextarea');
-if(noteTextarea){
-noteTextarea.addEventListener('input',function(e){
-document.getElementById('noteCharCount').textContent=e.target.value.length;
-});
-}
-
-const excelFile=document.getElementById('excelFile');
-if(excelFile){
-excelFile.addEventListener('change',function(e){self.importExcel(e);});
-}
-},
-
-renderStudents(list=[]){
-const ul=document.getElementById('studentsList');
-ul.innerHTML=list.map((s,i)=>{
-const idx=this.students.indexOf(s);
-const dCount=(this.delays[s.civil]||[]).length;
-const aCount=(this.absences[s.civil]||[]).length;
-const nCount=(this.notes[s.civil]||[]).length;
-let badges='';
-if(dCount>0)badges+=`<span class="badge delay">${dCount} تأخر</span>`;
-if(aCount>0)badges+=`<span class="badge absence">${aCount} غياب</span>`;
-if(nCount>0)badges+=`<span class="badge note">${nCount} ملاحظة</span>`;
-return`<li class="student-item" onclick="app.showStudent(${idx})">
-<div class="student-name">${badges}${s.name}</div>
-<div style="font-size:15px;color:#666;margin-top:4px">${s.class} - ${s.classroom} | 📞 ${s.phone}</div>
-</li>`;
-}).join('');
-},
-
-populateFilters() {
-  // تأكد من وجود بيانات أولاً
-  if (!this.students || this.students.length === 0) {
-    console.log('لا توجد بيانات طلاب');
-    return;
-  }
-  
-  const classes = [...new Set(this.students.map(s => s.class))].filter(c => c).sort();
-  const classrooms = [...new Set(this.students.map(s => s.classroom))].filter(c => c).sort();
-  
-  ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
-    const cls = document.getElementById(`class${t}`);
-    const clsr = document.getElementById(`classroom${t}`);
-    
-    if (cls) {
-      // احذف الخيارات القديمة أولاً
-      cls.innerHTML = '';
-      
-      // أضف الخيار الافتراضي
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'الكل';
-      cls.appendChild(defaultOption);
-      
-      // أضف الصفوف
-      classes.forEach(c => {
-        const option = document.createElement('option');
-        option.value = c;
-        option.textContent = c;
-        cls.appendChild(option);
-      });
-    }
-    
-    if (clsr) {
-      // احذف الخيارات القديمة أولاً
-      clsr.innerHTML = '';
-      
-      // أضف الخيار الافتراضي
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'الكل';
-      clsr.appendChild(defaultOption);
-      
-      // أضف الفصول
-      classrooms.forEach(c => {
-        const option = document.createElement('option');
-        option.value = c;
-        option.textContent = c;
-        clsr.appendChild(option);
-      });
-    }
-  });
-  
-  // إجبار Safari على إعادة الرسم (مهم جداً لـ iOS)
-  setTimeout(() => {
-    document.querySelectorAll('.filter-select').forEach(select => {
-      select.style.display = 'none';
-      select.offsetHeight; // Force reflow
-      select.style.display = '';
-    });
-  }, 100);
-},
-
-
-renderList(type){
-const list=document.getElementById('list'+type.charAt(0).toUpperCase()+type.slice(1));
-const key=type==='absence'?'absence':type==='note'?'note':type;
-list.innerHTML=this.students.map((s,i)=>{
-const idx=this.students.indexOf(s);
-const checked=this.selected[key].has(idx)?'checked':'';
-return`<li class="student-item">
-<label style="display:flex;align-items:center;gap:12px;cursor:pointer">
-<input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer">
-<div style="flex:1">
-<div style="font-weight:600;font-size:16px">${s.name}</div>
-<div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div>
-</div>
-</label>
-</li>`;
-}).join('');
-this.updateCount(key);
-},
-
-filterList(type){
-const T=type.charAt(0).toUpperCase()+type.slice(1);
-const search=document.getElementById('search'+T).value.toLowerCase();
-const cls=document.getElementById('class'+T).value;
-const clsr=document.getElementById('classroom'+T).value;
-const filtered=this.students.filter(s=>{
-const matchSearch=!search||s.name.toLowerCase().includes(search);
-const matchClass=!cls||s.class===cls;
-const matchClassroom=!clsr||s.classroom===clsr;
-return matchSearch&&matchClass&&matchClassroom;
-});
-const list=document.getElementById('list'+T);
-const key=type==='absence'?'absence':type==='note'?'note':type;
-list.innerHTML=filtered.map((s)=>{
-const idx=this.students.indexOf(s);
-const checked=this.selected[key].has(idx)?'checked':'';
-return`<li class="student-item">
-<label style="display:flex;align-items:center;gap:12px;cursor:pointer">
-<input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer">
-<div style="flex:1">
-<div style="font-weight:600;font-size:16px">${s.name}</div>
-<div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div>
-</div>
-</label>
-</li>`;
-}).join('');
-},
-
-toggleStudent(key,idx){
-this.selected[key].has(idx)?this.selected[key].delete(idx):this.selected[key].add(idx);
-this.updateCount(key);
-this.updateActions();
-},
-
-updateCount(key){
-const T=key==='absence'?'Absence':key==='note'?'Note':key.charAt(0).toUpperCase()+key.slice(1);
-const div=document.getElementById('count'+T);
-const count=this.selected[key].size;
-if(count>0){
-div.classList.remove('hidden');
-div.querySelector('span').textContent=count;
-}else{
-div.classList.add('hidden');
-}
-},
-
-updateActions(){
-const page=document.querySelector('.page.active').id;
-if(page==='delaysPage'){
-const key=this.currentTab.delay;
-const actions=document.getElementById('delayActions');
-this.selected[key].size>0&&this.currentTab.delay!=='view'?actions.classList.add('show'):actions.classList.remove('show');
-}else if(page==='absencesPage'){
-const actions=document.getElementById('absenceActions');
-this.selected.absence.size>0&&this.currentTab.absence!=='view'?actions.classList.add('show'):actions.classList.remove('show');
-}else if(page==='notesPage'){
-const actions=document.getElementById('noteActions');
-this.selected.note.size>0&&this.currentTab.notes!=='view'?actions.classList.add('show'):actions.classList.remove('show');
-}
-},
-
-showPage(page){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-const pages=['main','delays','absences','notes','stats','settings'];
-const idx=pages.indexOf(page);
-document.getElementById(page+'Page').classList.add('active');
-document.querySelectorAll('.nav-item')[idx].classList.add('active');
-if(page==='delays')this.renderList(this.currentTab.delay);
-if(page==='absences')this.currentTab.absence==='daily'?this.renderList('absence'):this.renderAbsenceView();
-if(page==='notes')this.currentTab.notes==='add'?this.renderList('note'):this.renderNoteView();
-if(page==='stats'){
-this.currentTab.stats='daily';
-// إعادة تعيين التبويبات
-document.querySelectorAll('#statsPage .tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('#statsPage .tab-content').forEach(c=>c.classList.remove('active'));
-document.querySelector('#statsPage .tab').classList.add('active');
-document.getElementById('statsDailyTab').classList.add('active');
-this.updateAllStats();
-}
-
-this.updateActions();
-},
-
-switchTab(page,tab){
-const container=page==='delays'?'delaysPage':page==='absence'?'absencesPage':page==='notes'?'notesPage':'statsPage';
-document.querySelectorAll(`#${container} .tab`).forEach(t=>t.classList.remove('active'));
-document.querySelectorAll(`#${container} .tab-content`).forEach(t=>t.classList.remove('active'));
-event.target.classList.add('active');
-if(page==='delays'){
-this.currentTab.delay=tab;
-document.getElementById('delay'+tab.charAt(0).toUpperCase()+tab.slice(1)+'Tab').classList.add('active');
-if(tab==='view')this.renderDelayView();
-else this.renderList(tab);
-}else if(page==='absence'){
-this.currentTab.absence=tab;
-document.getElementById('absence'+tab.charAt(0).toUpperCase()+tab.slice(1)+'Tab').classList.add('active');
-if(tab==='view')this.renderAbsenceView();
-else this.renderList('absence');
-
-}else if(page==='notes'){
-this.currentTab.notes=tab;
-document.getElementById('note'+tab.charAt(0).toUpperCase()+tab.slice(1)+'Tab').classList.add('active');
-if(tab==='view')this.renderNoteView();
-else this.renderList('note');
-}else if(page==='stats'){
-
-this.currentTab.stats=tab;
-document.querySelectorAll('#statsPage .tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('#statsPage .tab-content').forEach(c=>c.classList.remove('active'));
-event.target.classList.add('active');
-document.getElementById('stats'+tab.charAt(0).toUpperCase()+tab.slice(1)+'Tab').classList.add('active');
-this.updateAllStats();
-}
-this.updateActions();
-},
-
-confirmAction(action){
-  if(action==='saveDelay'||action==='saveAndSendDelay'||action==='sendDelay'){
-    const key=this.currentTab.delay;
-    const count=this.selected[key].size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    let msg='';
-    if(action==='saveDelay')msg=`هل تريد حفظ تأخر ${count} طالب؟`;
-    else if(action==='saveAndSendDelay')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveDelay'){
-        this.saveDelay();
-        this.clearSelection('delay');
-      }
-      else if(action==='saveAndSendDelay'){
-        this.saveDelay();
-        setTimeout(()=>{
-          this.sendDelay();
-          setTimeout(()=>this.clearSelection('delay'),1000);
-        },500);
-      }
-      else this.sendDelay();
-    });
-  }else if(action==='saveAbsence'||action==='saveAndSendAbsence'||action==='sendAbsence'){
-    const count=this.selected.absence.size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    let msg='';
-    if(action==='saveAbsence')msg=`هل تريد حفظ غياب ${count} طالب؟`;
-    else if(action==='saveAndSendAbsence')msg=`هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال إشعار لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveAbsence'){
-        this.saveAbsence();
-        this.clearSelection('absence');
-      }
-      else if(action==='saveAndSendAbsence'){
-        this.saveAbsence();
-        setTimeout(()=>{
-          this.sendAbsence();
-          setTimeout(()=>this.clearSelection('absence'),1000);
-        },500);
-      }
-      else this.sendAbsence();
-    });
-  }else if(action==='saveNote'||action==='saveAndSendNote'||action==='sendNote'){
-    const count=this.selected.note.size;
-    if(count===0)return this.showToast('⚠️ لم يتم اختيار أي طالب');
-    
-    // تحقق من الملاحظة فقط للحفظ أو الحفظ+الإرسال
-    if(action==='saveNote'||action==='saveAndSendNote'){
-      const noteText=document.getElementById('noteTextarea').value.trim();
-      if(!noteText)return this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
-    }
-    
-    let msg='';
-    if(action==='saveNote')msg=`هل تريد حفظ ملاحظة لـ ${count} طالب؟`;
-    else if(action==='saveAndSendNote')msg=`هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`;
-    else msg=`هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
-    this.showConfirm(msg,()=>{
-      if(action==='saveNote'){
-        this.saveNote();
-        this.clearSelection('note');
-      }
-      else if(action==='saveAndSendNote'){
-        this.saveNote();
-        setTimeout(()=>{
-          this.sendNote();
-          setTimeout(()=>this.clearSelection('note'),1000);
-        },500);
-      }
-      else this.sendNote();
-    });
-  }else if(action==='reset'){
-    this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.',()=>this.resetApp());
-  }
-},
-
-
-
-    saveDelay(){
-  const key = this.currentTab.delay;
-  const T = key.charAt(0).toUpperCase() + key.slice(1);
-  const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA');
-  const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-  
-  this.selected[key].forEach(i => {
-    const civil = this.students[i].civil;
-    if(!this.delays[civil]) this.delays[civil] = [];
-    this.delays[civil].push({type: typeName, date});
-  });
-  
-  // لا تمسح selected هنا - سنمسحها بعد الإرسال
-  // this.selected[key].clear(); ← احذف هذا السطر
-  
-  this.renderList(key);
-  this.saveData();
-  this.showToast('✅ تم الحفظ');
-},
-
-
-saveAbsence(){
-const date=new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
-this.selected.absence.forEach(i=>{
-const civil=this.students[i].civil;
-if(!this.absences[civil])this.absences[civil]=[];
-this.absences[civil].push({date});
-});
-//this.selected.absence.clear();
-this.renderList('absence');
-this.saveData();
-this.updateActions();
-this.showToast('✅ تم الحفظ بنجاح');
-},
-
-saveNote(){
-  const noteText=document.getElementById('noteTextarea').value.trim();
-  
-  // تحقق من وجود نص
-  if(!noteText) {
-    this.showToast('⚠️ يجب كتابة الملاحظة أولاً');
-    return;
-  }
-  
-  const date=new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
-  this.selected.note.forEach(i=>{
-    const civil=this.students[i].civil;
-    if(!this.notes[civil])this.notes[civil]=[];
-    this.notes[civil].push({text:noteText,date});
-  });
-  
-  // لا تمسح selected هنا - سيتم المسح في clearSelection بعد الإرسال
-  // this.selected.note.clear();
-  
-  document.getElementById('noteTextarea').value='';
-  document.getElementById('noteCharCount').textContent='0';
-  this.renderList('note');
-  this.saveData();
-  this.updateActions();
-  this.showToast('✅ تم حفظ الملاحظة بنجاح');
-},
-
-
-sendDelay(){
-  const key = this.currentTab.delay;
-  const selected = Array.from(this.selected[key]);
-  if(selected.length === 0) {
-    this.showToast('⚠️ لم يتم اختيار أي طالب');
-    return;
-  }
-  
-  const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-  
-  selected.forEach((i, index) => {
-    const student = this.students[i];
-    const phone = student.parentPhone || student.phone;
-    
-    if(!phone) {
-      this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`);
-      return;
-    }
-    
-    // صياغة الرسالة
-    const message = `السلام عليكم ورحمة الله\n\n` +
-                    `عزيزي ولي أمر الطالب/ة: *${student.name}*\n\n` +
-                    `نود إعلامكم بأن ابنكم/ابنتكم سجل *${typeName}*\n\n` +
-                    `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
-                    `🕐 الوقت: ${new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute: '2-digit'})}\n\n` +
-                    `نأمل منكم المتابعة والتعاون\n\n` +
-                    `_نظام الحضور الذكي_`;
-    
-    // تنظيف رقم الجوال (إزالة المسافات والرموز)
-    let phoneNumber = phone.replace(/\D/g, '');
-    
-    // إضافة كود السعودية إذا كان الرقم يبدأ بـ 05
-    if(phoneNumber.startsWith('05')) {
-      phoneNumber = '966' + phoneNumber.substring(1);
-    }
-    
-    // فتح واتساب مع تأخير (3 ثواني بين كل رسالة)
-    setTimeout(() => {
-      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
-    }, index * 3000);
-  });
-  
-  this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-},
-
-
-sendAbsence(){
-  const selected = Array.from(this.selected.absence);
-  if(selected.length === 0) {
-    this.showToast('⚠️ لم يتم اختيار أي طالب');
-    return;
-  }
-  
-  selected.forEach((i, index) => {
-    const student = this.students[i];
-    const phone = student.parentPhone || student.phone;
-    
-    if(!phone) {
-      this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`);
-      return;
-    }
-    
-    // صياغة الرسالة
-    const message = `السلام عليكم ورحمة الله\n\n` +
-                    `عزيزي ولي أمر الطالب/ة: *${student.name}*\n\n` +
-                    `نود إعلامكم بأن ابنكم/ابنتكم *غائب/ة اليوم*\n\n` +
-                    `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\n` +
-                    `نأمل منكم المتابعة والاطمئنان على الطالب/ة\n\n` +
-                    `_نظام الحضور الذكي_`;
-    
-    // تنظيف رقم الجوال
-    let phoneNumber = phone.replace(/\D/g, '');
-    
-    // إضافة كود السعودية إذا كان الرقم يبدأ بـ 05
-    if(phoneNumber.startsWith('05')) {
-      phoneNumber = '966' + phoneNumber.substring(1);
-    }
-    
-    // فتح واتساب مع تأخير (3 ثواني بين كل رسالة)
-    setTimeout(() => {
-      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
-    }, index * 3000);
-  });
-  
-  this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-},
-
-
-sendNote(){
-  const selected = Array.from(this.selected.note);
-  
-  if(selected.length === 0) {
-    this.showToast('⚠️ لم يتم اختيار أي طالب');
-    return;
-  }
-  
-  // احصل على النص من آخر ملاحظة محفوظة أو من textarea
-  let noteText = document.getElementById('noteTextarea').value.trim();
-  
-  // إذا كان textarea فارغ، خذ النص من آخر ملاحظة محفوظة
-  if(!noteText && selected.length > 0) {
-    const firstStudent = this.students[selected[0]];
-    const civil = firstStudent.civil;
-    if(this.notes[civil] && this.notes[civil].length > 0) {
-      noteText = this.notes[civil][this.notes[civil].length - 1].text;
-    }
-  }
-  
-  if(!noteText) {
-    this.showToast('⚠️ لا توجد ملاحظة للإرسال');
-    return;
-  }
-  
-  selected.forEach((i, index) => {
-    const student = this.students[i];
-    const phone = student.parentPhone || student.phone;
-    
-    if(!phone) {
-      this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`);
-      return;
-    }
-    
-    // صياغة الرسالة
-    const message = `السلام عليكم ورحمة الله\n\n` +
-                    `عزيزي ولي أمر الطالب/ة: *${student.name}*\n\n` +
-                    `📝 *ملاحظة مهمة:*\n` +
-                    `${noteText}\n\n` +
-                    `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\n` +
-                    `نشكر لكم تعاونكم\n\n` +
-                    `_نظام الحضور الذكي_`;
-    
-    // تنظيف رقم الجوال
-    let phoneNumber = phone.replace(/\D/g, '');
-    
-    // إضافة كود السعودية إذا كان الرقم يبدأ بـ 05
-    if(phoneNumber.startsWith('05')) {
-      phoneNumber = '966' + phoneNumber.substring(1);
-    }
-    
-    // فتح واتساب مع تأخير (3 ثواني بين كل رسالة)
-    setTimeout(() => {
-      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
-    }, index * 3000);
-  });
-  
-  this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-},
-
-    
-clearSelection(type){
-  if(type === 'delay'){
-    const key = this.currentTab.delay;
-    this.selected[key].clear();
-    this.renderList(key);
-  } else if(type === 'absence'){
-    this.selected.absence.clear();
-    this.renderList('absence');
-  } else if(type === 'note'){
-    this.selected.note.clear();
-    this.renderList('note');
-  }
-  this.updateActions();
-},
-
-
-renderDelayView(){
-const search=document.getElementById('searchDelayView').value.toLowerCase();
-const all=[];
-for(const civil in this.delays){
-const s=this.students.find(st=>st.civil===civil);
-if(s&&(!search||s.name.toLowerCase().includes(search))){
-this.delays[civil].forEach((d,i)=>all.push({s,d,civil,i}));
-}
-}
-all.sort((a,b)=>new Date(b.d.date)-new Date(a.d.date));
-const div=document.getElementById('delayViewList');
-if(all.length===0){
-div.innerHTML='<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد تأخرات</div>';
-return;
-}
-div.innerHTML=all.map(item=>`
-<div class="record-item" style="border-right:4px solid #ff9800;padding:14px;display:flex;justify-content:space-between;align-items:center">
-<div style="flex:1">
-<div style="font-weight:600;color:#e65100;font-size:15px">${item.s.name}</div>
-<div style="font-size:13px;color:#666;margin-top:4px">${item.d.type} - 📅 ${item.d.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteRecord('delay','${item.civil}',${item.i})">🗑️</button>
-</div>
-`).join('');
-},
-
-renderAbsenceView(){
-const search=document.getElementById('searchAbsenceView').value.toLowerCase();
-const all=[];
-for(const civil in this.absences){
-const s=this.students.find(st=>st.civil===civil);
-if(s&&(!search||s.name.toLowerCase().includes(search))){
-this.absences[civil].forEach((a,i)=>all.push({s,a,civil,i}));
-}
-}
-all.sort((a,b)=>new Date(b.a.date)-new Date(a.a.date));
-const div=document.getElementById('absenceViewList');
-if(all.length===0){
-div.innerHTML='<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا يوجد غياب</div>';
-return;
-}
-div.innerHTML=all.map(item=>`
-<div class="record-item" style="border-right:4px solid #f44336;padding:14px;display:flex;justify-content:space-between;align-items:center">
-<div style="flex:1">
-<div style="font-weight:600;color:#c62828;font-size:15px">${item.s.name}</div>
-<div style="font-size:13px;color:#666;margin-top:4px">غياب يومي - 📅 ${item.a.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteRecord('absence','${item.civil}',${item.i})">🗑️</button>
-</div>
-`).join('');
-},
-
-renderNoteView(){
-const search=document.getElementById('searchNoteView').value.toLowerCase();
-const all=[];
-for(const civil in this.notes){
-const s=this.students.find(st=>st.civil===civil);
-if(s&&(!search||s.name.toLowerCase().includes(search))){
-this.notes[civil].forEach((n,i)=>all.push({s,n,civil,i}));
-}
-}
-all.sort((a,b)=>new Date(b.n.date)-new Date(a.n.date));
-const div=document.getElementById('noteViewList');
-if(all.length===0){
-div.innerHTML='<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد ملاحظات</div>';
-return;
-}
-div.innerHTML=all.map(item=>`
-<div class="record-item" style="border-right:4px solid #00897b;padding:14px">
-<div class="record-item-header">
-<div style="flex:1">
-<div style="font-weight:600;color:#00695c;font-size:15px">${item.s.name}</div>
-<div style="font-size:13px;color:#666;margin-top:4px">📅 ${item.n.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteRecord('note','${item.civil}',${item.i})">🗑️</button>
-</div>
-<div class="record-note-text">${item.n.text}</div>
-</div>
-`).join('');
-},
-
-deleteRecord(type,civil,idx){
-if(!confirm('هل تريد حذف هذا السجل؟'))return;
-if(type==='delay'){
-this.delays[civil].splice(idx,1);
-if(this.delays[civil].length===0)delete this.delays[civil];
-this.renderDelayView();
-}else if(type==='absence'){
-this.absences[civil].splice(idx,1);
-if(this.absences[civil].length===0)delete this.absences[civil];
-this.renderAbsenceView();
-}else if(type==='note'){
-this.notes[civil].splice(idx,1);
-if(this.notes[civil].length===0)delete this.notes[civil];
-this.renderNoteView();
-}
-this.saveData();
-this.showToast('✅ تم الحذف');
-},
-
-showStudent(idx){
-const s=this.students[idx];
-const delays=this.delays[s.civil]||[];
-const absences=this.absences[s.civil]||[];
-const notes=this.notes[s.civil]||[];
-const modal=document.getElementById('studentModal');
-const body=document.getElementById('modalBody');
-body.innerHTML=`
-<div style="margin-bottom:18px">
-<div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0">
-<strong style="color:#666;font-size:15px">👤 الاسم:</strong> <span style="font-size:16px">${s.name}</span>
-</div>
-<div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0">
-<strong style="color:#666;font-size:15px">🆔 السجل المدني:</strong> <span style="font-size:16px">${s.civil}</span>
-</div>
-<div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0">
-<strong style="color:#666;font-size:15px">📱 الجوال:</strong> <span style="font-size:16px">${s.phone}</span>
-</div>
-<div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0">
-<strong style="color:#666;font-size:15px">📚 الصف:</strong> <span style="font-size:16px">${s.class}</span>
-</div>
-<div style="margin:12px 0;padding:12px 0">
-<strong style="color:#666;font-size:15px">🏫 الفصل:</strong> <span style="font-size:16px">${s.classroom}</span>
-</div>
-</div>
-<div class="record-grid">
-<div class="record-card delays">
-<h4>⏰ التأخرات (${delays.length})</h4>
-<div class="record-list">
-${delays.length>0?delays.map((d,i)=>`
-<div class="record-item">
-<div class="record-item-header">
-<div class="record-info">
-<div class="record-type">${d.type}</div>
-<div class="record-date">📅 ${d.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteFromModal('delay','${s.civil}',${i})">🗑️</button>
-</div>
-</div>
-`).join(''):'<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد تأخرات</div>'}
-</div>
-</div>
-<div class="record-card absences">
-<h4>📅 الغياب (${absences.length})</h4>
-<div class="record-list">
-${absences.length>0?absences.map((a,i)=>`
-<div class="record-item">
-<div class="record-item-header">
-<div class="record-info">
-<div style="font-weight:600;color:#c62828;font-size:12px">غياب يومي</div>
-<div class="record-date">📅 ${a.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteFromModal('absence','${s.civil}',${i})">🗑️</button>
-</div>
-</div>
-`).join(''):'<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا يوجد غياب</div>'}
-</div>
-</div>
-<div class="record-card notes">
-<h4>📝 الملاحظات (${notes.length})</h4>
-<div class="record-list">
-${notes.length>0?notes.map((n,i)=>`
-<div class="record-item">
-<div class="record-item-header">
-<div class="record-info">
-<div class="record-type">ملاحظة</div>
-<div class="record-date">📅 ${n.date}</div>
-</div>
-<button class="delete-btn" onclick="app.deleteFromModal('note','${s.civil}',${i})">🗑️</button>
-</div>
-<div class="record-note-text">${n.text}</div>
-</div>
-`).join(''):'<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد ملاحظات</div>'}
-</div>
-</div>
-</div>
-`;
-modal.classList.add('active');
-},
-
-deleteFromModal(type,civil,idx){
-if(!confirm('هل تريد حذف هذا السجل؟'))return;
-if(type==='delay'){
-this.delays[civil].splice(idx,1);
-if(this.delays[civil].length===0)delete this.delays[civil];
-}else if(type==='absence'){
-this.absences[civil].splice(idx,1);
-if(this.absences[civil].length===0)delete this.absences[civil];
-}else if(type==='note'){
-this.notes[civil].splice(idx,1);
-if(this.notes[civil].length===0)delete this.notes[civil];
-}
-this.saveData();
-this.closeModal();
-this.renderStudents();
-this.showToast('✅ تم الحذف');
-},
-
-closeModal(){
-document.getElementById('studentModal').classList.remove('active');
-},
-
-showConfirm(msg,onYes){
-document.getElementById('confirmMsg').textContent=msg;
-document.getElementById('confirmYes').onclick=function(){
-app.closeConfirm();
-onYes();
-};
-document.getElementById('confirmModal').classList.add('active');
-},
-
-closeConfirm(){
-document.getElementById('confirmModal').classList.remove('active');
-},
-
-importExcel(e){
-const file=e.target.files[0];
-if(!file)return;
-const reader=new FileReader();
-const self=this;
-reader.onload=function(ev){
-try{
-const data=new Uint8Array(ev.target.result);
-const wb=XLSX.read(data,{type:'array'});
-const sheet=wb.Sheets[wb.SheetNames[0]];
-const json=XLSX.utils.sheet_to_json(sheet);
-self.students=json.map(r=>({
-name:r['الاسم']||r['Name']||'',
-civil:String(r['السجل المدني']||r['Civil']||''),
-phone:String(r['الجوال']||r['Phone']||''),
-class:r['الصف']||r['Class']||'',
-classroom:r['الفصل']||r['Classroom']||''
-}));
-self.saveData();
-self.populateFilters();
-self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`);
-e.target.value='';
-}catch(err){
-self.showToast('❌ خطأ في قراءة الملف');
-}
-};
-reader.readAsArrayBuffer(file);
-},
-
-resetApp(){
-localStorage.clear();
-this.students=[];
-this.delays={};
-this.absences={};
-this.notes={};
-this.selected={morning:new Set(),break:new Set(),departure:new Set(),absence:new Set(),note:new Set()};
-document.getElementById('studentsList').innerHTML='';
-document.getElementById('noteTextarea').value='';
-document.getElementById('noteCharCount').textContent='0';
-this.showToast('✅ تم مسح جميع البيانات');
-this.showPage('main');
-},
-
-showToast(msg){
-const toast=document.getElementById('toast');
-toast.textContent=msg;
-toast.classList.add('show');
-setTimeout(function(){toast.classList.remove('show');},3000);
-},  
-
-// نظام الفترة التجريبية
-subscription: {
-    trialDays: 30,
-    activationCodes: [],
-},
-
-// تحقق من حالة الاشتراك
-checkSubscription(){
-  let code = localStorage.getItem('activationCode');
-  
-  // إذا لم يوجد كود - أنشئ تجربة 7 أيام
-  if(!code){
-    code = this.initTrialSubscription();
-  }
-  
-  // تحميل الاشتراكات من localStorage
-  const storedSubs = localStorage.getItem('subscriptions');
-  if(storedSubs){
-    this.subscriptions = JSON.parse(storedSubs);
-  }
-  
-  const subscription = this.subscriptions[code];
-  
-  if(!subscription || !subscription.active){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-  
-  const days = this.calculateRemainingDays(subscription.endDate);
-  
-  // تنبيهات الفترة التجريبية
-  if(subscription.isTrial){
-    if(days === 2){
-      this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000);
-    } else if(days === 1){
-      this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000);
-    } else if(days === 0){
-      this.showToast('⚠️ انتهت الفترة التجريبية', 5000);
-    }
-  }
-  
-  this.updateSubscriptionBadge(days);
-  
-  if(days <= 0){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-  
-  return true;
-},
-
-calculateRemainingDays(endDate){
-  const now = new Date();
-  const end = new Date(endDate);
-  const diff = end - now;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-},
-
-updateSubscriptionBadge(days){
-  const badge = document.getElementById('subscriptionBadge');
-  if(!badge) return;
-  
-  const daysEl = badge.querySelector('.badge-days');
-  const labelEl = badge.querySelector('.badge-label');
-  
-  if(daysEl) daysEl.textContent = days;
-  if(labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
-  
-  // تغيير اللون حسب الأيام المتبقية
-  badge.classList.remove('trial', 'warning', 'active');
-  if(days <= 3){
-    badge.classList.add('warning');
-  } else if(days <= 7){
-    badge.classList.add('trial');
-  } else {
-    badge.classList.add('active');
-  }
-},
-
-    async checkExpiredTrials(){
-  const deviceId = this.getDeviceId();
-  if(typeof database === 'undefined') return;
-  
-  try {
-    const code = localStorage.getItem('activationCode');
-    if(!code || !code.includes('TRIAL')) return;
-    
-    const subscription = this.subscriptions[code];
-    if(!subscription) return;
-    
-    const endDate = new Date(subscription.endDate);
-    const now = new Date();
-    const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
-    
-    // تحذير قبل الحذف بـ 5 أيام
-    if(daysSinceExpiry === 18){
-      this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
-    }
-    
-    // حذف بعد 30 يوم
-    if(daysSinceExpiry >= 23){
-      await database.ref('backups/' + deviceId).remove();
-      localStorage.clear();
-      alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.');
-      location.reload();
-    }
-  } catch(error){
-    console.error('خطأ في فحص التجارب:', error);
-  }
-},
-
-
-
-// دالة جديدة للحصول على معرّف الجهاز
-getDeviceId(){
-  let deviceId = localStorage.getItem('deviceId');
-  
-  if(!deviceId){
-    // أنشئ معرّف فريد للجهاز (لا يمكن تغييره)
-    deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
-  }
-  
-  return deviceId;
-},
-
-// دالة للتحقق من انتهاء التجربة
-async checkTrialExpiry(code){
-  const deviceId = this.getDeviceId();
-  
-  try {
-    const snapshot = await database.ref('trials/' + deviceId).once('value');
-    const trial = snapshot.val();
-    
-    if(trial){
-      const startDate = new Date(trial.startDate);
-      const today = new Date();
-      const daysUsed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-      
-      if(daysUsed >= trial.trialDays){
-        this.showTrialExpiredMessage(daysUsed);
-        this.showPage('lock');
-      } else {
-        const remaining = trial.trialDays - daysUsed;
-        this.showToast(`⏰ تبقى ${remaining} يوم من الفترة التجريبية`);
-      }
-    }
-  } catch(error){
-    console.error('خطأ في التحقق:', error);
-  }
-},
-
-// رسالة انتهاء التجربة
-showTrialExpiredMessage(daysUsed){
-  const msg = `انتهت الفترة التجريبية (${daysUsed} يوم)\n\n` +
-              `📊 بياناتك محفوظة بأمان!\n` +
-              `للاستمرار واستعادة الوصول لـ:\n` +
-              `• ${this.students.length} طالب\n` +
-              `• جميع السجلات والإحصائيات\n\n` +
-              `اشترك الآن للحصول على كود التفعيل`;
-  
-  alert(msg);
-},
-
-
-// تحديث بانر الأيام المتبقية
-
- updateTrialBanner(days,isActivated){
-  const badge=document.getElementById('subscriptionBadge');
-  const daysSpan=badge?.querySelector('.badge-days');
-  const labelSpan=badge?.querySelector('.badge-label');
-  const iconDiv=badge?.querySelector('.badge-icon');
-  
-  if(!badge) return;
-  
-  // إزالة الحالات السابقة
-  badge.classList.remove('trial','active','warning');
-  
-  if(isActivated){
-    // اشتراك مفعّل
-    iconDiv.textContent='✅';
-    daysSpan.textContent=days;
-    labelSpan.textContent='يوم متبقي';
-    badge.classList.add('active');
-  }else{
-    // فترة تجريبية
-    if(days<=3){
-      iconDiv.textContent='⚠️';
-      badge.classList.add('warning');
-    }else if(days<=7){
-      iconDiv.textContent='⏰';
-      badge.classList.add('warning');
-    }else{
-      iconDiv.textContent='📦';
-      badge.classList.add('trial');
-    }
-    daysSpan.textContent=days;
-    labelSpan.textContent='يوم تجريبي';
-  }
-  
-  badge.style.display='flex';
-},
-   
-
-// عرض شاشة القفل
-showLockScreen() {
-    const lockScreen = document.getElementById('lockScreen');
-    if (lockScreen) {
-        lockScreen.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-},
-
-// إخفاء شاشة القفل
-hideLockScreen() {
-    const lockScreen = document.getElementById('lockScreen');
-    if (lockScreen) {
-        lockScreen.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-},
-
-// تفعيل الاشتراك
-activateSubscription(){
-  let code = document.getElementById('activationCode')?.value?.trim().toUpperCase();
-  
-  // إذا لم يوجد العنصر، جرب العنصر من صفحة الإعدادات
-  if(!code){
-    code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
-  }
-  
-  if(!code){
-    this.showToast('⚠️ الرجاء إدخال كود التفعيل');
-    return;
-  }
-  
-  if(!code.startsWith('SK-')){
-    this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-');
-    return;
-  }
-  
-  // حدد نوع الاشتراك
-  const isTrial = code.includes('TRIAL');
-  const endDate = new Date();
-  
-  if(isTrial){
-    endDate.setDate(endDate.getDate() + 7); // 7 أيام
-  } else {
-    endDate.setFullYear(endDate.getFullYear() + 1); // سنة كاملة
-  }
-  
-  this.subscriptions[code] = {
-    active: true,
-    startDate: new Date().toISOString(),
-    endDate: endDate.toISOString(),
-    isTrial: isTrial,
-    paid: !isTrial
-  };
-  
-  localStorage.setItem('activationCode', code);
-  localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-  this.saveData();
-  
-  // إخفاء شاشة القفل
-  document.getElementById('lockScreen').style.display = 'none';
-  
-  this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
-  
-  setTimeout(() => {
-    this.showPage('main');
-    location.reload();
-  }, 2000);
-},
-
-
-
-// إضافة كود تفعيل جديد (للمطور)
-addActivationCode(code) {
-    this.subscription.activationCodes.push(code.toUpperCase());
-    localStorage.setItem('validCodes', JSON.stringify(this.subscription.activationCodes));
-},
-
-// دالة نسخ النص إلى الحافظة
-copyText(text){
-if(navigator.clipboard){
-navigator.clipboard.writeText(text).then(()=>{
-this.showToast('✅ تم النسخ بنجاح');
-}).catch(()=>{
-this.showToast('❌ فشل النسخ');
-});
-}else{
-const textarea=document.createElement('textarea');
-textarea.value=text;
-textarea.style.position='fixed';
-textarea.style.opacity='0';
-document.body.appendChild(textarea);
-textarea.select();
-try{
-document.execCommand('copy');
-this.showToast('✅ تم النسخ بنجاح');
-}catch(err){
-this.showToast('❌ فشل النسخ');
-}
-document.body.removeChild(textarea);
-}
-},
-
-// مستويات الغياب (قابلة للتعديل)
-levelSettings:{
-level1:{min:1,max:5},
-level2:{min:6,max:10},
-level3:{min:11,max:15},
-level4:{min:16,max:20}
-},
-
-// تحميل إعدادات المستويات
-loadLevelSettings(){
-const stored=localStorage.getItem('levelSettings');
-if(stored){
-this.levelSettings=JSON.parse(stored);
-this.applyLevelSettings();
-}
-},
-
-// تطبيق الإعدادات على الحقول
-applyLevelSettings(){
-document.getElementById('level1Min').value=this.levelSettings.level1.min;
-document.getElementById('level1Max').value=this.levelSettings.level1.max;
-document.getElementById('level2Min').value=this.levelSettings.level2.min;
-document.getElementById('level2Max').value=this.levelSettings.level2.max;
-document.getElementById('level3Min').value=this.levelSettings.level3.min;
-document.getElementById('level3Max').value=this.levelSettings.level3.max;
-document.getElementById('level4Min').value=this.levelSettings.level4.min;
-document.getElementById('level4Max').value=this.levelSettings.level4.max;
-},
-
-// حفظ إعدادات المستويات
-saveLevelSettings(){
-this.levelSettings={
-level1:{
-min:parseInt(document.getElementById('level1Min').value),
-max:parseInt(document.getElementById('level1Max').value)
-},
-level2:{
-min:parseInt(document.getElementById('level2Min').value),
-max:parseInt(document.getElementById('level2Max').value)
-},
-level3:{
-min:parseInt(document.getElementById('level3Min').value),
-max:parseInt(document.getElementById('level3Max').value)
-},
-level4:{
-min:parseInt(document.getElementById('level4Min').value),
-max:parseInt(document.getElementById('level4Max').value)
-}
-};
-localStorage.setItem('levelSettings',JSON.stringify(this.levelSettings));
-this.renderAbsenceLevels();
-this.showToast('✅ تم حفظ الإعدادات');
-},
-
-// حساب الإحصائيات اليومية
-calculateDailyStats(){
-const today=new Date().toLocaleDateString('ar-SA');
-let absentToday=0;
-let lateToday=0;
-for(const civil in this.absences){
-if(this.absences[civil].some(a=>a.date===today))absentToday++;
-}
-for(const civil in this.delays){
-if(this.delays[civil].some(d=>d.date===today))lateToday++;
-}
-const total=this.students.length;
-const present=total-absentToday;
-const percentage=total>0?Math.round((present/total)*100):0;
-document.getElementById('dailyDate').textContent=today;
-document.getElementById('dailyTotal').textContent=total;
-document.getElementById('dailyPresent').textContent=present;
-document.getElementById('dailyAbsent').textContent=absentToday;
-document.getElementById('dailyLate').textContent=lateToday;
-document.getElementById('dailyPercentage').textContent=percentage+'%';
-},
-
-// حساب الإحصائيات الأسبوعية
-calculateWeeklyStats(){
-const now=new Date();
-const weekAgo=new Date(now.getTime()-(7*24*60*60*1000));
-let totalAbsent=0;
-let totalLate=0;
-for(const civil in this.absences){
-totalAbsent+=this.absences[civil].filter(a=>{
-const date=new Date(a.date.split('/').reverse().join('-'));
-return date>=weekAgo&&date<=now;
-}).length;
-}
-for(const civil in this.delays){
-totalLate+=this.delays[civil].filter(d=>{
-const date=new Date(d.date.split('/').reverse().join('-'));
-return date>=weekAgo&&date<=now;
-}).length;
-}
-const avgPresent=this.students.length>0?Math.round((this.students.length*7-totalAbsent)/7):0;
-document.getElementById('weeklyDays').textContent='7';
-document.getElementById('weeklyAvgPresent').textContent=avgPresent;
-document.getElementById('weeklyTotalAbsent').textContent=totalAbsent;
-document.getElementById('weeklyTotalLate').textContent=totalLate;
-},
-
-// حساب الإحصائيات الشهرية
-calculateMonthlyStats(){
-const now=new Date();
-const monthAgo=new Date(now.getFullYear(),now.getMonth(),1);
-let totalAbsent=0;
-let totalLate=0;
-const absentCounts={};
-for(const civil in this.absences){
-const count=this.absences[civil].filter(a=>{
-const date=new Date(a.date.split('/').reverse().join('-'));
-return date>=monthAgo&&date<=now;
-}).length;
-totalAbsent+=count;
-if(count>0)absentCounts[civil]=count;
-}
-for(const civil in this.delays){
-totalLate+=this.delays[civil].filter(d=>{
-const date=new Date(d.date.split('/').reverse().join('-'));
-return date>=monthAgo&&date<=now;
-}).length;
-}
-const days=now.getDate();
-const avgPresent=this.students.length>0?Math.round((this.students.length*days-totalAbsent)/days):0;
-document.getElementById('monthlyDays').textContent=days;
-document.getElementById('monthlyAvgPresent').textContent=avgPresent;
-document.getElementById('monthlyTotalAbsent').textContent=totalAbsent;
-document.getElementById('monthlyTotalLate').textContent=totalLate;
-const sorted=Object.entries(absentCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-const listDiv=document.getElementById('topAbsentList');
-if(sorted.length===0){
-listDiv.innerHTML='<div class="level-empty">✅ لا يوجد غياب هذا الشهر</div>';
-}else{
-listDiv.innerHTML=sorted.map(([civil,count])=>{
-const s=this.students.find(st=>st.civil===civil);
-return s?`<div class="level-student">
-<span class="student-name-stat">${s.name}</span>
-<span class="student-days">${count} يوم</span>
-</div>`:'';
-}).join('');
-}
-},
-
-// عرض مستويات الغياب
-renderAbsenceLevels(){
-const levels={1:[],2:[],3:[],4:[]};
-for(const civil in this.absences){
-const count=this.absences[civil].length;
-const s=this.students.find(st=>st.civil===civil);
-if(!s)continue;
-if(count>=this.levelSettings.level1.min&&count<=this.levelSettings.level1.max){
-levels[1].push({student:s,days:count});
-}else if(count>=this.levelSettings.level2.min&&count<=this.levelSettings.level2.max){
-levels[2].push({student:s,days:count});
-}else if(count>=this.levelSettings.level3.min&&count<=this.levelSettings.level3.max){
-levels[3].push({student:s,days:count});
-}else if(count>=this.levelSettings.level4.min&&count<=this.levelSettings.level4.max){
-levels[4].push({student:s,days:count});
-}
-}
-for(let i=1;i<=4;i++){
-const div=document.getElementById(`level${i}Students`);
-if(levels[i].length===0){
-div.innerHTML='<div class="level-empty">✅ لا يوجد طلاب في هذا المستوى</div>';
-}else{
-div.innerHTML=levels[i].map(item=>`
-<div class="level-student">
-<span class="student-name-stat">${item.student.name}</span>
-<span class="student-days">${item.days} يوم</span>
-</div>
-`).join('');
-}
-}
-},
-
-// تحديث الإحصائيات عند فتح الصفحة
-updateAllStats(){
-this.calculateDailyStats();
-this.calculateWeeklyStats();
-this.calculateMonthlyStats();
-this.renderAbsenceLevels();
-}
 };
 
-document.addEventListener('DOMContentLoaded',function(){app.init();});
-
-
-// دعم المزامنة في الخلفية
-if ('serviceWorker' in navigator && 'SyncManager' in window) {
-  navigator.serviceWorker.ready.then(swRegistration => {
-    return swRegistration.sync.register('sync-data');
-  });
-}
-
-    
+document.addEventListener('DOMContentLoaded', function () { app.init(); });
 </script>
-
 </body>
 </html>
