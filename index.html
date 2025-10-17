@@ -1160,6 +1160,28 @@ init() {
   }
 },
 
+// دالة جديدة: إنشاء فترة تجريبية 7 أيام
+initTrialSubscription(){
+  const code = 'SK-TRIAL-' + Date.now();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 7); // ← 7 أيام فقط
+  
+  this.subscriptions[code] = {
+    active: true,
+    startDate: new Date().toISOString(),
+    endDate: endDate.toISOString(),
+    isTrial: true
+  };
+  
+  localStorage.setItem('activationCode', code);
+  this.saveData();
+  
+  this.showToast('🎉 مرحباً! لديك 7 أيام تجربة مجانية', 5000);
+  
+  return code;
+},
+
+
 
 // كشف حالة الاتصال (دالة منفصلة خارج init)
 checkOnlineStatus(){
@@ -2167,43 +2189,44 @@ subscription: {
 },
 
 // تحقق من حالة الاشتراك
-checkSubscription() {
-    const firstUse = localStorage.getItem('firstUse');
-    const activationDate = localStorage.getItem('activationDate');
-    const now = new Date().getTime();
-
-    // إذا مفعّل
-    if (activationDate) {
-        const activated = parseInt(activationDate);
-        const daysLeft = Math.floor((activated + 365 * 24 * 60 * 60 * 1000 - now) / (24 * 60 * 60 * 1000));
-        if (daysLeft > 0) {
-            this.updateTrialBanner(daysLeft, true);
-            return true;
-        } else {
-            this.showLockScreen();
-            return false;
-        }
+checkSubscription(){
+  let code = localStorage.getItem('activationCode');
+  
+  // إذا لم يوجد كود - أنشئ تجربة 7 أيام
+  if(!code){
+    code = this.initTrialSubscription();
+  }
+  
+  const subscription = this.subscriptions[code];
+  
+  if(!subscription || !subscription.active){
+    this.showPage('lock');
+    return false;
+  }
+  
+  const days = this.calculateRemainingDays(subscription.endDate);
+  
+  // تنبيهات الفترة التجريبية
+  if(subscription.isTrial){
+    if(days === 2){
+      this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000);
+    } else if(days === 1){
+      this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000);
+    } else if(days === 0){
+      this.showToast('⚠️ انتهت الفترة التجريبية', 5000);
     }
-
-    // إذا فترة تجريبية
-    if (!firstUse) {
-        localStorage.setItem('firstUse', now);
-        this.updateTrialBanner(this.subscription.trialDays, false);
-        return true;
-    }
-
-    const first = parseInt(firstUse);
-    const elapsed = Math.floor((now - first) / (24 * 60 * 60 * 1000));
-    const remaining = this.subscription.trialDays - elapsed;
-
-    if (remaining > 0) {
-        this.updateTrialBanner(remaining, false);
-        return true;
-    } else {
-        this.showLockScreen();
-        return false;
-    }
+  }
+  
+  this.updateSubscriptionBadge(days);
+  
+  if(days <= 0){
+    this.showPage('lock');
+    return false;
+  }
+  
+  return true;
 },
+
 
 // تحديث بانر الأيام المتبقية
 
@@ -2264,29 +2287,47 @@ hideLockScreen() {
 
 // تفعيل الاشتراك
 activateSubscription(){
-const input=document.getElementById('activationCodeInput') || document.getElementById('activationCode');
-
-    if (!input) return;
-    const code = input.value.trim().toUpperCase();
-    if (!code) {
-        this.showToast('⚠️ يرجى إدخال كود التفعيل');
-        return;
-    }
-
-    // تحقق من صحة الكود (يبدأ بـ SK-)
-    if (!code.startsWith('SK-')) {
-        this.showToast('❌ كود غير صحيح');
-        return;
-    }
-
-    // حفظ تاريخ التفعيل (سنة كاملة من الآن)
-    const now = new Date().getTime();
-    localStorage.setItem('activationDate', now);
-    localStorage.setItem('activationCode', code);
-    this.hideLockScreen();
-    this.showToast('🎉 تم تفعيل الاشتراك بنجاح!');
-    this.checkSubscription();
+  const code = document.getElementById('activationInput').value.trim().toUpperCase();
+  
+  if(!code){
+    this.showToast('⚠️ الرجاء إدخال كود التفعيل');
+    return;
+  }
+  
+  if(!code.startsWith('SK-')){
+    this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-');
+    return;
+  }
+  
+  // حدد نوع الاشتراك
+  const isTrial = code.includes('TRIAL');
+  const endDate = new Date();
+  
+  if(isTrial){
+    endDate.setDate(endDate.getDate() + 7); // 7 أيام
+  } else {
+    endDate.setFullYear(endDate.getFullYear() + 1); // سنة كاملة
+  }
+  
+  this.subscriptions[code] = {
+    active: true,
+    startDate: new Date().toISOString(),
+    endDate: endDate.toISOString(),
+    isTrial: isTrial,
+    paid: !isTrial
+  };
+  
+  localStorage.setItem('activationCode', code);
+  this.saveData();
+  
+  this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
+  
+  setTimeout(() => {
+    this.showPage('students');
+    location.reload();
+  }, 2000);
 },
+
 
 // إضافة كود تفعيل جديد (للمطور)
 addActivationCode(code) {
