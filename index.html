@@ -554,7 +554,22 @@ margin-bottom:15px;
   }
 }
 /* ===== تصميم شاشة القفل متجاوب للجوال ===== */
-
+#lockScreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  box-sizing: border-box;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
 
 .lock-content {
   width: 100%;
@@ -700,7 +715,15 @@ margin-bottom:15px;
 }
 
 /* ===== شاشة القفل الاحترافية ===== */
-
+#lockScreen, #paymentPage {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 .lock-overlay {
   position: fixed;
@@ -1216,760 +1239,55 @@ margin-bottom:15px;
     
     
 
+/* ===== إصلاح عرض شاشة القفل ===== */
+#lockScreen {
+  display: none !important;
+}
+
+#lockScreen[style*="display: block"],
+#lockScreen[style*="display: flex"] {
+  display: flex !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+}
+
+#paymentPage {
+  display: none !important;
+}
+
+#paymentPage[style*="display: block"],
+#paymentPage[style*="display: flex"] {
+  display: flex !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+}
+
 /* إخفاء أي عناصر أخرى عند عرض شاشة القفل */
+body:has(#lockScreen[style*="display: flex"]) .container,
+body:has(#lockScreen[style*="display: flex"]) .page,
+body:has(#lockScreen[style*="display: flex"]) nav {
+  display: none !important;
+}
 
-
-
+body:has(#paymentPage[style*="display: flex"]) .container,
+body:has(#paymentPage[style*="display: flex"]) .page,
+body:has(#paymentPage[style*="display: flex"]) nav {
+  display: none !important;
+}
 
 </style>
 </head>
     
 <body>
 <div class="container">
-<!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
-<!-- شاشة القفل الاحترافية -->
-<div id="lockScreen" style="display:none">
-  <div class="lock-overlay"></div>
-  <div class="lock-container">
-    
-    <!-- الجزء الأول: الرسالة الرئيسية -->
-    <div class="lock-header">
-      <div class="lock-icon-main">🔒</div>
-      <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
-      <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
-    <
-/* شاشة القفل - محسّن */
-#lockScreen {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-  overflow-y: auto;
-}
-
-#paymentPage {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-  overflow-y: auto;
-}
-
-/div>
-    
-    <!-- الجزء الثاني: عرض الاشتراك -->
-    <div class="subscription-card">
-      <div class="card-badge">عرض خاص 🎁</div>
-      
-      <div class="price-section">
-        <span class="old-price">99 ريال</span>
-        <div class="new-price-wrapper">
-          <span class="currency">ريال</span>
-          <span class="new-price">75</span>
-        </div>
-        <span class="duration">/ سنة كاملة</span>
-      </div>
-      
-      <div class="benefits-list">
-        <div class="benefit-item">
-          <span class="benefit-icon">✅</span>
-          <span class="benefit-text">استرجاع جميع بياناتك المحفوظة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">☁️</span>
-          <span class="benefit-text">نسخ احتياطي تلقائي في السحابة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">🔄</span>
-          <span class="benefit-text">تحديثات مجانية مدى الحياة</span>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">💬</span>
-          <span class="benefit-text">دعم فني مجاني 24/7</span>
-        </div>
-      </div>
-      
-      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">
-        🚀 اشترك الآن واسترجع بياناتك
-      </button>
-      
-      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
-    </div>
-    
-    <!-- تحذير حذف البيانات -->
-    <div class="warning-box">
-      <span class="warning-icon">⚠️</span>
-      <div class="warning-content">
-        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
-      </div>
-    </div>
-    
-  </div>
-</div>
-
-<!-- صفحة معلومات الدفع -->
-<div id="paymentPage" style="display:none">
-  <div class="lock-overlay"></div>
-  <div class="payment-container">
-    
-    <button class="btn-back" onclick="app.hidePaymentPage()">
-      ← رجوع
-    </button>
-    
-    <div class="payment-header">
-      <div class="payment-icon">💳</div>
-      <h2>معلومات الدفع</h2>
-      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
-    </div>
-    
-    <!-- طرق الدفع -->
-    <div class="payment-methods">
-      
-      <!-- تحويل بنكي -->
-      <div class="payment-method" id="bankTransferSection">
-        <div class="method-header" onclick="app.selectPaymentMethod('bank')">
-          <div class="method-info">
-            <span class="method-icon">🏦</span>
-            <span class="method-name">تحويل بنكي</span>
-          </div>
-          <span class="method-arrow">▼</span>
-        </div>
-        
-        <div class="method-details" id="bankDetails" style="display:none">
-          <div class="bank-info-card">
-            <div class="info-row">
-              <span class="info-label">البنك:</span>
-              <span class="info-value">مصرف الراجحي</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">الاسم:</span>
-              <span class="info-value">سلطان عبدالله المالكي</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">رقم الآيبان:</span>
-              <div class="iban-container">
-                <input type="text" id="ibanNumber" value="SA0000000000000000000000" readonly class="iban-input">
-                <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="qr-section">
-            <h4>📱 أو امسح رمز QR</h4>
-            <div class="qr-placeholder">
-              <img src="qr-code.png" alt="QR Code" style="max-width:200px">
-              <small>استخدم تطبيق الراجحي المباشر</small>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- تواصل واتساب -->
-      <div class="payment-method">
-        <div class="method-header" onclick="app.contactWhatsApp()">
-          <div class="method-info">
-            <span class="method-icon">💚</span>
-            <span class="method-name">التواصل عبر واتساب</span>
-          </div>
-          <span class="method-arrow">→</span>
-        </div>
-      </div>
-      
-    </div>
-    
-    <!-- إدخال كود التفعيل -->
-    <div class="activation-section">
-      <h3>🔑 لديك كود تفعيل؟</h3>
-      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
-      <div class="activation-input-group">
-        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
-        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
-      </div>
-    </div>
-    
-    <!-- معلومات الدعم -->
-    <div class="support-section">
-      <h4>💬 بحاجة لمساعدة؟</h4>
-      <div class="support-contacts">
-        <a href="https://wa.me/966XXXXXXXXX" class="support-link" target="_blank">
-          <span>📱</span> واتساب: 966XXXXXXXXX
-        </a>
-        <a href="mailto:support@attendance.app" class="support-link">
-          <span>📧</span> البريد: support@attendance.app
-        </a>
-      </div>
-    </div>
-    
-  </div>
-</div>
-
-    
-    <!-- زر الاشتراك -->
-    <button onclick="app.showSubscriptionInfo ? app.showSubscriptionInfo() : app.showPaymentDetails()" style="background: #ffd700; color: #333; border: none; padding: 18px 50px; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 8px 20px rgba(255,215,0,0.4); transition: all 0.3s; width: 100%; margin-top: 10px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        🚀 اشترك الآن واسترجع بياناتك
-    </button>
-    
-    <p style="margin-top: 15px; font-size: 14px; color: rgba(255,255,255,0.7);">
-        💡 ضمان استرجاع الأموال خلال 14 يوم
-    </p>
-</div>
-
-<!-- تنبيه حذف البيانات -->
-<div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; border-right: 4px solid #ffc107;">
-    <strong>⚠️ تحذير مهم:</strong><br>
-    سيتم حذف جميع بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
-</div>
-
-
-        <input 
-            type="text" 
-            id="activationCode" 
-            class="activation-input" 
-            placeholder="أدخل كود التفعيل"
-            maxlength="20">
-
-        <button class="btn btn-primary" onclick="app.activateSubscription()">
-            ✅ تفعيل الاشتراك
-        </button>
-<button class="btn btn-success" onclick="app.showPage('settings')" style="margin-top:10px">
-💳 الاشتراك الآن (75 ريال)
-</button>
-
-
-        <p style="font-size:13px;color:#999;margin-top:20px">
-            لم تحصل على الكود؟ 
-            <a href="https://wa.me/966533371147" style="color:#1976d2;text-decoration:none;font-weight:600">تواصل معنا</a>
-        </p>
-    </div>
-</div>
-
-
-<!-- الصفحة الرئيسية -->
-<div id="mainPage" class="page active">
-    
-<header>
-<h1>🎓 نظام الحضور الذكي</h1>
-    
-    <!-- أيقونة حالة الاشتراك -->
-<div id="subscriptionBadge" class="subscription-badge">
-  <div class="badge-icon">📦</div>
-  <div class="badge-text">
-    <span class="badge-days">30</span>
-    <span class="badge-label">يوم متبقي</span>
-  </div>
-</div>
-
-
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<input type="text" id="searchInput" class="search-input" placeholder="ابحث عن طالب...">
-<ul id="studentsList" class="students-list"></ul>
-<div id="emptyState" style="text-align:center;padding:50px 20px;color:#999">
-<div style="font-size:60px">🔍</div>
-<div style="font-size:16px;margin-top:10px">استخدم البحث للعثور على طالب</div>
-</div>
-</div>
-</div>
-
-<!-- صفحة التأخرات -->
-<div id="delaysPage" class="page">
-<header>
-<h1>⏰ التأخرات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('delays','morning')">صباحي</button>
-<button class="tab" onclick="app.switchTab('delays','break')">فسحة</button>
-<button class="tab" onclick="app.switchTab('delays','departure')">انصراف</button>
-<button class="tab" onclick="app.switchTab('delays','view')">استعراض</button>
-</div>
-
-<div id="delayMorningTab" class="tab-content active">
-<input type="date" id="dateMorning" class="date-input">
-<input type="text" id="searchMorning" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classMorning" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomMorning" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countMorning" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listMorning" class="students-list"></ul>
-</div>
-
-<div id="delayBreakTab" class="tab-content">
-<input type="date" id="dateBreak" class="date-input">
-<input type="text" id="searchBreak" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classBreak" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomBreak" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countBreak" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listBreak" class="students-list"></ul>
-</div>
-
-<div id="delayDepartureTab" class="tab-content">
-<input type="date" id="dateDeparture" class="date-input">
-<input type="text" id="searchDeparture" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classDeparture" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomDeparture" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countDeparture" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listDeparture" class="students-list"></ul>
-</div>
-
-<div id="delayViewTab" class="tab-content">
-<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="delayViewList"></div>
-</div>
-
-<div id="delayActions" class="action-btns">
-<button class="btn btn-primary" onclick="app.confirmAction('saveDelay')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendDelay')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendDelay')">📤 إرسال</button>
-</div>
-</div>
-</div>
-
-<!-- صفحة الغياب -->
-<div id="absencesPage" class="page">
-<header class="absence">
-<h1>📅 الغياب</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('absence','daily')">غياب يومي</button>
-<button class="tab" onclick="app.switchTab('absence','view')">استعراض</button>
-</div>
-
-<div id="absenceDailyTab" class="tab-content active">
-<input type="date" id="dateAbsence" class="date-input">
-<input type="text" id="searchAbsence" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classAbsence" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomAbsence" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countAbsence" class="selected-count absence hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listAbsence" class="students-list"></ul>
-</div>
-
-<div id="absenceViewTab" class="tab-content">
-<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="absenceViewList"></div>
-</div>
-
-<div id="absenceActions" class="action-btns">
-<button class="btn btn-primary" onclick="app.confirmAction('saveAbsence')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendAbsence')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendAbsence')">📤 إرسال</button>
-</div>
-</div>
-</div>
-
-<!-- صفحة الملاحظات -->
-<div id="notesPage" class="page notes-page">
-<header class="notes">
-<h1>📝 الملاحظات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
-<button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
-</div>
-
-<div id="noteAddTab" class="tab-content active">
-<div class="note-container">
-<label class="note-label">📝 اكتب الملاحظة:</label>
-<textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
-<div class="note-char-count"><span id="noteCharCount">0</span> / 500 حرف</div>
-</div>
-
-<input type="date" id="dateNote" class="date-input">
-<input type="text" id="searchNote" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classNote" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomNote" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countNote" class="selected-count notes hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listNote" class="students-list"></ul>
-</div>
-
-<div id="noteViewTab" class="tab-content">
-<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="noteViewList"></div>
-</div>
-
-<div id="noteActions" class="action-btns">
-<button class="btn btn-notes" onclick="app.confirmAction('saveNote')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendNote')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendNote')">📤 إرسال</button>
-</div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     صفحة الإحصائيات - أضف قبل صفحة الإعدادات
-     ═══════════════════════════════════════ -->
-
-<div id="statsPage" class="page stats-page">
-<header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
-<h1>📊 الإحصائيات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('stats','daily')">اليومية</button>
-<button class="tab" onclick="app.switchTab('stats','weekly')">الأسبوعية</button>
-<button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
-<button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
-</div>
-
-<div id="statsDailyTab" class="tab-content active">
-<div class="stats-card">
-<h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
-<div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="dailyTotal">0</div>
-<div class="stat-label">إجمالي الطلاب</div>
-</div>
-<div class="stat-box success">
-<div class="stat-number" id="dailyPresent">0</div>
-<div class="stat-label">الحاضرون</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="dailyAbsent">0</div>
-<div class="stat-label">الغائبون</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="dailyLate">0</div>
-<div class="stat-label">المتأخرون</div>
-</div>
-</div>
-<div style="background:#e3f2fd;padding:20px;border-radius:10px;text-align:center;margin-top:15px">
-<div style="font-size:14px;color:#1976d2;margin-bottom:8px;font-weight:600">نسبة الحضور</div>
-<div style="font-size:42px;font-weight:700;color:#1976d2" id="dailyPercentage">0%</div>
-</div>
-</div>
-</div>
-
-<div id="statsWeeklyTab" class="tab-content">
-<div class="stats-card">
-<h3>📊 إحصائيات الأسبوع</h3>
-<div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="weeklyDays">7</div>
-<div class="stat-label">أيام</div>
-</div>
-<div class="stat-box success">
-<div class="stat-number" id="weeklyAvgPresent">0</div>
-<div class="stat-label">متوسط الحضور</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="weeklyTotalAbsent">0</div>
-<div class="stat-label">إجمالي الغياب</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="weeklyTotalLate">0</div>
-<div class="stat-label">إجمالي التأخرات</div>
-</div>
-</div>
-</div>
-</div>
-
-<div id="statsMonthlyTab" class="tab-content">
-<div class="stats-card">
-<h3>📅 إحصائيات الشهر</h3>
-<div class="stats-grid">
-<div class="stat-box info">
-<div class="stat-number" id="monthlyDays">30</div>
-<div class="stat-label">أيام الدراسة</div>
-</div>
-<div class="stat-box success">
-<div class="stat-number" id="monthlyAvgPresent">0</div>
-<div class="stat-label">متوسط الحضور</div>
-</div>
-<div class="stat-box danger">
-<div class="stat-number" id="monthlyTotalAbsent">0</div>
-<div class="stat-label">إجمالي الغياب</div>
-</div>
-<div class="stat-box warning">
-<div class="stat-number" id="monthlyTotalLate">0</div>
-<div class="stat-label">إجمالي التأخرات</div>
-</div>
-</div>
-<div class="stats-card">
-<h3>🏆 الطلاب الأكثر غياباً</h3>
-<div id="topAbsentList"></div>
-</div>
-</div>
-</div>
-
-<div id="statsLevelsTab" class="tab-content">
-<div class="stats-card">
-<h3>⚙️ إعدادات المستويات</h3>
-<div class="settings-input">
-<label>🟢 المستوى الأول: من</label>
-<input type="number" id="level1Min" value="1" min="1">
-<span>إلى</span>
-<input type="number" id="level1Max" value="5" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🟡 المستوى الثاني: من</label>
-<input type="number" id="level2Min" value="6" min="1">
-<span>إلى</span>
-<input type="number" id="level2Max" value="10" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🟠 المستوى الثالث: من</label>
-<input type="number" id="level3Min" value="11" min="1">
-<span>إلى</span>
-<input type="number" id="level3Max" value="15" min="1">
-<span>أيام</span>
-</div>
-<div class="settings-input">
-<label>🔴 المستوى الرابع: من</label>
-<input type="number" id="level4Min" value="16" min="1">
-<span>إلى</span>
-<input type="number" id="level4Max" value="20" min="1">
-<span>أيام</span>
-</div>
-<button class="btn btn-primary" onclick="app.saveLevelSettings()">💾 حفظ الإعدادات</button>
-</div>
-
-<div class="level-card level-1" id="level1Card">
-<div class="level-title">🟢 المستوى الأول (آمن)</div>
-<div id="level1Students"></div>
-</div>
-
-<div class="level-card level-2" id="level2Card">
-<div class="level-title">🟡 المستوى الثاني (انتباه)</div>
-<div id="level2Students"></div>
-</div>
-
-<div class="level-card level-3" id="level3Card">
-<div class="level-title">🟠 المستوى الثالث (تحذير)</div>
-<div id="level3Students"></div>
-</div>
-
-<div class="level-card level-4" id="level4Card">
-<div class="level-title">🔴 المستوى الرابع (خطر!)</div>
-<div id="level4Students"></div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- صفحة الإعدادات المحدثة -->
-<div id="settingsPage" class="page">
-<header>
-<h1>⚙️ الإعدادات</h1>
-<p>نظام الحضور الذكي - إدارة احترافية</p>
-</header>
-<div class="content">
-
-<!-- بطاقة الاشتراك والدعم -->
-<div class="subscription-hero">
-    <div class="app-logo">
-        <div class="app-logo-icon">👨‍🎓</div>
-    </div>
-    <h2 style="font-size:24px;margin:10px 0">نظام الحضور الذكي</h2>
-    <p style="opacity:0.95;font-size:15px">إدارة احترافية للحضور والغياب</p>
-    <div class="subscription-price">
-        75 ر.س
-        <small>/ سنوياً</small>
-    </div>
-</div>
-
-<!-- معلومات الدفع -->
-<div class="payment-card">
-<h3>💳 معلومات الدفع</h3>
-
-<div class="bank-info">
-<div class="bank-info-row">
-<span class="bank-label">🏦 البنك:</span>
-<span class="bank-value">مصرف الراجحي</span>
-</div>
-
-<div class="bank-info-row">
-<span class="bank-label">📋 رقم الآيبان:</span>
-<div style="display:flex;align-items:center;gap:8px">
-<button class="copy-btn" onclick="app.copyText('SA4780000381608010039716')">نسخ</button>
-<span class="bank-value" dir="ltr">SA47 8000 0381 6080 1003 9716</span>
-</div>
-</div>
-
-<div class="bank-info-row">
-<span class="bank-label">🔢 رقم الحساب:</span>
-<div style="display:flex;align-items:center;gap:8px">
-<button class="copy-btn" onclick="app.copyText('381000010006080039716')">نسخ</button>
-<span class="bank-value" dir="ltr">381000010006080039716</span>
-</div>
-</div>
-
-<div class="bank-info-row">
-<span class="bank-label">💰 المبلغ:</span>
-<span class="bank-value">75 ريال سعودي</span>
-</div>
-</div>
-
-<!-- باركود التحويل السريع -->
-<div class="qr-container">
-<h4 style="color:#1976d2;font-size:18px;margin-bottom:10px">📱 امسح للتحويل السريع</h4>
-<p style="color:#666;font-size:14px;margin-bottom:15px">استخدم تطبيق الراجحي المباشر</p>
-<div class="qr-code">
-<img src="brkwd.jpg" alt="باركود التحويل السريع" style="width:100%;height:100%;object-fit:contain">
-</div>
-<p style="color:#999;font-size:13px;margin-top:10px">امسح الباركود باستخدام كاميرا الجوال</p>
-</div>
-</div>
-
-<!-- خطوات التفعيل -->
-<div class="activation-steps">
-<h4>🚀 خطوات التفعيل</h4>
-
-<div class="step-item">
-<div class="step-number">1</div>
-<div class="step-text">قم بتحويل المبلغ (75 ريال) عبر الآيبان أو الباركود أعلاه</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">2</div>
-<div class="step-text">التقط صورة لإيصال التحويل من تطبيق البنك</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">3</div>
-<div class="step-text">أرسل الإيصال عبر واتساب للدعم الفني: <strong>0533371147</strong></div>
-</div>
-
-<div class="step-item">
-<div class="step-number">4</div>
-<div class="step-text">ستحصل على <strong>كود التفعيل</strong> خلال دقائق</div>
-</div>
-
-<a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" 
-   class="whatsapp-link" 
-   target="_blank"
-   style="width:100%;margin-top:15px;justify-content:center">
-<span style="font-size:22px">📱</span>
-<span>تواصل مع الدعم الفني</span>
-</a>
-</div>
-
-<!-- زر تفعيل الاشتراك -->
-<div class="settings-card" style="margin-bottom:20px;">
-<h3 style="color:#1976d2;margin-bottom:15px;">🔑 تفعيل الاشتراك</h3>
-<p style="color:#666;margin-bottom:15px;">أدخل كود الاشتراك لتفعيل التطبيق لمدة سنة كاملة</p>
-
-<input 
-  type="text" 
-  id="activationCodeInput" 
-placeholder="أدخل كود التفعيل الذي حصلت عليه"
-  style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
-
-<button 
-  onclick="app.activateSubscription()" 
-  style="width:100%;padding:15px;background:#4caf50;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">
-  ✅ تفعيل الاشتراك الآن
-</button>
-</div>
-
-    
-<!-- معلومات المطور -->
-<div class="developer-info">
-<div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
-<div class="developer-name">أ. سلطان عبدالله المالكي</div>
-<div class="developer-role">مطور التطبيق</div>
-<p style="font-size:14px;color:#666;line-height:1.6">
-متخصص في تطوير أنظمة إدارة التعليم<br>
-جودة عالية • دعم مستمر • تحديثات دورية
-</p>
-</div>
-
-<!-- استيراد البيانات -->
-<div class="settings-card">
-<h3>📥 استيراد بيانات الطلاب</h3>
-<p>قم برفع ملف Excel يحتوي على: الاسم - السجل المدني - الجوال - الصف - الفصل</p>
-<input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none">
-<button class="btn btn-primary" onclick="document.getElementById('excelFile').click()">📂 اختر ملف Excel</button>
-</div>
-
-<!-- إعادة تعيين -->
-<div class="settings-card">
-<h3>🗑️ إعادة تعيين التطبيق</h3>
-<p>سيتم حذف جميع البيانات بشكل نهائي</p>
-<button class="btn btn-danger" onclick="app.confirmAction('reset')">مسح جميع البيانات</button>
-</div>
-
-<!-- معلومات التطبيق -->
-<div class="settings-card">
-<h3>ℹ️ معلومات التطبيق</h3>
-<p style="font-size:15px;line-height:1.7">
-<strong>الاسم:</strong> نظام الحضور الذكي<br>
-<strong>الإصدار:</strong> 4.0.0<br>
-<strong>التحديث:</strong> أكتوبر 2025<br>
-<strong>الاشتراك:</strong> 75 ريال سنوياً
-</p>
-</div>
-
-</div>
-</div>
-
-<!-- Navigation Bar -->
-<div class="bottom-nav">
-<button class="nav-item active" onclick="app.showPage('main')">
-<span class="nav-icon">🏠</span>الرئيسية
-</button>
-<button class="nav-item" onclick="app.showPage('delays')">
-<span class="nav-icon">⏰</span>التأخرات
-</button>
-<button class="nav-item" onclick="app.showPage('absences')">
-<span class="nav-icon">📅</span>الغياب
-</button>
-<button class="nav-item" onclick="app.showPage('notes')">
-<span class="nav-icon">📝</span>الملاحظات
-</button>
-<button class="nav-item" onclick="app.showPage('stats')">
-<span class="nav-icon">📊</span>الإحصائيات
-</button>
-<button class="nav-item" onclick="app.showPage('settings')">
-<span class="nav-icon">⚙️</span>الإعدادات
-</button>
-</div>
-
-<!-- Modals -->
-<div id="studentModal" class="modal" onclick="if(event.target.id==='studentModal')app.closeModal()">
-<div class="modal-content" onclick="event.stopPropagation()">
-<h2 style="text-align:center;color:#1976d2;margin-bottom:20px;font-size:20px">بيانات الطالب</h2>
-<div id="modalBody"></div>
-<button class="btn btn-primary" onclick="app.closeModal()">إغلاق</button>
-</div>
-</div>
-
-<div id="confirmModal" class="modal" onclick="if(event.target.id==='confirmModal')app.closeConfirm()">
-<div class="modal-content" onclick="event.stopPropagation()">
-<h3 id="confirmTitle" style="text-align:center;margin-bottom:12px;font-size:19px">تأكيد العملية</h3>
-<p id="confirmMsg" style="text-align:center;color:#666;margin-bottom:22px;font-size:15px">هل أنت متأكد؟</p>
-<div style="display:flex;gap:12px">
-<button class="btn" style="flex:1;background:#f5f5f5;color:#333" onclick="app.closeConfirm()">إلغاء</button>
-<button class="btn btn-primary" style="flex:1" id="confirmYes">تأكيد</button>
-</div>
-</div>
-</div>
-
-<div id="toast" class="toast"></div>
-
 <script>
 // إعداد Firebase
 const firebaseConfig = {
@@ -3497,6 +2815,142 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
         style="position:fixed; bottom:20px; right:20px; z-index:999999; background:#f44336; color:white; border:none; padding:20px; border-radius:50%; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,0.4); cursor:pointer;">
   🔒
 </button>
+
+
+<!-- شاشة القفل الاحترافية -->
+<div id="lockScreen" style="display:none;">
+  <div class="lock-overlay"></div>
+  <div class="lock-container">
+
+    <div class="lock-header">
+      <div class="lock-icon-main">🔒</div>
+      <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
+      <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
+    </div>
+
+    <div class="subscription-card">
+      <div class="card-badge">عرض خاص 🎁</div>
+
+      <div class="price-section">
+        <span class="old-price">99 ريال</span>
+        <div class="new-price-wrapper">
+          <span class="currency">ريال</span>
+          <span class="new-price">75</span>
+        </div>
+        <span class="duration">/ سنة كاملة</span>
+      </div>
+
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <span class="benefit-icon">✅</span>
+          <span class="benefit-text">استرجاع جميع بياناتك المحفوظة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">☁️</span>
+          <span class="benefit-text">نسخ احتياطي تلقائي في السحابة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🔄</span>
+          <span class="benefit-text">تحديثات مجانية مدى الحياة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">💬</span>
+          <span class="benefit-text">دعم فني مجاني 24/7</span>
+        </div>
+      </div>
+
+      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">
+        🚀 اشترك الآن واسترجع بياناتك
+      </button>
+
+      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
+    </div>
+
+    <div class="warning-box">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-content">
+        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- صفحة معلومات الدفع -->
+<div id="paymentPage" style="display:none;">
+  <div class="lock-overlay"></div>
+  <div class="payment-container">
+
+    <button class="btn-back" onclick="app.hidePaymentPage()">← رجوع</button>
+
+    <div class="payment-header">
+      <div class="payment-icon">💳</div>
+      <h2>معلومات الدفع</h2>
+      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
+    </div>
+
+    <div class="payment-methods">
+      <div class="payment-method">
+        <div class="method-header" onclick="app.selectPaymentMethod('bank')">
+          <div class="method-info">
+            <span class="method-icon">🏦</span>
+            <span class="method-name">تحويل بنكي</span>
+          </div>
+          <span class="method-arrow">▼</span>
+        </div>
+
+        <div class="method-details" id="bankDetails" style="display:none">
+          <div class="bank-info-card">
+            <div class="info-row">
+              <span class="info-label">البنك:</span>
+              <span class="info-value">مصرف الراجحي</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">الاسم:</span>
+              <span class="info-value">سلطان عبدالله المالكي</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">رقم الآيبان:</span>
+              <div class="iban-container">
+                <input type="text" id="ibanNumber" value="SA0000000000000000000000" readonly class="iban-input">
+                <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-method">
+        <div class="method-header" onclick="app.contactWhatsApp()">
+          <div class="method-info">
+            <span class="method-icon">💚</span>
+            <span class="method-name">التواصل عبر واتساب</span>
+          </div>
+          <span class="method-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="activation-section">
+      <h3>🔑 لديك كود تفعيل؟</h3>
+      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
+      <div class="activation-input-group">
+        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
+        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
+      </div>
+    </div>
+
+    <div class="support-section">
+      <h4>💬 بحاجة لمساعدة؟</h4>
+      <div class="support-contacts">
+        <a href="https://wa.me/966533371147" class="support-link" target="_blank">
+          <span>📱</span> واتساب: 966533371147
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
