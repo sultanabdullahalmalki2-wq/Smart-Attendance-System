@@ -1817,17 +1817,28 @@ sendAbsence(){
 },
 
 
-sendNote(){
-  const noteText = document.getElementById('noteTextarea').value.trim();
+ sendNote(){
   const selected = Array.from(this.selected.note);
-  
-  if(!noteText) {
-    this.showToast('⚠️ الرجاء كتابة الملاحظة أولاً');
-    return;
-  }
   
   if(selected.length === 0) {
     this.showToast('⚠️ لم يتم اختيار أي طالب');
+    return;
+  }
+  
+  // احصل على النص من آخر ملاحظة محفوظة أو من textarea
+  let noteText = document.getElementById('noteTextarea').value.trim();
+  
+  // إذا كان textarea فارغ، خذ النص من آخر ملاحظة محفوظة
+  if(!noteText && selected.length > 0) {
+    const firstStudent = this.students[selected[0]];
+    const civil = firstStudent.civil;
+    if(this.notes[civil] && this.notes[civil].length > 0) {
+      noteText = this.notes[civil][this.notes[civil].length - 1].text;
+    }
+  }
+  
+  if(!noteText) {
+    this.showToast('⚠️ لا توجد ملاحظة للإرسال');
     return;
   }
   
@@ -1865,6 +1876,7 @@ sendNote(){
   
   this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
 },
+   
     
     clearSelection(type){
   if(type === 'delay'){
