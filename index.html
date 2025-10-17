@@ -1806,8 +1806,9 @@ hideLockScreen() {
 },
 
 // تفعيل الاشتراك
-activateSubscription() {
-    const input = document.getElementById('activationCode');
+activateSubscription(){
+const input=document.getElementById('activationCodeInput') || document.getElementById('activationCode');
+
     if (!input) return;
     const code = input.value.trim().toUpperCase();
     if (!code) {
