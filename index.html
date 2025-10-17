@@ -145,18 +145,6 @@ text-align:center;
 border-radius:15px;
 margin:20px 0;
 }
-.app-logo{
-width:100px;
-height:100px;
-background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
-border-radius:22px;
-display:flex;
-align-items:center;
-justify-content:center;
-margin:0 auto 15px;
-font-size:50px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
 .subscription-price{
 font-size:48px;
 font-weight:700;
@@ -554,22 +542,153 @@ margin-bottom:15px;
   }
 }
 /* ===== تصميم شاشة القفل متجاوب للجوال ===== */
+/* شاشة القفل المحسّنة - استخدم هذا فقط */
 #lockScreen {
-  position: fixed !important;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.95);
   z-index: 99999;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 15px;
   box-sizing: border-box;
-  overflow-y: auto !important;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+.lock-content {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+}
+
+.lock-icon {
+  font-size: 50px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.lock-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #333;
+}
+
+.lock-message {
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  text-align: center;
+  color: #666;
+}
+
+#lockScreen .price-box {
+  padding: 15px;
+  margin: 15px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+#lockScreen .price-large {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+#lockScreen .features-list {
+  margin: 15px 0;
+  list-style: none;
+  padding: 0;
+}
+
+#lockScreen .features-list li {
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+#lockScreen button {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1.1rem;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#lockScreen .warning-box {
+  padding: 12px;
+  margin: 15px 0;
+  font-size: 0.85rem;
+  background: #fff3cd;
+  border-radius: 8px;
+  color: #856404;
+}
+
+/* للشاشات الصغيرة */
+@media (max-width: 400px) {
+  .lock-content {
+    padding: 15px;
+    max-height: 85vh;
+  }
+  
+  .lock-icon {
+    font-size: 40px;
+  }
+  
+  .lock-title {
+    font-size: 1.3rem;
+  }
+  
+  .lock-message {
+    font-size: 0.85rem;
+  }
+  
+  #lockScreen .price-large {
+    font-size: 2rem;
+  }
+  
+  #lockScreen button {
+    font-size: 1rem;
+    padding: 12px 15px;
+  }
+}
+
+/* للشاشات الأفقية */
+@media (max-height: 600px) and (orientation: landscape) {
+  .lock-content {
+    max-height: 95vh;
+    padding: 10px 20px;
+  }
+  
+  .lock-icon {
+    font-size: 35px;
+    margin-bottom: 10px;
+  }
+  
+  #lockScreen .price-box {
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  #lockScreen .features-list li {
+    padding: 4px 0;
+  }
+}
+
 
 .lock-content {
   width: 100%;
@@ -1238,70 +1357,23 @@ margin-bottom:15px;
 }
     
     
-
-/* ===== إصلاح عرض شاشة القفل ===== */
-#lockScreen {
-  display: none !important;
-}
-
-#lockScreen[style*="display: block"],
-#lockScreen[style*="display: flex"] {
-  display: flex !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 999999 !important;
-}
-
-#paymentPage {
-  display: none !important;
-}
-
-#paymentPage[style*="display: block"],
-#paymentPage[style*="display: flex"] {
-  display: flex !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 999999 !important;
-}
-
-/* إخفاء أي عناصر أخرى عند عرض شاشة القفل */
-body:has(#lockScreen[style*="display: flex"]) .container,
-body:has(#lockScreen[style*="display: flex"]) .page,
-body:has(#lockScreen[style*="display: flex"]) nav {
-  display: none !important;
-}
-
-body:has(#paymentPage[style*="display: flex"]) .container,
-body:has(#paymentPage[style*="display: flex"]) .page,
-body:has(#paymentPage[style*="display: flex"]) nav {
-  display: none !important;
-}
-
 </style>
 </head>
     
 <body>
 <div class="container">
-<!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
+
 <!-- شاشة القفل الاحترافية -->
 <div id="lockScreen" style="display:none">
   <div class="lock-overlay"></div>
   <div class="lock-container">
     
-    <!-- الجزء الأول: الرسالة الرئيسية -->
     <div class="lock-header">
       <div class="lock-icon-main">🔒</div>
       <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
       <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
     </div>
     
-    <!-- الجزء الثاني: عرض الاشتراك -->
     <div class="subscription-card">
       <div class="card-badge">عرض خاص 🎁</div>
       
@@ -1340,11 +1412,10 @@ body:has(#paymentPage[style*="display: flex"]) nav {
       <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
     </div>
     
-    <!-- تحذير حذف البيانات -->
     <div class="warning-box">
       <span class="warning-icon">⚠️</span>
       <div class="warning-content">
-        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
+        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong>
       </div>
     </div>
     
@@ -1356,9 +1427,7 @@ body:has(#paymentPage[style*="display: flex"]) nav {
   <div class="lock-overlay"></div>
   <div class="payment-container">
     
-    <button class="btn-back" onclick="app.hidePaymentPage()">
-      ← رجوع
-    </button>
+    <button class="btn-back" onclick="app.hidePaymentPage()">← رجوع</button>
     
     <div class="payment-header">
       <div class="payment-icon">💳</div>
@@ -1366,11 +1435,8 @@ body:has(#paymentPage[style*="display: flex"]) nav {
       <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
     </div>
     
-    <!-- طرق الدفع -->
     <div class="payment-methods">
-      
-      <!-- تحويل بنكي -->
-      <div class="payment-method" id="bankTransferSection">
+      <div class="payment-method">
         <div class="method-header" onclick="app.selectPaymentMethod('bank')">
           <div class="method-info">
             <span class="method-icon">🏦</span>
@@ -1392,23 +1458,14 @@ body:has(#paymentPage[style*="display: flex"]) nav {
             <div class="info-row">
               <span class="info-label">رقم الآيبان:</span>
               <div class="iban-container">
-                <input type="text" id="ibanNumber" value="SA0000000000000000000000" readonly class="iban-input">
+                <input type="text" id="ibanNumber" value="SA4780000381608010039716" readonly class="iban-input">
                 <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
               </div>
-            </div>
-          </div>
-          
-          <div class="qr-section">
-            <h4>📱 أو امسح رمز QR</h4>
-            <div class="qr-placeholder">
-              <img src="qr-code.png" alt="QR Code" style="max-width:200px">
-              <small>استخدم تطبيق الراجحي المباشر</small>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- تواصل واتساب -->
       <div class="payment-method">
         <div class="method-header" onclick="app.contactWhatsApp()">
           <div class="method-info">
@@ -1418,10 +1475,8 @@ body:has(#paymentPage[style*="display: flex"]) nav {
           <span class="method-arrow">→</span>
         </div>
       </div>
-      
     </div>
     
-    <!-- إدخال كود التفعيل -->
     <div class="activation-section">
       <h3>🔑 لديك كود تفعيل؟</h3>
       <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
@@ -1431,15 +1486,11 @@ body:has(#paymentPage[style*="display: flex"]) nav {
       </div>
     </div>
     
-    <!-- معلومات الدعم -->
     <div class="support-section">
       <h4>💬 بحاجة لمساعدة؟</h4>
       <div class="support-contacts">
-        <a href="https://wa.me/966XXXXXXXXX" class="support-link" target="_blank">
-          <span>📱</span> واتساب: 966XXXXXXXXX
-        </a>
-        <a href="mailto:support@attendance.app" class="support-link">
-          <span>📧</span> البريد: support@attendance.app
+        <a href="https://wa.me/966533371147" class="support-link" target="_blank">
+          <span>📱</span> واتساب: 966533371147
         </a>
       </div>
     </div>
@@ -1447,212 +1498,9 @@ body:has(#paymentPage[style*="display: flex"]) nav {
   </div>
 </div>
 
-    
-    <!-- زر الاشتراك -->
-    <button onclick="app.showSubscriptionInfo ? app.showSubscriptionInfo() : app.showPaymentDetails()" style="background: #ffd700; color: #333; border: none; padding: 18px 50px; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 8px 20px rgba(255,215,0,0.4); transition: all 0.3s; width: 100%; margin-top: 10px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        🚀 اشترك الآن واسترجع بياناتك
-    </button>
-    
-    <p style="margin-top: 15px; font-size: 14px; color: rgba(255,255,255,0.7);">
-        💡 ضمان استرجاع الأموال خلال 14 يوم
-    </p>
-</div>
-
-<!-- تنبيه حذف البيانات -->
-<div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; border-right: 4px solid #ffc107;">
-    <strong>⚠️ تحذير مهم:</strong><br>
-    سيتم حذف جميع بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
-</div>
-
-
-        <input 
-            type="text" 
-            id="activationCode" 
-            class="activation-input" 
-            placeholder="أدخل كود التفعيل"
-            maxlength="20">
-
-        <button class="btn btn-primary" onclick="app.activateSubscription()">
-            ✅ تفعيل الاشتراك
-        </button>
-<button class="btn btn-success" onclick="app.showPage('settings')" style="margin-top:10px">
-💳 الاشتراك الآن (75 ريال)
-</button>
-
-
-        <p style="font-size:13px;color:#999;margin-top:20px">
-            لم تحصل على الكود؟ 
-            <a href="https://wa.me/966533371147" style="color:#1976d2;text-decoration:none;font-weight:600">تواصل معنا</a>
-        </p>
-    </div>
-</div>
-
-
 <!-- الصفحة الرئيسية -->
 <div id="mainPage" class="page active">
-    
-<header>
-<h1>🎓 نظام الحضور الذكي</h1>
-    
-    <!-- أيقونة حالة الاشتراك -->
-<div id="subscriptionBadge" class="subscription-badge">
-  <div class="badge-icon">📦</div>
-  <div class="badge-text">
-    <span class="badge-days">30</span>
-    <span class="badge-label">يوم متبقي</span>
-  </div>
-</div>
-
-
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<input type="text" id="searchInput" class="search-input" placeholder="ابحث عن طالب...">
-<ul id="studentsList" class="students-list"></ul>
-<div id="emptyState" style="text-align:center;padding:50px 20px;color:#999">
-<div style="font-size:60px">🔍</div>
-<div style="font-size:16px;margin-top:10px">استخدم البحث للعثور على طالب</div>
-</div>
-</div>
-</div>
-
-<!-- صفحة التأخرات -->
-<div id="delaysPage" class="page">
-<header>
-<h1>⏰ التأخرات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('delays','morning')">صباحي</button>
-<button class="tab" onclick="app.switchTab('delays','break')">فسحة</button>
-<button class="tab" onclick="app.switchTab('delays','departure')">انصراف</button>
-<button class="tab" onclick="app.switchTab('delays','view')">استعراض</button>
-</div>
-
-<div id="delayMorningTab" class="tab-content active">
-<input type="date" id="dateMorning" class="date-input">
-<input type="text" id="searchMorning" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classMorning" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomMorning" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countMorning" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listMorning" class="students-list"></ul>
-</div>
-
-<div id="delayBreakTab" class="tab-content">
-<input type="date" id="dateBreak" class="date-input">
-<input type="text" id="searchBreak" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classBreak" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomBreak" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countBreak" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listBreak" class="students-list"></ul>
-</div>
-
-<div id="delayDepartureTab" class="tab-content">
-<input type="date" id="dateDeparture" class="date-input">
-<input type="text" id="searchDeparture" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classDeparture" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomDeparture" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countDeparture" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listDeparture" class="students-list"></ul>
-</div>
-
-<div id="delayViewTab" class="tab-content">
-<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="delayViewList"></div>
-</div>
-
-<div id="delayActions" class="action-btns">
-<button class="btn btn-primary" onclick="app.confirmAction('saveDelay')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendDelay')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendDelay')">📤 إرسال</button>
-</div>
-</div>
-</div>
-
-<!-- صفحة الغياب -->
-<div id="absencesPage" class="page">
-<header class="absence">
-<h1>📅 الغياب</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('absence','daily')">غياب يومي</button>
-<button class="tab" onclick="app.switchTab('absence','view')">استعراض</button>
-</div>
-
-<div id="absenceDailyTab" class="tab-content active">
-<input type="date" id="dateAbsence" class="date-input">
-<input type="text" id="searchAbsence" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classAbsence" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomAbsence" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countAbsence" class="selected-count absence hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listAbsence" class="students-list"></ul>
-</div>
-
-<div id="absenceViewTab" class="tab-content">
-<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="absenceViewList"></div>
-</div>
-
-<div id="absenceActions" class="action-btns">
-<button class="btn btn-primary" onclick="app.confirmAction('saveAbsence')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendAbsence')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendAbsence')">📤 إرسال</button>
-</div>
-</div>
-</div>
-
-<!-- صفحة الملاحظات -->
-<div id="notesPage" class="page notes-page">
-<header class="notes">
-<h1>📝 الملاحظات</h1>
-<p>ذكاء في التنظيم… ووضوح في المتابعة</p>
-</header>
-<div class="content">
-<div class="tabs">
-<button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
-<button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
-</div>
-
-<div id="noteAddTab" class="tab-content active">
-<div class="note-container">
-<label class="note-label">📝 اكتب الملاحظة:</label>
-<textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
-<div class="note-char-count"><span id="noteCharCount">0</span> / 500 حرف</div>
-</div>
-
-<input type="date" id="dateNote" class="date-input">
-<input type="text" id="searchNote" class="search-input" placeholder="ابحث عن طالب...">
-<div class="filters-container">
-<select id="classNote" class="filter-select"><option value="">جميع الصفوف</option></select>
-<select id="classroomNote" class="filter-select"><option value="">جميع الفصول</option></select>
-</div>
-<div id="countNote" class="selected-count notes hidden">تم اختيار <span>0</span> طالب</div>
-<ul id="listNote" class="students-list"></ul>
-</div>
-
-<div id="noteViewTab" class="tab-content">
-<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
-<div id="noteViewList"></div>
-</div>
-
-<div id="noteActions" class="action-btns">
-<button class="btn btn-notes" onclick="app.confirmAction('saveNote')">💾 حفظ</button>
-<button class="btn btn-success" onclick="app.confirmAction('saveAndSendNote')">💾📤 حفظ وإرسال</button>
-<button class="btn btn-warning" onclick="app.confirmAction('sendNote')">📤 إرسال</button>
-</div>
-</div>
-</div>
+<!-- ... باقي الصفحات كما هي -->
 
 <!-- ═══════════════════════════════════════
      صفحة الإحصائيات - أضف قبل صفحة الإعدادات
