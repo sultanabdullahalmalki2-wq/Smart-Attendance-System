@@ -714,6 +714,529 @@ margin-bottom:15px;
   }
 }
 
+/* ===== شاشة القفل الاحترافية ===== */
+#lockScreen, #paymentPage {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lock-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(26,35,126,0.95) 0%, rgba(13,71,161,0.95) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.lock-container, .payment-container {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.lock-header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.lock-icon-main {
+  font-size: 70px;
+  margin-bottom: 15px;
+  animation: bounce 2s infinite;
+}
+
+.lock-main-title {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.lock-subtitle {
+  color: rgba(255,255,255,0.9);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.subscription-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.card-badge {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #333;
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.price-section {
+  text-align: center;
+  margin: 25px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 15px;
+}
+
+.old-price {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.new-price-wrapper {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+}
+
+.new-price {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #1976d2;
+  line-height: 1;
+}
+
+.currency {
+  font-size: 1.5rem;
+  color: #1976d2;
+}
+
+.duration {
+  color: #666;
+  font-size: 1rem;
+  display: block;
+  margin-top: 5px;
+}
+
+.benefits-list {
+  margin: 25px 0;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.benefit-item:last-child {
+  border-bottom: none;
+}
+
+.benefit-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.benefit-text {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.btn-subscribe-main {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+
+.btn-subscribe-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(102,126,234,0.5);
+}
+
+.btn-subscribe-main:active {
+  transform: translateY(0);
+}
+
+.guarantee {
+  text-align: center;
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 15px;
+}
+
+.warning-box {
+  background: rgba(255,243,205,0.95);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warning-content {
+  color: #856404;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ===== صفحة الدفع ===== */
+.payment-container {
+  padding-top: 60px;
+}
+
+.btn-back {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+
+.btn-back:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.payment-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.payment-header h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.payment-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.payment-method {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.method-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.method-header:hover {
+  background: #f8f9fa;
+}
+
+.method-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.method-icon {
+  font-size: 1.8rem;
+}
+
+.method-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.method-arrow {
+  color: #999;
+  transition: transform 0.3s;
+}
+
+.method-details {
+  padding: 0 20px 20px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.bank-info-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.iban-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.iban-input {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.95rem;
+}
+
+.btn-copy {
+  padding: 12px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-copy:hover {
+  background: #45a049;
+}
+
+.qr-section {
+  text-align: center;
+}
+
+.qr-section h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.qr-placeholder {
+  background: white;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 40px;
+  color: #999;
+}
+
+.activation-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.activation-section h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.activation-hint {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.activation-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.activation-input {
+  flex: 1;
+  padding: 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.btn-activate {
+  padding: 14px 25px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-activate:hover {
+  background: #45a049;
+}
+
+.support-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+}
+
+.support-section h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.support-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.support-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.3s;
+}
+
+.support-link:hover {
+  background: #e9ecef;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lock-main-title {
+    font-size: 1.5rem;
+  }
+  
+  .new-price {
+    font-size: 3rem;
+  }
+  
+  .subscription-card {
+    padding: 20px;
+  }
+  
+  .benefit-text {
+    font-size: 0.9rem;
+  }
+  
+  .btn-subscribe-main {
+    font-size: 1rem;
+    padding: 15px;
+  }
+  
+  .activation-input-group {
+    flex-direction: column;
+  }
+  
+  .btn-activate {
+    width: 100%;
+  }
+}
+    
     
 </style>
 </head>
@@ -721,48 +1244,164 @@ margin-bottom:15px;
 <body>
 <div class="container">
 <!-- شاشة القفل (تظهر بعد انتهاء الفترة التجريبية) -->
-<div id="lockScreen" class="lock-screen" style="display:none">
-    <div class="lock-content">
-        <div class="lock-icon">🔒</div>
-        <h2 class="lock-title">انتهت الفترة التجريبية</h2>
-        <p class="lock-message">
-    شكراً لتجربة <strong>نظام الحضور الذكي</strong>!<br>
-    لقد استمتعت بـ <strong>7 أيام</strong> تجربة مجانية<br>
-    للاستمرار واستعادة بياناتك، اشترك الآن
-</p>
-
-<!-- قسم عرض السعر (جديد) -->
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px; margin: 30px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-    <h3 style="font-size: 24px; margin-bottom: 20px; font-weight: bold;">🎁 عرض خاص لك!</h3>
+<!-- شاشة القفل الاحترافية -->
+<div id="lockScreen" style="display:none">
+  <div class="lock-overlay"></div>
+  <div class="lock-container">
     
-    <!-- قائمة المميزات -->
-    <ul style="list-style: none; padding: 0; margin: 25px 0; text-align: right;">
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ استرجاع جميع بياناتك المحفوظة فوراً
-        </li>
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ نسخ احتياطي تلقائي في السحابة
-        </li>
-        <li style="padding: 10px 0; font-size: 17px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            ✅ تحديثات مجانية طوال السنة
-        </li>
-        <li style="padding: 10px 0; font-size: 17px;">
-            ✅ دعم فني مجاني على مدار الساعة
-        </li>
-    </ul>
-    
-    <!-- عرض السعر -->
-    <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
-        <div style="font-size: 20px; margin-bottom: 10px; color: rgba(255,255,255,0.8);">
-            السعر العادي: <span style="text-decoration: line-through;">99 ريال</span>
-        </div>
-        <div style="font-size: 52px; font-weight: bold; color: #ffd700; text-shadow: 0 4px 8px rgba(0,0,0,0.3); margin: 15px 0;">
-            75 ريال
-        </div>
-        <div style="font-size: 18px; color: rgba(255,255,255,0.9);">
-            اشتراك سنة كاملة • وفّر 24 ريال
-        </div>
+    <!-- الجزء الأول: الرسالة الرئيسية -->
+    <div class="lock-header">
+      <div class="lock-icon-main">🔒</div>
+      <h2 class="lock-main-title">انتهت الفترة التجريبية</h2>
+      <p class="lock-subtitle">شكراً لتجربتك! استمتعت بـ <strong>7 أيام</strong> مجانية</p>
     </div>
+    
+    <!-- الجزء الثاني: عرض الاشتراك -->
+    <div class="subscription-card">
+      <div class="card-badge">عرض خاص 🎁</div>
+      
+      <div class="price-section">
+        <span class="old-price">99 ريال</span>
+        <div class="new-price-wrapper">
+          <span class="currency">ريال</span>
+          <span class="new-price">75</span>
+        </div>
+        <span class="duration">/ سنة كاملة</span>
+      </div>
+      
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <span class="benefit-icon">✅</span>
+          <span class="benefit-text">استرجاع جميع بياناتك المحفوظة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">☁️</span>
+          <span class="benefit-text">نسخ احتياطي تلقائي في السحابة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🔄</span>
+          <span class="benefit-text">تحديثات مجانية مدى الحياة</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">💬</span>
+          <span class="benefit-text">دعم فني مجاني 24/7</span>
+        </div>
+      </div>
+      
+      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">
+        🚀 اشترك الآن واسترجع بياناتك
+      </button>
+      
+      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
+    </div>
+    
+    <!-- تحذير حذف البيانات -->
+    <div class="warning-box">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-content">
+        <strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <strong>30 يوم</strong> من انتهاء الفترة التجريبية
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- صفحة معلومات الدفع -->
+<div id="paymentPage" style="display:none">
+  <div class="lock-overlay"></div>
+  <div class="payment-container">
+    
+    <button class="btn-back" onclick="app.hidePaymentPage()">
+      ← رجوع
+    </button>
+    
+    <div class="payment-header">
+      <div class="payment-icon">💳</div>
+      <h2>معلومات الدفع</h2>
+      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
+    </div>
+    
+    <!-- طرق الدفع -->
+    <div class="payment-methods">
+      
+      <!-- تحويل بنكي -->
+      <div class="payment-method" id="bankTransferSection">
+        <div class="method-header" onclick="app.selectPaymentMethod('bank')">
+          <div class="method-info">
+            <span class="method-icon">🏦</span>
+            <span class="method-name">تحويل بنكي</span>
+          </div>
+          <span class="method-arrow">▼</span>
+        </div>
+        
+        <div class="method-details" id="bankDetails" style="display:none">
+          <div class="bank-info-card">
+            <div class="info-row">
+              <span class="info-label">البنك:</span>
+              <span class="info-value">مصرف الراجحي</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">الاسم:</span>
+              <span class="info-value">سلطان عبدالله المالكي</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">رقم الآيبان:</span>
+              <div class="iban-container">
+                <input type="text" id="ibanNumber" value="SA0000000000000000000000" readonly class="iban-input">
+                <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="qr-section">
+            <h4>📱 أو امسح رمز QR</h4>
+            <div class="qr-placeholder">
+              <img src="qr-code.png" alt="QR Code" style="max-width:200px">
+              <small>استخدم تطبيق الراجحي المباشر</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- تواصل واتساب -->
+      <div class="payment-method">
+        <div class="method-header" onclick="app.contactWhatsApp()">
+          <div class="method-info">
+            <span class="method-icon">💚</span>
+            <span class="method-name">التواصل عبر واتساب</span>
+          </div>
+          <span class="method-arrow">→</span>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- إدخال كود التفعيل -->
+    <div class="activation-section">
+      <h3>🔑 لديك كود تفعيل؟</h3>
+      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
+      <div class="activation-input-group">
+        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
+        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
+      </div>
+    </div>
+    
+    <!-- معلومات الدعم -->
+    <div class="support-section">
+      <h4>💬 بحاجة لمساعدة؟</h4>
+      <div class="support-contacts">
+        <a href="https://wa.me/966XXXXXXXXX" class="support-link" target="_blank">
+          <span>📱</span> واتساب: 966XXXXXXXXX
+        </a>
+        <a href="mailto:support@attendance.app" class="support-link">
+          <span>📧</span> البريد: support@attendance.app
+        </a>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
     
     <!-- زر الاشتراك -->
     <button onclick="app.showSubscriptionInfo ? app.showSubscriptionInfo() : app.showPaymentDetails()" style="background: #ffd700; color: #333; border: none; padding: 18px 50px; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 8px 20px rgba(255,215,0,0.4); transition: all 0.3s; width: 100%; margin-top: 10px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
@@ -2832,7 +3471,205 @@ this.calculateDailyStats();
 this.calculateWeeklyStats();
 this.calculateMonthlyStats();
 this.renderAbsenceLevels();
-}
+},
+
+
+// ===== دوال شاشة القفل والدفع =====
+
+showPaymentPage(){
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('paymentPage').style.display = 'block';
+},
+
+hidePaymentPage(){
+  document.getElementById('paymentPage').style.display = 'none';
+  document.getElementById('lockScreen').style.display = 'block';
+},
+
+selectPaymentMethod(method){
+  const details = document.getElementById('bankDetails');
+  const arrow = event.currentTarget.querySelector('.method-arrow');
+
+  if(details.style.display === 'none' || !details.style.display){
+    details.style.display = 'block';
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    details.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }
+},
+
+copyIBAN(){
+  const iban = document.getElementById('ibanNumber');
+  iban.select();
+  iban.setSelectionRange(0, 99999);
+
+  try {
+    document.execCommand('copy');
+    this.showToast('✅ تم نسخ رقم الآيبان');
+  } catch(err) {
+    navigator.clipboard.writeText(iban.value).then(() => {
+      this.showToast('✅ تم نسخ رقم الآيبان');
+    }).catch(() => {
+      this.showToast('⚠️ فشل النسخ - انسخه يدوياً');
+    });
+  }
+},
+
+contactWhatsApp(){
+  const phone = '966533371147';
+  const message = 'مرحباً، أريد الاشتراك في نظام الحضور الذكي';
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+},
+
+checkSubscription(){
+  let code = localStorage.getItem('activationCode');
+
+  if(!code){
+    code = this.initTrialSubscription();
+  }
+
+  const storedSubs = localStorage.getItem('subscriptions');
+  if(storedSubs){
+    this.subscriptions = JSON.parse(storedSubs);
+  }
+
+  const subscription = this.subscriptions[code];
+
+  if(!subscription || !subscription.active){
+    document.getElementById('lockScreen').style.display = 'flex';
+    return false;
+  }
+
+  const days = this.calculateRemainingDays(subscription.endDate);
+
+  if(subscription.isTrial){
+    if(days === 2){
+      this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000);
+    } else if(days === 1){
+      this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000);
+    } else if(days === 0){
+      this.showToast('⚠️ انتهت الفترة التجريبية', 5000);
+    }
+  }
+
+  this.updateSubscriptionBadge(days);
+
+  if(days <= 0){
+    document.getElementById('lockScreen').style.display = 'flex';
+    return false;
+  }
+
+  return true;
+},
+
+calculateRemainingDays(endDate){
+  const now = new Date();
+  const end = new Date(endDate);
+  const diff = end - now;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+},
+
+updateSubscriptionBadge(days){
+  const badge = document.getElementById('subscriptionBadge');
+  if(!badge) return;
+
+  const daysEl = badge.querySelector('.badge-days');
+  const labelEl = badge.querySelector('.badge-label');
+
+  if(daysEl) daysEl.textContent = days;
+  if(labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
+
+  badge.classList.remove('trial', 'warning', 'active');
+  if(days <= 3){
+    badge.classList.add('warning');
+  } else if(days <= 7){
+    badge.classList.add('trial');
+  } else {
+    badge.classList.add('active');
+  }
+},
+
+activateSubscription(){
+  let code = document.getElementById('activationCode')?.value?.trim().toUpperCase();
+
+  if(!code){
+    code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
+  }
+
+  if(!code){
+    this.showToast('⚠️ الرجاء إدخال كود التفعيل');
+    return;
+  }
+
+  if(!code.startsWith('SK-')){
+    this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-');
+    return;
+  }
+
+  const isTrial = code.includes('TRIAL');
+  const endDate = new Date();
+
+  if(isTrial){
+    endDate.setDate(endDate.getDate() + 7);
+  } else {
+    endDate.setFullYear(endDate.getFullYear() + 1);
+  }
+
+  this.subscriptions[code] = {
+    active: true,
+    startDate: new Date().toISOString(),
+    endDate: endDate.toISOString(),
+    isTrial: isTrial,
+    paid: !isTrial
+  };
+
+  localStorage.setItem('activationCode', code);
+  localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+  this.saveData();
+
+  document.getElementById('lockScreen').style.display = 'none';
+
+  this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
+
+  setTimeout(() => {
+    this.showPage('main');
+    location.reload();
+  }, 2000);
+},
+
+async checkExpiredTrials(){
+  const deviceId = this.getDeviceId();
+  if(typeof database === 'undefined') return;
+
+  try {
+    const code = localStorage.getItem('activationCode');
+    if(!code || !code.includes('TRIAL')) return;
+
+    const subscription = this.subscriptions[code];
+    if(!subscription) return;
+
+    const endDate = new Date(subscription.endDate);
+    const now = new Date();
+    const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
+
+    if(daysSinceExpiry === 18){
+      this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
+    }
+
+    if(daysSinceExpiry >= 23){
+      await database.ref('backups/' + deviceId).remove();
+      localStorage.clear();
+      alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.');
+      location.reload();
+    }
+  } catch(error){
+    console.error('خطأ في فحص التجارب:', error);
+  }
+},
+
+
 };
 
 document.addEventListener('DOMContentLoaded',function(){app.init();});
