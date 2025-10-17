@@ -1347,7 +1347,7 @@ margin-bottom:15px;
             <div class="info-row">
               <span class="info-label">رقم الآيبان:</span>
               <div class="iban-container">
-                <input type="text" id="ibanNumber" value="SA4780000381608010039716" readonly class="iban-input">
+                <input type="text" id="ibanNumber" value="SA0000000000000000000000" readonly class="iban-input">
                 <button onclick="app.copyIBAN()" class="btn-copy">📋 نسخ</button>
               </div>
             </div>
@@ -1390,8 +1390,8 @@ margin-bottom:15px;
     <div class="support-section">
       <h4>💬 بحاجة لمساعدة؟</h4>
       <div class="support-contacts">
-        <a href="https://wa.me/966533371147" class="support-link" target="_blank">
-          <span>📱</span> واتساب: 966533371147
+        <a href="https://wa.me/966XXXXXXXXX" class="support-link" target="_blank">
+          <span>📱</span> واتساب: 966XXXXXXXXX
         </a>
         <a href="mailto:support@attendance.app" class="support-link">
           <span>📧</span> البريد: support@attendance.app
@@ -3471,205 +3471,7 @@ this.calculateDailyStats();
 this.calculateWeeklyStats();
 this.calculateMonthlyStats();
 this.renderAbsenceLevels();
-},
-
-
-// ===== دوال شاشة القفل والدفع =====
-
-showPaymentPage(){
-  document.getElementById('lockScreen').style.display = 'none';
-  document.getElementById('paymentPage').style.display = 'block';
-},
-
-hidePaymentPage(){
-  document.getElementById('paymentPage').style.display = 'none';
-  document.getElementById('lockScreen').style.display = 'block';
-},
-
-selectPaymentMethod(method){
-  const details = document.getElementById('bankDetails');
-  const arrow = event.currentTarget.querySelector('.method-arrow');
-
-  if(details.style.display === 'none' || !details.style.display){
-    details.style.display = 'block';
-    arrow.style.transform = 'rotate(180deg)';
-  } else {
-    details.style.display = 'none';
-    arrow.style.transform = 'rotate(0deg)';
-  }
-},
-
-copyIBAN(){
-  const iban = document.getElementById('ibanNumber');
-  iban.select();
-  iban.setSelectionRange(0, 99999);
-
-  try {
-    document.execCommand('copy');
-    this.showToast('✅ تم نسخ رقم الآيبان');
-  } catch(err) {
-    navigator.clipboard.writeText(iban.value).then(() => {
-      this.showToast('✅ تم نسخ رقم الآيبان');
-    }).catch(() => {
-      this.showToast('⚠️ فشل النسخ - انسخه يدوياً');
-    });
-  }
-},
-
-contactWhatsApp(){
-  const phone = '966533371147';
-  const message = 'مرحباً، أريد الاشتراك في نظام الحضور الذكي';
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
-},
-
-checkSubscription(){
-  let code = localStorage.getItem('activationCode');
-
-  if(!code){
-    code = this.initTrialSubscription();
-  }
-
-  const storedSubs = localStorage.getItem('subscriptions');
-  if(storedSubs){
-    this.subscriptions = JSON.parse(storedSubs);
-  }
-
-  const subscription = this.subscriptions[code];
-
-  if(!subscription || !subscription.active){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-
-  const days = this.calculateRemainingDays(subscription.endDate);
-
-  if(subscription.isTrial){
-    if(days === 2){
-      this.showToast('⏰ تبقى يومان من التجربة المجانية!', 8000);
-    } else if(days === 1){
-      this.showToast('🔥 آخر يوم! اشترك الآن لحفظ بياناتك', 10000);
-    } else if(days === 0){
-      this.showToast('⚠️ انتهت الفترة التجريبية', 5000);
-    }
-  }
-
-  this.updateSubscriptionBadge(days);
-
-  if(days <= 0){
-    document.getElementById('lockScreen').style.display = 'flex';
-    return false;
-  }
-
-  return true;
-},
-
-calculateRemainingDays(endDate){
-  const now = new Date();
-  const end = new Date(endDate);
-  const diff = end - now;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-},
-
-updateSubscriptionBadge(days){
-  const badge = document.getElementById('subscriptionBadge');
-  if(!badge) return;
-
-  const daysEl = badge.querySelector('.badge-days');
-  const labelEl = badge.querySelector('.badge-label');
-
-  if(daysEl) daysEl.textContent = days;
-  if(labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
-
-  badge.classList.remove('trial', 'warning', 'active');
-  if(days <= 3){
-    badge.classList.add('warning');
-  } else if(days <= 7){
-    badge.classList.add('trial');
-  } else {
-    badge.classList.add('active');
-  }
-},
-
-activateSubscription(){
-  let code = document.getElementById('activationCode')?.value?.trim().toUpperCase();
-
-  if(!code){
-    code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
-  }
-
-  if(!code){
-    this.showToast('⚠️ الرجاء إدخال كود التفعيل');
-    return;
-  }
-
-  if(!code.startsWith('SK-')){
-    this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-');
-    return;
-  }
-
-  const isTrial = code.includes('TRIAL');
-  const endDate = new Date();
-
-  if(isTrial){
-    endDate.setDate(endDate.getDate() + 7);
-  } else {
-    endDate.setFullYear(endDate.getFullYear() + 1);
-  }
-
-  this.subscriptions[code] = {
-    active: true,
-    startDate: new Date().toISOString(),
-    endDate: endDate.toISOString(),
-    isTrial: isTrial,
-    paid: !isTrial
-  };
-
-  localStorage.setItem('activationCode', code);
-  localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-  this.saveData();
-
-  document.getElementById('lockScreen').style.display = 'none';
-
-  this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
-
-  setTimeout(() => {
-    this.showPage('main');
-    location.reload();
-  }, 2000);
-},
-
-async checkExpiredTrials(){
-  const deviceId = this.getDeviceId();
-  if(typeof database === 'undefined') return;
-
-  try {
-    const code = localStorage.getItem('activationCode');
-    if(!code || !code.includes('TRIAL')) return;
-
-    const subscription = this.subscriptions[code];
-    if(!subscription) return;
-
-    const endDate = new Date(subscription.endDate);
-    const now = new Date();
-    const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
-
-    if(daysSinceExpiry === 18){
-      this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
-    }
-
-    if(daysSinceExpiry >= 23){
-      await database.ref('backups/' + deviceId).remove();
-      localStorage.clear();
-      alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.');
-      location.reload();
-    }
-  } catch(error){
-    console.error('خطأ في فحص التجارب:', error);
-  }
-},
-
-
+}
 };
 
 document.addEventListener('DOMContentLoaded',function(){app.init();});
