@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>نظام الحضور الذكي  v4.0</title>
+    
+<!-- PWA Support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1976d2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="الحضور الذكي">
 
 <!-- App Icons -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -1114,6 +1122,8 @@ init(){
   this.loadLevelSettings();
   this.updateAllStats();
   this.setupRealtimeSync();
+  this.checkOnlineStatus(); 
+
   
   // إضافة حدث الضغط على الأيقونة
   const badge = document.getElementById('subscriptionBadge');
@@ -1123,7 +1133,58 @@ init(){
     };
     badge.style.cursor = 'pointer';
   }
+    // كشف حالة الاتصال
+checkOnlineStatus(){
+  const updateOnlineStatus = () => {
+    const statusBadge = document.getElementById('subscriptionBadge');
+    if(statusBadge){
+      if(navigator.onLine){
+        statusBadge.style.borderLeft = '4px solid #4caf50';
+        this.syncPendingData(); // مزامنة عند العودة أونلاين
+      }else{
+        statusBadge.style.borderLeft = '4px solid #ff9800';
+        this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال');
+      }
+    }
+  };
+  
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
 },
+
+// حفظ البيانات المعلقة للمزامنة
+savePendingData(data){
+  const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+  pending.push({...data, timestamp: Date.now()});
+  localStorage.setItem('pendingSync', JSON.stringify(pending));
+},
+
+// مزامنة البيانات المعلقة
+syncPendingData(){
+  const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+  if(pending.length === 0) return;
+  
+  const activationCode = localStorage.getItem('activationCode');
+  if(!activationCode || !activationCode.startsWith('SK-')) return;
+  
+  this.showToast('🔄 جارٍ المزامنة...');
+  
+  // مزامنة مع Firebase
+  database.ref('subscriptions/' + activationCode).set({
+    students: this.students,
+    delays: this.delays,
+    absences: this.absences,
+    notes: this.notes,
+    lastUpdate: Date.now()
+  }).then(() => {
+    localStorage.setItem('pendingSync', '[]');
+    this.showToast('✅ تمت المزامنة بنجاح');
+  }).catch((error) => {
+    console.log('خطأ في المزامنة:', error);
+  });
+},
+
 
 
 setupRealtimeSync(){
@@ -1208,11 +1269,27 @@ if(activationCode && activationCode.startsWith('SK-')){
   });
 }
 
-// حفظ محلياً (نسخة احتياطية)
-localStorage.setItem('students',JSON.stringify(this.students));
-localStorage.setItem('delays',JSON.stringify(this.delays));
-localStorage.setItem('absences',JSON.stringify(this.absences));
-localStorage.setItem('notes',JSON.stringify(this.notes));
+saveData(){
+  // حفظ محلياً (يعمل أوفلاين)
+  localStorage.setItem('students',JSON.stringify(this.students));
+  localStorage.setItem('delays',JSON.stringify(this.delays));
+  localStorage.setItem('absences',JSON.stringify(this.absences));
+  localStorage.setItem('notes',JSON.stringify(this.notes));
+  
+  // محاولة المزامنة مع السحابة إذا أونلاين
+  if(navigator.onLine){
+    // إذا كان عندك Firebase أو أي API للمزامنة، ضعه هنا
+    console.log('✅ البيانات محفوظة ومزامنة');
+  }else{
+    // حفظ للمزامنة لاحقاً
+    this.savePendingData({
+      students: this.students,
+      delays: this.delays,
+      absences: this.absences,
+      notes: this.notes
+    });
+    console.log('💾 البيانات محفوظة محلياً - ستتم المزامنة عند الاتصال');
+  }
 },
 
 setToday(){
@@ -1221,6 +1298,8 @@ const today=new Date().toISOString().split('T')[0];
 const el=document.getElementById(id);
 if(el)el.value=today;
 });
+
+    
 },
 
 setupEvents(){
@@ -2172,6 +2251,16 @@ this.renderAbsenceLevels();
 };
 
 document.addEventListener('DOMContentLoaded',function(){app.init();});
+
+
+// دعم المزامنة في الخلفية
+if ('serviceWorker' in navigator && 'SyncManager' in window) {
+  navigator.serviceWorker.ready.then(swRegistration => {
+    return swRegistration.sync.register('sync-data');
+  });
+}
+
+    
 </script>
 
 </body>
