@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>نظام الحضور الذكي </title>
+<title>نظام الحضور الذكي v5.0</title>
     
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -23,226 +23,216 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
-<!-- PDF Export Libraries -->
-<script src="https://unpkg.com/@digicole/pdfmake-rtl/build/pdfmake.min.js"></script>
-<script src="https://unpkg.com/@digicole/pdfmake-rtl/build/vfs_fonts.js"></script>
-
-
+<!-- PDF Make RTL -->
+<script src="https://unpkg.com/@digicole/pdfmake-rtl@0.2.0/build/pdfmake-rtl.min.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+
 /* =================== Base & Reset =================== */
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333;-webkit-font-smoothing:antialiased}
-.container{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;padding-bottom:70px}
+:root{
+  --primary-color: #1565c0;
+  --primary-light: #1e88e5;
+  --primary-dark: #0d47a1;
+  --secondary-color: #00897b;
+  --accent-color: #5e35b1;
+  --success-color: #43a047;
+  --warning-color: #fb8c00;
+  --danger-color: #e53935;
+  --light-color: #f5f7fa;
+  --dark-color: #263238;
+  --text-color: #37474f;
+  --border-radius: 12px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body{font-family:'Tajawal', sans-serif;background:linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);min-height:100vh;color:var(--text-color);-webkit-font-smoothing:antialiased;line-height:1.6}
+.container{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;padding-bottom:70px;box-shadow:var(--shadow)}
 
 /* =================== Headers =================== */
-header{background:linear-gradient(135deg,#1976d2 0%,#1565c0 100%);color:white;padding:22px;text-align:center;position:sticky;top:0;z-index:100}
-header.absence{background:linear-gradient(135deg,#d32f2f 0%,#c62828 100%)}
-header.notes{background:linear-gradient(135deg,#00897b 0%,#00796b 100%)}
-header h1{font-size:22px;font-weight:600;letter-spacing:0.3px}
-header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
+header{background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%);color:white;padding:25px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(21,101,192,0.3)}
+header.absence{background:linear-gradient(135deg,var(--danger-color) 0%, #c62828 100%);box-shadow:0 4px 20px rgba(229,57,53,0.3)}
+header.notes{background:linear-gradient(135deg,var(--secondary-color) 0%, #00796b 100%);box-shadow:0 4px 20px rgba(0,137,123,0.3)}
+header h1{font-size:24px;font-weight:700;letter-spacing:0.5px;margin-bottom:8px}
+header p{font-size:15px;opacity:0.95;font-weight:500}
 
 /* =================== Content & Inputs =================== */
 .content{padding:20px}
-.search-input{width:100%;padding:16px;border:2px solid #e0e0e0;border-radius:12px;font-size:17px;font-family:inherit;margin:12px 0;font-weight:500}
-.search-input:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1)}
-.date-input{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;background:white;margin:15px 0;font-family:inherit;font-weight:500}
-.note-container{background:#e0f2f1;padding:18px;border-radius:12px;border:2px solid #00897b;margin:15px 0}
-.note-label{font-size:15px;font-weight:700;color:#00695c;margin-bottom:10px;display:block}
-.note-textarea{width:100%;min-height:120px;padding:14px;border:2px solid #80cbc4;border-radius:10px;font-size:16px;font-family:inherit;background:white;resize:vertical;font-weight:500}
-.note-textarea:focus{outline:none;border-color:#00897b;box-shadow:0 0 0 3px rgba(0,137,123,0.1)}
-.note-char-count{text-align:left;font-size:13px;color:#666;margin-top:6px;font-weight:600}
+.search-input{width:100%;padding:16px 20px;border:2px solid #e0e0e0;border-radius:var(--border-radius);font-size:16px;font-family:inherit;margin:15px 0;font-weight:500;transition:var(--transition)}
+.search-input:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 4px rgba(21,101,192,0.1)}
+.date-input{width:100%;padding:14px 20px;border:2px solid #e0e0e0;border-radius:var(--border-radius);font-size:16px;background:white;margin:15px 0;font-family:inherit;font-weight:500;transition:var(--transition)}
+.date-input:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 4px rgba(21,101,192,0.1)}
+.note-container{background:#e0f2f1;padding:20px;border-radius:var(--border-radius);border:2px solid var(--secondary-color);margin:15px 0;box-shadow:0 2px 10px rgba(0,137,123,0.1)}
+.note-label{font-size:16px;font-weight:700;color:#00695c;margin-bottom:12px;display:block}
+.note-textarea{width:100%;min-height:120px;padding:16px;border:2px solid #80cbc4;border-radius:var(--border-radius);font-size:16px;font-family:inherit;background:white;resize:vertical;font-weight:500;transition:var(--transition)}
+.note-textarea:focus{outline:none;border-color:var(--secondary-color);box-shadow:0 0 0 4px rgba(0,137,123,0.1)}
+.note-char-count{text-align:left;font-size:13px;color:#666;margin-top:8px;font-weight:600}
 .filters-container{display:flex;gap:12px;margin:15px 0}
-.filter-select{flex:1;padding:14px 12px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;font-family:inherit;background:white;cursor:pointer;font-weight:500;-webkit-appearance: menulist;appearance: menulist;min-height: 44px;}
-.filter-select:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1)}
+.filter-select{flex:1;padding:14px 12px;border:2px solid #e0e0e0;border-radius:var(--border-radius);font-size:15px;font-family:inherit;background:white;cursor:pointer;font-weight:500;-webkit-appearance: menulist;appearance: menulist;min-height: 44px;transition:var(--transition)}
+.filter-select:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 4px rgba(21,101,192,0.1)}
 
 /* =================== Components =================== */
 .students-list{list-style:none;padding:0}
-.student-item{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin:12px 0;cursor:pointer;transition:all 0.3s}
-.student-item:active{transform:translateY(2px)}
-.student-name{font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:0.2px}
-.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-left:6px;color:white}
-.badge.delay{background:#ff9800}
-.badge.absence{background:#f44336}
-.badge.note{background:#00897b}
-.btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer;margin:6px 0;color:white;font-family:inherit}
-.btn-primary{background:linear-gradient(135deg,#1976d2 0%,#1565c0 100%)}
-.btn-success{background:linear-gradient(135deg,#4caf50 0%,#45a049 100%)}
-.btn-warning{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%)}
-.btn-danger{background:linear-gradient(135deg,#d32f2f 0%,#c62828 100%)}
-.btn-notes{background:linear-gradient(135deg,#00897b 0%,#00796b 100%)}
+.student-item{background:#fff;border:1px solid #e0e0e0;border-radius:var(--border-radius);padding:18px;margin:12px 0;cursor:pointer;transition:var(--transition);box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.student-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.student-item:active{transform:translateY(0)}
+.student-name{font-size:18px;font-weight:600;margin-bottom:8px;letter-spacing:0.2px}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-left:6px;color:white}
+.badge.delay{background:var(--warning-color)}
+.badge.absence{background:var(--danger-color)}
+.badge.note{background:var(--secondary-color)}
+.btn{width:100%;padding:16px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;margin:8px 0;color:white;font-family:inherit;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%);box-shadow:0 4px 15px rgba(21,101,192,0.3)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--primary-light) 0%, var(--primary-color) 100%);box-shadow:0 6px 20px rgba(21,101,192,0.4)}
+.btn-success{background:linear-gradient(135deg,var(--success-color) 0%, #388e3c 100%);box-shadow:0 4px 15px rgba(67,160,71,0.3)}
+.btn-success:hover{background:linear-gradient(135deg,#66bb6a 0%, var(--success-color) 100%);box-shadow:0 6px 20px rgba(67,160,71,0.4)}
+.btn-warning{background:linear-gradient(135deg,var(--warning-color) 0%, #f57c00 100%);box-shadow:0 4px 15px rgba(251,140,0,0.3)}
+.btn-warning:hover{background:linear-gradient(135deg,#ffa726 0%, var(--warning-color) 100%);box-shadow:0 6px 20px rgba(251,140,0,0.4)}
+.btn-danger{background:linear-gradient(135deg,var(--danger-color) 0%, #c62828 100%);box-shadow:0 4px 15px rgba(229,57,53,0.3)}
+.btn-danger:hover{background:linear-gradient(135deg,#ef5350 0%, var(--danger-color) 100%);box-shadow:0 6px 20px rgba(229,57,53,0.4)}
+.btn-notes{background:linear-gradient(135deg,var(--secondary-color) 0%, #00796b 100%);box-shadow:0 4px 15px rgba(0,137,123,0.3)}
+.btn-notes:hover{background:linear-gradient(135deg,#26a69a 0%, var(--secondary-color) 100%);box-shadow:0 6px 20px rgba(0,137,123,0.4)}
 .btn:active{transform:scale(0.98)}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;box-shadow:0 -2px 10px rgba(0,0,0,0.1);display:flex;z-index:100}
-.nav-item{flex:1;text-align:center;padding:10px 6px;cursor:pointer;border:none;background:none;color:#666;font-size:11px;font-weight:600}
-.nav-item.active{color:#1976d2}
-.nav-icon{font-size:22px;display:block;margin-bottom:3px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;box-shadow:0 -2px 20px rgba(0,0,0,0.1);display:flex;z-index:100;border-top:1px solid #e0e0e0}
+.nav-item{flex:1;text-align:center;padding:12px 6px;cursor:pointer;border:none;background:none;color:#757575;font-size:11px;font-weight:600;transition:var(--transition)}
+.nav-item.active{color:var(--primary-color)}
+.nav-item:hover{color:var(--primary-light)}
+.nav-icon{font-size:22px;display:block;margin-bottom:4px}
 .page{display:none}
-.page.active{display:block}.tabs {
-  display: flex;
-  gap: 8px;
-  margin: 16px 0;
-  position: sticky;
-  top: 84px;
-  background: white;
-  padding: 12px 0;
-  z-index: 90;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.tab {
-  flex: 0 0 auto;
-  min-width: fit-content;
-  padding: 12px 14px;
-  border: 2px solid #e0e0e0;
-  background: white;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-}
-
-.tab.active{background:#1976d2;color:white;border-color:#1976d2}
-    
-/* ===== إضافة جديدة: تنسيق خاص لتبويب الإحصائيات ===== */
-#statsPage .tabs {
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-#statsPage .tab {
-  flex: 0 1 calc(50% - 4px);
-  min-width: 0;
-  padding: 11px 10px;
-  font-size: 12px;
-  text-align: center;
-}
-
-#statsPage .tab:last-child {
-  flex: 1 1 100%;
-  background: #4caf50;
-  color: white;
-  border-color: #4caf50;
-  margin-top: 6px;
-}
-.notes-page .tab.active{background:#00897b;border-color:#00897b}
+.page.active{display:block}
+.tabs{display:flex;gap:10px;margin:16px 0;position:sticky;top:84px;background:white;padding:12px 0;z-index:90;overflow-x:auto}
+.tab{flex:1;padding:13px 16px;border:2px solid #e0e0e0;background:white;border-radius:var(--border-radius);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:var(--transition)}
+.tab.active{background:var(--primary-color);color:white;border-color:var(--primary-color);box-shadow:0 4px 10px rgba(21,101,192,0.2)}
+.tab:hover:not(.active){background:#f5f5f5}
+.notes-page .tab.active{background:var(--secondary-color);border-color:var(--secondary-color);box-shadow:0 4px 10px rgba(0,137,123,0.2)}
 .tab:active{transform:scale(0.97)}
 .tab-content{display:none}
 .tab-content.active{display:block}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;backdrop-filter:blur(5px)}
 .modal.active{display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-content{background:white;border-radius:18px;padding:26px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto}
-.toast{position:fixed;bottom:80px;left:20px;right:20px;background:#323232;color:white;padding:16px 20px;border-radius:10px;z-index:2000;display:none;font-size:15px;font-weight:500}
-.toast.show{display:block}
+.modal-content{background:white;border-radius:18px;padding:26px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.toast{position:fixed;bottom:80px;left:20px;right:20px;background:var(--dark-color);color:white;padding:16px 20px;border-radius:var(--border-radius);z-index:2000;display:none;font-size:15px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.2);backdrop-filter:blur(10px)}
+.toast.show{display:block;animation:slideUp 0.3s ease-out}
 .record-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0}
-.record-card{background:#f8f9fa;border-radius:12px;padding:15px;border:2px solid #e0e0e0}
-.record-card.delays{border-color:#ff9800;background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
-.record-card.absences{border-color:#f44336;background:linear-gradient(135deg,#ffebee,#ffcdd2)}
-.record-card.notes{border-color:#00897b;background:linear-gradient(135deg,#e0f2f1,#b2dfdb)}
+.record-card{background:#f8f9fa;border-radius:var(--border-radius);padding:15px;border:2px solid #e0e0e0;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.record-card.delays{border-color:var(--warning-color);background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
+.record-card.absences{border-color:var(--danger-color);background:linear-gradient(135deg,#ffebee,#ffcdd2)}
+.record-card.notes{border-color:var(--secondary-color);background:linear-gradient(135deg,#e0f2f1,#b2dfdb)}
 .record-card h4{font-size:15px;margin-bottom:10px;color:#333;border-bottom:2px solid rgba(0,0,0,0.1);padding-bottom:8px;font-weight:600}
 .record-card.delays h4{color:#e65100}
 .record-card.absences h4{color:#c62828}
 .record-card.notes h4{color:#00695c}
 .record-list{max-height:180px;overflow-y:auto}
-.record-item{background:white;padding:9px;border-radius:7px;margin:5px 0;font-size:13px}
+.record-item{background:white;padding:10px;border-radius:8px;margin:6px 0;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
 .record-item-header{display:flex;justify-content:space-between;align-items:flex-start}
 .record-type{font-weight:600;font-size:12px}
 .record-card.delays .record-type{color:#e65100}
 .record-card.absences .record-type{color:#c62828}
 .record-card.notes .record-type{color:#00695c}
 .record-date{color:#666;font-size:11px;margin-top:2px}
-.record-note-text{background:#f8f9fa;padding:8px;border-radius:6px;font-size:12px;margin-top:6px;border-right:3px solid #00897b;line-height:1.4}
-.delete-btn{background:#f44336;color:white;border:none;padding:5px 9px;border-radius:5px;font-size:10px;cursor:pointer;font-weight:600}
+.record-note-text{background:#f8f9fa;padding:8px;border-radius:6px;font-size:12px;margin-top:6px;border-right:3px solid var(--secondary-color);line-height:1.4}
+.delete-btn{background:var(--danger-color);color:white;border:none;padding:5px 9px;border-radius:5px;font-size:10px;cursor:pointer;font-weight:600;transition:var(--transition)}
+.delete-btn:hover{background:#c62828}
 .delete-btn:active{transform:scale(0.95)}
-.selected-count{background:#4caf50;color:white;padding:12px;border-radius:10px;text-align:center;margin:12px 0;font-weight:600;font-size:15px}
-.selected-count.absence{background:#d32f2f}
-.selected-count.notes{background:#00897b}
-.action-btns{position:sticky;bottom:70px;background:white;padding:16px 20px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);margin:0 -20px;display:none;gap:12px}
+.selected-count{background:var(--success-color);color:white;padding:12px;border-radius:var(--border-radius);text-align:center;margin:12px 0;font-weight:600;font-size:15px;box-shadow:0 2px 10px rgba(67,160,71,0.2)}
+.selected-count.absence{background:var(--danger-color);box-shadow:0 2px 10px rgba(229,57,53,0.2)}
+.selected-count.notes{background:var(--secondary-color);box-shadow:0 2px 10px rgba(0,137,123,0.2)}
+.action-btns{position:sticky;bottom:70px;background:white;padding:16px 20px;box-shadow:0 -2px 20px rgba(0,0,0,0.1);margin:0 -20px;display:none;gap:12px;z-index:90}
 .action-btns.show{display:flex}
 .action-btns .btn{margin:0;padding:13px;font-size:15px}
 .hidden{display:none}
 
 /* =================== Stats Page =================== */
-.stats-page{background:#f5f5f5}
-.stats-card{background:white;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 2px 4px rgba(0,0,0,0.08)}
-.stats-card h3{font-size:18px;font-weight:600;color:#333;margin-bottom:15px;border-bottom:2px solid #e0e0e0;padding-bottom:10px}
+.stats-page{background:var(--light-color)}
+.stats-card{background:white;border-radius:var(--border-radius);padding:20px;margin:15px 0;box-shadow:var(--shadow)}
+.stats-card h3{font-size:18px;font-weight:600;color:var(--dark-color);margin-bottom:15px;border-bottom:2px solid #e0e0e0;padding-bottom:10px}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
-.stat-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:18px;border-radius:10px;text-align:center}
-.stat-box.success{background:linear-gradient(135deg,#4caf50 0%,#45a049 100%)}
-.stat-box.danger{background:linear-gradient(135deg,#f44336 0%,#d32f2f 100%)}
-.stat-box.warning{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%)}
-.stat-box.info{background:linear-gradient(135deg,#2196f3 0%,#1976d2 100%)}
+.stat-box{background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%);color:white;padding:18px;border-radius:var(--border-radius);text-align:center;box-shadow:0 4px 15px rgba(21,101,192,0.2)}
+.stat-box.success{background:linear-gradient(135deg,var(--success-color) 0%, #388e3c 100%);box-shadow:0 4px 15px rgba(67,160,71,0.2)}
+.stat-box.danger{background:linear-gradient(135deg,var(--danger-color) 0%, #c62828 100%);box-shadow:0 4px 15px rgba(229,57,53,0.2)}
+.stat-box.warning{background:linear-gradient(135deg,var(--warning-color) 0%, #f57c00 100%);box-shadow:0 4px 15px rgba(251,140,0,0.2)}
+.stat-box.info{background:linear-gradient(135deg,var(--primary-light) 0%, var(--primary-color) 100%);box-shadow:0 4px 15px rgba(30,136,229,0.2)}
 .stat-number{font-size:32px;font-weight:700;margin:8px 0}
 .stat-label{font-size:13px;opacity:0.95;font-weight:500}
-.level-card{border-radius:10px;padding:16px;margin:12px 0;border-right:5px solid}
-.level-1{background:#e8f5e9;border-color:#4caf50}
+.level-card{border-radius:var(--border-radius);padding:16px;margin:12px 0;border-right:5px solid;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.level-1{background:#e8f5e9;border-color:var(--success-color)}
 .level-1 .level-title{color:#2e7d32}
-.level-2{background:#fff9c4;border-color:#ffc107}
+.level-2{background:#fff9c4;border-color:var(--warning-color)}
 .level-2 .level-title{color:#f57f17}
 .level-3{background:#ffe0b2;border-color:#ff9800}
 .level-3 .level-title{color:#e65100}
-.level-4{background:#ffebee;border-color:#f44336}
+.level-4{background:#ffebee;border-color:var(--danger-color)}
 .level-4 .level-title{color:#c62828}
 .level-title{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;word-break:break-word}
-.level-card{border-radius:10px;padding:16px;margin:12px 0;border-right:5px solid;overflow:hidden}
 .level-student{background:white;padding:10px 12px;border-radius:8px;margin:6px 0;font-size:14px;display:flex;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-.student-name-stat{font-weight:600;color:#333}
+.student-name-stat{font-weight:600;color:var(--dark-color)}
 .student-days{color:#666;font-size:13px}
 .level-empty{text-align:center;padding:20px;color:#999;font-size:14px}
 .settings-input{display:flex;align-items:center;gap:10px;margin:10px 0}
 .settings-input label{flex:1;font-size:14px;font-weight:500;color:#666}
 .settings-input input{width:60px;padding:8px;border:2px solid #e0e0e0;border-radius:6px;text-align:center;font-size:14px;font-weight:600}
 .percentage-circle{width:120px;height:120px;margin:20px auto;position:relative}
-.percentage-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:700;color:#1976d2}
-.settings-card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:22px;margin:16px 0}
-.settings-card h3{margin-bottom:12px;font-size:18px;font-weight:600}
+.percentage-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:700;color:var(--primary-color)}
+.settings-card{background:#fff;border:1px solid #e0e0e0;border-radius:var(--border-radius);padding:22px;margin:16px 0;box-shadow:var(--shadow)}
+.settings-card h3{margin-bottom:12px;font-size:18px;font-weight:600;color:var(--dark-color)}
 .settings-card p{color:#666;font-size:15px;margin-bottom:16px;line-height:1.6}
 
+/* =================== Export Controls =================== */
+.export-controls{background:#f8f9fa;border-radius:var(--border-radius);padding:15px;margin:15px 0;border:1px solid #e0e0e0}
+.export-title{font-size:16px;font-weight:600;color:var(--dark-color);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.export-options{display:flex;flex-wrap:wrap;gap:10px}
+.export-btn{padding:10px 15px;border:2px solid var(--primary-color);background:white;color:var(--primary-color);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px}
+.export-btn:hover{background:var(--primary-color);color:white}
+.export-btn:active{transform:scale(0.95)}
+.export-date-group{display:flex;align-items:center;gap:10px;margin-top:10px}
+.export-date-group input{flex:1;padding:10px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px}
+.export-date-group button{padding:10px 15px;background:var(--primary-color);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition)}
+.export-date-group button:hover{background:var(--primary-dark)}
+
 /* =================== Subscription & Payment UI =================== */
-.subscription-hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center;border-radius:15px;margin:20px 0}
-.app-logo{width:100px;height:100px;background:linear-gradient(135deg,#0A84FF 0%,#5AC8FA 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;box-shadow:0 10px 30px rgba(10,132,255,0.3),0 5px 15px rgba(10,132,255,0.2);position:relative;overflow:hidden}
+.subscription-hero{background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%);color:white;padding:30px;text-align:center;border-radius:15px;margin:20px 0;box-shadow:0 10px 30px rgba(21,101,192,0.3)}
+.app-logo{width:100px;height:100px;background:linear-gradient(135deg,#0A84FF 0%, #5AC8FA 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;box-shadow:0 10px 30px rgba(10,132,255,0.3),0 5px 15px rgba(10,132,255,0.2);position:relative;overflow:hidden}
 .app-logo::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)}
 .app-logo-icon{font-size:50px;position:relative;z-index:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2))}
 .subscription-price{font-size:48px;font-weight:700;margin:15px 0}
 .subscription-price small{font-size:18px;opacity:0.9}
-.payment-card{background:white;border-radius:15px;padding:25px;margin:20px 0;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:2px solid #e0e0e0}
-.payment-card h3{color:#1976d2;font-size:20px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
-.bank-info{background:#f8f9fa;padding:18px;border-radius:10px;margin:15px 0;border-right:4px solid #1976d2}
+.payment-card{background:white;border-radius:15px;padding:25px;margin:20px 0;box-shadow:var(--shadow);border:2px solid #e0e0e0}
+.payment-card h3{color:var(--primary-color);font-size:20px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.bank-info{background:#f8f9fa;padding:18px;border-radius:10px;margin:15px 0;border-right:4px solid var(--primary-color)}
 .bank-info-row{display:flex;justify-content:space-between;align-items:center;margin:12px 0;padding:10px 0;border-bottom:1px solid #e0e0e0}
 .bank-info-row:last-child{border-bottom:none}
 .bank-label{font-weight:600;color:#666;font-size:14px}
-.bank-value {font-weight: 700;color: #1976d2;font-size:15px;direction: ltr;text-align: left;word-break: break-all;overflow-wrap: break-word;max-width: 100%;}
-.copy-btn{background:#4caf50;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:8px;font-weight:600}
+.bank-value {font-weight: 700;color: var(--primary-color);font-size:15px;direction: ltr;text-align: left;word-break: break-all;overflow-wrap: break-word;max-width: 100%;}
+.copy-btn{background:var(--success-color);color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:8px;font-weight:600;transition:var(--transition)}
+.copy-btn:hover{background:#388e3c}
 .copy-btn:active{transform:scale(0.95)}
 .qr-container{text-align:center;padding:20px;background:#f8f9fa;border-radius:10px;margin:15px 0}
-.qr-code{width:200px;height:200px;margin:15px auto;border:3px solid #1976d2;border-radius:10px;padding:10px;background:white}
+.qr-code{width:200px;height:200px;margin:15px auto;border:3px solid var(--primary-color);border-radius:10px;padding:10px;background:white}
 .qr-code img{width:100%;height:100%;object-fit:contain}
 .activation-steps{background:#e3f2fd;padding:20px;border-radius:10px;margin:20px 0}
-.activation-steps h4{color:#1976d2;margin-bottom:15px;font-size:18px}
+.activation-steps h4{color:var(--primary-color);margin-bottom:15px;font-size:18px}
 .step-item{display:flex;align-items:flex-start;margin:15px 0}
-.step-number{background:#1976d2;color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-left:12px;flex-shrink:0}
-.step-text{flex:1;font-size:15px;line-height:1.6;color:#333}
+.step-number{background:var(--primary-color);color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-left:12px;flex-shrink:0}
+.step-text{flex:1;font-size:15px;line-height:1.6;color:var(--dark-color)}
 .developer-info{background:#f5f5f5;padding:20px;border-radius:10px;text-align:center;margin:20px 0;border:2px solid #e0e0e0}
-.developer-name{font-size:18px;font-weight:600;color:#333;margin:10px 0}
+.developer-name{font-size:18px;font-weight:600;color:var(--dark-color);margin:10px 0}
 .developer-role{color:#666;font-size:14px;margin-bottom:15px}
-.whatsapp-link{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:white;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;margin-top:10px}
+.whatsapp-link{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366 0%, #128c7e 100%);color:white;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;margin-top:10px;transition:var(--transition)}
+.whatsapp-link:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,0.3)}
 .whatsapp-link:active{transform:scale(0.97)}
 
 /* =================== Subscription Badge =================== */
-.subscription-badge{position:fixed;top:15px;right:15px;background:white;border-radius:12px;padding:10px 15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;z-index:1000;animation:slideInRight 0.5s ease;cursor:pointer}
+.subscription-badge{position:fixed;top:15px;right:15px;background:white;border-radius:12px;padding:10px 15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;z-index:1000;animation:slideInRight 0.5s ease;cursor:pointer;transition:var(--transition)}
+.subscription-badge:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(0,0,0,0.15)}
 .badge-icon{font-size:24px;line-height:1}
 .badge-text{display:flex;flex-direction:column;line-height:1.2}
-.badge-days{font-size:18px;font-weight:700;color:#333}
+.badge-days{font-size:18px;font-weight:700;color:var(--dark-color)}
 .badge-label{font-size:11px;color:#666}
-.subscription-badge.trial{border-left:4px solid #ff9800}
-.subscription-badge.active{border-left:4px solid #4caf50}
-.subscription-badge.warning{border-left:4px solid #f44336;animation:pulse 2s infinite}
+.subscription-badge.trial{border-left:4px solid var(--warning-color)}
+.subscription-badge.active{border-left:4px solid var(--success-color)}
+.subscription-badge.warning{border-left:4px solid var(--danger-color);animation:pulse 2s infinite}
 
 /* =================== Lock Screen & Payment Page =================== */
 #lockScreen, #paymentPage{position:fixed;top:0;left:0;width:100vw;min-height:100vh;height:auto;z-index:99999;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -254,61 +244,61 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .lock-subtitle{color:rgba(255,255,255,0.9);font-size:1.1rem;margin:0}
 .subscription-card{background:white;border-radius:20px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:fadeInUp 0.6s ease-out 0.2s both}
 .card-badge{background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;display:inline-block;padding:8px 20px;border-radius:50px;font-weight:bold;font-size:0.9rem;margin-bottom:20px}
-.price-section{text-align:center;margin:25px 0;padding:20px;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);border-radius:15px}
+.price-section{text-align:center;margin:25px 0;padding:20px;background:linear-gradient(135deg,#f5f7fa 0%, #c3cfe2 100%);border-radius:15px}
 .old-price{color:#999;text-decoration:line-through;font-size:1.2rem;display:block;margin-bottom:10px}
 .new-price-wrapper{display:flex;align-items:baseline;justify-content:center;gap:10px}
-.new-price{font-size:4rem;font-weight:bold;color:#1976d2;line-height:1}
-.currency{font-size:1.5rem;color:#1976d2}
+.new-price{font-size:4rem;font-weight:bold;color:var(--primary-color);line-height:1}
+.currency{font-size:1.5rem;color:var(--primary-color)}
 .duration{color:#666;font-size:1rem;display:block;margin-top:5px}
 .benefits-list{margin:25px 0}
 .benefit-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}
 .benefit-item:last-child{border-bottom:none}
 .benefit-icon{font-size:1.3rem;flex-shrink:0}
-.benefit-text{color:#333;font-size:1rem;line-height:1.4}
-.btn-subscribe-main{width:100%;padding:18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:12px;font-size:1.2rem;font-weight:bold;cursor:pointer;box-shadow:0 10px 30px rgba(102,126,234,0.4);transition:all 0.3s;margin-top:10px}
-.btn-subscribe-main:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(102,126,234,0.5)}
+.benefit-text{color:var(--dark-color);font-size:1rem;line-height:1.4}
+.btn-subscribe-main{width:100%;padding:18px;background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%);color:white;border:none;border-radius:12px;font-size:1.2rem;font-weight:bold;cursor:pointer;box-shadow:0 10px 30px rgba(21,101,192,0.4);transition:var(--transition);margin-top:10px}
+.btn-subscribe-main:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(21,101,192,0.5)}
 .btn-subscribe-main:active{transform:translateY(0)}
 .guarantee{text-align:center;color:#666;font-size:0.85rem;margin-top:15px}
 .warning-box{background:rgba(255,243,205,0.95);border-radius:12px;padding:15px;display:flex;align-items:flex-start;gap:12px;margin-top:20px;animation:fadeInUp 0.6s ease-out 0.4s both}
 .warning-icon{font-size:1.5rem;flex-shrink:0}
 .warning-content{color:#856404;font-size:0.9rem;line-height:1.5}
 .payment-container{padding-top:60px}
-.btn-back{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.3);padding:10px 20px;border-radius:8px;font-size:1rem;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.3s}
+.btn-back{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.3);padding:10px 20px;border-radius:8px;font-size:1rem;cursor:pointer;backdrop-filter:blur(10px);transition:var(--transition)}
 .btn-back:hover{background:rgba(255,255,255,0.3)}
 .payment-header{text-align:center;margin-bottom:30px;color:white}
 .payment-icon{font-size:60px;margin-bottom:15px}
 .payment-header h2{font-size:2rem;margin-bottom:10px}
 .payment-subtitle{font-size:1rem;opacity:0.9}
 .payment-methods{display:flex;flex-direction:column;gap:15px;margin-bottom:30px}
-.payment-method{background:white;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
-.method-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:background 0.3s}
+.payment-method{background:white;border-radius:15px;overflow:hidden;box-shadow:var(--shadow)}
+.method-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:var(--transition)}
 .method-header:hover{background:#f8f9fa}
 .method-info{display:flex;align-items:center;gap:15px}
 .method-icon{font-size:1.8rem}
-.method-name{font-size:1.1rem;font-weight:bold;color:#333}
-.method-arrow{color:#999;transition:transform 0.3s}
+.method-name{font-size:1.1rem;font-weight:bold;color:var(--dark-color)}
+.method-arrow{color:#999;transition:var(--transition)}
 .method-details{padding:0 20px 20px;animation:slideDown 0.3s ease-out}
 .bank-info-card{background:#f8f9fa;border-radius:12px;padding:20px;margin-bottom:20px}
 .info-row{display:flex;flex-direction:column;gap:5px;margin-bottom:15px}
 .info-row:last-child{margin-bottom:0}
 .info-label{color:#666;font-size:0.9rem}
-.info-value{color:#333;font-size:1.1rem;font-weight:bold}
+.info-value{color:var(--dark-color);font-size:1.1rem;font-weight:bold}
 .iban-container {display: flex;gap: 10px;margin-top: 10px;flex-wrap: wrap;}
 .iban-input {flex: 1;padding: 12px;border: 2px solid #e0e0e0;border-radius: 8px;font-family: monospace;font-size: 0.95rem;word-break: break-all;min-width: 0;}
 .qr-section{text-align:center}
-.qr-section h4{margin-bottom:15px;color:#333}
+.qr-section h4{margin-bottom:15px;color:var(--dark-color)}
 .qr-placeholder{background:white;border:2px dashed #ddd;border-radius:12px;padding:40px;color:#999}
 .activation-section{background:white;border-radius:15px;padding:25px;margin-bottom:20px}
-.activation-section h3{margin-bottom:10px;color:#333}
+.activation-section h3{margin-bottom:10px;color:var(--dark-color)}
 .activation-hint{color:#666;font-size:0.9rem;margin-bottom:15px}
 .activation-input-group{display:flex;gap:10px}
 .activation-input{flex:1;padding:14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1rem;text-transform:uppercase}
-.btn-activate{padding:14px 25px;background:#4CAF50;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;transition:background 0.3s}
-.btn-activate:hover{background:#45a049}
+.btn-activate{padding:14px 25px;background:var(--success-color);color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;transition:var(--transition)}
+.btn-activate:hover{background:#388e3c}
 .support-section{background:rgba(255,255,255,0.95);border-radius:15px;padding:20px;text-align:center}
-.support-section h4{margin-bottom:15px;color:#333}
+.support-section h4{margin-bottom:15px;color:var(--dark-color)}
 .support-contacts{display:flex;flex-direction:column;gap:10px}
-.support-link{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#f8f9fa;border-radius:8px;text-decoration:none;color:#333;transition:background 0.3s}
+.support-link{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#f8f9fa;border-radius:8px;text-decoration:none;color:var(--dark-color);transition:var(--transition)}
 .support-link:hover{background:#e9ecef}
 
 /* =================== Animations =================== */
@@ -318,6 +308,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:1000px}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 
 /* =================== Responsive =================== */
 @media (max-width: 768px){
@@ -325,6 +316,8 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
   .badge-icon{font-size:20px}
   .badge-days{font-size:16px}
   .badge-label{font-size:10px}
+  .tabs{overflow-x:scroll}
+  .tab{min-width:100px}
 }
 @media (max-width: 480px){
   .lock-main-title{font-size:1.5rem}
@@ -339,98 +332,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
     justify-content: flex-start;
     padding-top: 40px;
   }
-  /* تنسيق احترافي للأزرار في الإحصائيات */
-#statsPage .tabs {
-  gap: 6px;
-  padding: 8px 0;
-  margin: 12px 0;
-}
-
-#statsPage .tab {
-  flex: 0 1 calc(50% - 3px);
-  padding: 10px 8px;
-  font-size: 11px;
-  line-height: 1.3;
-}
-
-#statsPage .tab:nth-child(1),
-#statsPage .tab:nth-child(2) {
-  flex: 0 1 calc(50% - 3px);
-}
-
-#statsPage .tab:nth-child(3),
-#statsPage .tab:nth-child(4) {
-  flex: 0 1 calc(50% - 3px);
-}
-
-#statsPage .tab:last-child {
-  flex: 1 1 100%;
-  margin-top: 6px;
-  padding: 12px 10px;
-  font-size: 12px;
-}
-
-/* إصلاح أزرار التصدير في جميع الصفحات */
-.tab-content > div[style*="display:flex"] {
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  margin-bottom: 12px !important;
-}
-
-.tab-content > div[style*="display:flex"] input {
-  flex: 1 1 100% !important;
-  min-width: 0 !important;
-  margin-bottom: 8px !important;
-}
-
-.tab-content > div[style*="display:flex"] button {
-  flex: 1 1 calc(50% - 4px) !important;
-  padding: 11px 8px !important;
-  font-size: 11px !important;
-  white-space: normal !important;
-  line-height: 1.3 !important;
-  min-width: 0 !important;
-}
-    @media (max-width: 375px) {
-  #statsPage .tab {
-    font-size: 10px;
-    padding: 9px 6px;
-  }
-
-  #statsPage .tab:last-child {
-    font-size: 11px;
-    padding: 11px 8px;
-  }
-
-  .tab-content > div[style*="display:flex"] button {
-    font-size: 10px !important;
-    padding: 10px 6px !important;
-  }
-
-  .level-title {
-    font-size: 14px;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .stats-card h3 {
-    font-size: 16px;
-  }
-
-  .stat-box {
-    padding: 14px;
-  }
-
-  .stat-number {
-    font-size: 26px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-}
-
-
+  
   .lock-subtitle {
     font-size: 0.9rem;
     padding: 0 10px;
@@ -492,6 +394,15 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
     padding: 8px 15px;
     font-size: 0.9rem;
   }
+  
+  .export-options {
+    flex-direction: column;
+  }
+  
+  .export-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* ثم أضف هذا القسم الجديد بعد إغلاق 480px */
@@ -525,9 +436,24 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
   .app-logo-icon {
     font-size: 40px;
   }
+  
+  .export-date-group {
+    flex-direction: column;
+  }
+  
+  .export-date-group button {
+    width: 100%;
+  }
 }
 
 </style>
+
+<script>
+// تعريف app كمتغير عالمي
+var app = {};
+window.app = app;
+console.log('✓ Step 1: app pre-initialized');
+</script>
 </head>
     
 <body>
@@ -674,13 +600,26 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div id="countDeparture" class="selected-count hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listDeparture" class="students-list"></ul>
 </div>
-<div id="delayViewTab" class="tab-content">
-<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
-<button class="btn btn-primary" onclick="app.exportAllDelays()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
-<button class="btn btn-success" onclick="app.showDateSelector('delay')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
-<button class="btn btn-warning" onclick="app.exportSelectedStudentDelays()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+<div id="delayViewTab" class="tab-content active">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportAllDelays()"><span>📋</span> تصدير الكل</button>
+<button class="export-btn" onclick="app.showExportDateDialog('delays')"><span>📅</span> تصدير يوم محدد</button>
+<button class="export-btn" onclick="app.showStudentExportDialog('delays')"><span>👤</span> تصدير طالب محدد</button>
 </div>
+<div id="delaysExportDateGroup" class="export-date-group" style="display:none">
+<input type="date" id="delaysExportDate" class="date-input">
+<button onclick="app.exportDelaysByDate()">تصدير</button>
+</div>
+<div id="delaysExportStudentGroup" class="export-date-group" style="display:none">
+<select id="delaysExportStudent" class="filter-select">
+<option value="">اختر طالب</option>
+</select>
+<button onclick="app.exportDelaysByStudent()">تصدير</button>
+</div>
+</div>
+<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="delayViewList"></div>
 </div>
 <div id="delayActions" class="action-btns">
@@ -706,13 +645,26 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div id="countAbsence" class="selected-count absence hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listAbsence" class="students-list"></ul>
 </div>
-<div id="absenceViewTab" class="tab-content">
-<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
-<button class="btn btn-primary" onclick="app.exportAllAbsences()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
-<button class="btn btn-success" onclick="app.showDateSelector('absence')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
-<button class="btn btn-warning" onclick="app.exportSelectedStudentAbsences()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+<div id="absenceViewTab" class="tab-content active">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportAllAbsences()"><span>📋</span> تصدير الكل</button>
+<button class="export-btn" onclick="app.showExportDateDialog('absences')"><span>📅</span> تصدير يوم محدد</button>
+<button class="export-btn" onclick="app.showStudentExportDialog('absences')"><span>👤</span> تصدير طالب محدد</button>
 </div>
+<div id="absencesExportDateGroup" class="export-date-group" style="display:none">
+<input type="date" id="absencesExportDate" class="date-input">
+<button onclick="app.exportAbsencesByDate()">تصدير</button>
+</div>
+<div id="absencesExportStudentGroup" class="export-date-group" style="display:none">
+<select id="absencesExportStudent" class="filter-select">
+<option value="">اختر طالب</option>
+</select>
+<button onclick="app.exportAbsencesByStudent()">تصدير</button>
+</div>
+</div>
+<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="absenceViewList"></div>
 </div>
 <div id="absenceActions" class="action-btns">
@@ -732,7 +684,6 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
 </div>
 <div id="noteAddTab" class="tab-content active">
-
 <div class="note-container">
 <label class="note-label">📝 اكتب الملاحظة:</label>
 <textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
@@ -744,13 +695,26 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div id="countNote" class="selected-count notes hidden">تم اختيار <span>0</span> طالب</div>
 <ul id="listNote" class="students-list"></ul>
 </div>
-<div id="noteViewTab" class="tab-content">
-<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
-<button class="btn btn-primary" onclick="app.exportAllNotes()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
-<button class="btn btn-success" onclick="app.showDateSelector('note')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
-<button class="btn btn-warning" onclick="app.exportSelectedStudentNotes()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+<div id="noteViewTab" class="tab-content active">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportAllNotes()"><span>📋</span> تصدير الكل</button>
+<button class="export-btn" onclick="app.showExportDateDialog('notes')"><span>📅</span> تصدير يوم محدد</button>
+<button class="export-btn" onclick="app.showStudentExportDialog('notes')"><span>👤</span> تصدير طالب محدد</button>
 </div>
+<div id="notesExportDateGroup" class="export-date-group" style="display:none">
+<input type="date" id="notesExportDate" class="date-input">
+<button onclick="app.exportNotesByDate()">تصدير</button>
+</div>
+<div id="notesExportStudentGroup" class="export-date-group" style="display:none">
+<select id="notesExportStudent" class="filter-select">
+<option value="">اختر طالب</option>
+</select>
+<button onclick="app.exportNotesByStudent()">تصدير</button>
+</div>
+</div>
+<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
 <div id="noteViewList"></div>
 </div>
 <div id="noteActions" class="action-btns">
@@ -763,16 +727,21 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 
 <!-- صفحة الإحصائيات -->
 <div id="statsPage" class="page stats-page">
-<header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"><h1>📊 الإحصائيات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
+<header style="background:linear-gradient(135deg,var(--primary-color) 0%, var(--primary-dark) 100%)"><h1>📊 الإحصائيات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('stats','daily')">اليومية</button>
 <button class="tab" onclick="app.switchTab('stats','weekly')">الأسبوعية</button>
 <button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
 <button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
-<button class="tab" onclick="app.exportCurrentStats()" style="background:#4caf50;color:white;">📄 تصدير</button>
 </div>
 <div id="statsDailyTab" class="tab-content active">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportDailyStats()"><span>📊</span> تصدير إحصائيات اليوم</button>
+</div>
+</div>
 <div class="stats-card"><h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
 <div class="stats-grid">
 <div class="stat-box info"><div class="stat-number" id="dailyTotal">0</div><div class="stat-label">إجمالي الطلاب</div></div>
@@ -780,10 +749,16 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div class="stat-box danger"><div class="stat-number" id="dailyAbsent">0</div><div class="stat-label">الغائبون</div></div>
 <div class="stat-box warning"><div class="stat-number" id="dailyLate">0</div><div class="stat-label">المتأخرون</div></div>
 </div>
-<div style="background:#e3f2fd;padding:20px;border-radius:10px;text-align:center;margin-top:15px"><div style="font-size:14px;color:#1976d2;margin-bottom:8px;font-weight:600">نسبة الحضور</div><div style="font-size:42px;font-weight:700;color:#1976d2" id="dailyPercentage">0%</div></div>
+<div style="background:#e3f2fd;padding:20px;border-radius:10px;text-align:center;margin-top:15px"><div style="font-size:14px;color:var(--primary-color);margin-bottom:8px;font-weight:600">نسبة الحضور</div><div style="font-size:42px;font-weight:700;color:var(--primary-color)" id="dailyPercentage">0%</div></div>
 </div>
 </div>
 <div id="statsWeeklyTab" class="tab-content">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportWeeklyStats()"><span>📊</span> تصدير إحصائيات الأسبوع</button>
+</div>
+</div>
 <div class="stats-card"><h3>📊 إحصائيات الأسبوع</h3>
 <div class="stats-grid">
 <div class="stat-box info"><div class="stat-number" id="weeklyDays">7</div><div class="stat-label">أيام</div></div>
@@ -794,6 +769,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 </div>
 </div>
 <div id="statsMonthlyTab" class="tab-content">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportMonthlyStats()"><span>📊</span> تصدير إحصائيات الشهر</button>
+</div>
+</div>
 <div class="stats-card"><h3>📅 إحصائيات الشهر</h3>
 <div class="stats-grid">
 <div class="stat-box info"><div class="stat-number" id="monthlyDays">30</div><div class="stat-label">أيام الدراسة</div></div>
@@ -805,6 +786,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 </div>
 </div>
 <div id="statsLevelsTab" class="tab-content">
+<div class="export-controls">
+<div class="export-title"><span>📄</span> خيارات التصدير</div>
+<div class="export-options">
+<button class="export-btn" onclick="app.exportLevelsStats()"><span>📊</span> تصدير مستويات الغياب</button>
+</div>
+</div>
 <div class="stats-card"><h3>⚙️ إعدادات المستويات</h3>
 <div class="settings-input"><label>🟢 المستوى الأول: من</label><input type="number" id="level1Min" value="1" min="1"><span>إلى</span><input type="number" id="level1Max" value="5" min="1"><span>أيام</span></div>
 <div class="settings-input"><label>🟡 المستوى الثاني: من</label><input type="number" id="level2Min" value="6" min="1"><span>إلى</span><input type="number" id="level2Max" value="10" min="1"><span>أيام</span></div>
@@ -839,7 +826,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div class="bank-info-row"><span class="bank-label">💰 المبلغ:</span><span class="bank-value">75 ريال سعودي</span></div>
 </div>
 <div class="qr-container">
-<h4 style="color:#1976d2;font-size:18px;margin-bottom:10px">📱 امسح للتحويل السريع</h4>
+<h4 style="color:var(--primary-color);font-size:18px;margin-bottom:10px">📱 امسح للتحويل السريع</h4>
 <p style="color:#666;font-size:14px;margin-bottom:15px">استخدم تطبيق الراجحي المباشر</p>
 <div class="qr-code"><img src="brkwd.jpg" alt="باركود التحويل السريع" style="width:100%;height:100%;object-fit:contain"></div>
 <p style="color:#999;font-size:13px;margin-top:10px">امسح الباركود باستخدام كاميرا الجوال</p>
@@ -854,14 +841,14 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" class="whatsapp-link" target="_blank" style="width:100%;margin-top:15px;justify-content:center"><span style="font-size:22px">📱</span><span>تواصل مع الدعم الفني</span></a>
 </div>
 <div class="settings-card" style="margin-bottom:20px;">
-<h3 style="color:#1976d2;margin-bottom:15px;">🔑 تفعيل الاشتراك</h3>
+<h3 style="color:var(--primary-color);margin-bottom:15px;">🔑 تفعيل الاشتراك</h3>
 <p style="color:#666;margin-bottom:15px;">أدخل كود الاشتراك لتفعيل التطبيق لمدة سنة كاملة</p>
 <input type="text" id="activationCodeSettings" placeholder="أدخل كود التفعيل الذي حصلت عليه" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
-<button onclick="app.activateSubscriptionFromSettings()" style="width:100%;padding:15px;background:#4caf50;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">✅ تفعيل الاشتراك الآن</button>
+<button onclick="app.activateSubscriptionFromSettings()" style="width:100%;padding:15px;background:var(--success-color);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">✅ تفعيل الاشتراك الآن</button>
 </div>
 <div class="developer-info">
 <div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
-<div class="developer-name">تكوين</div>
+<div class="developer-name">أ. سلطان عبدالله المالكي</div>
 <div class="developer-role">مطور التطبيق</div>
 <p style="font-size:14px;color:#666;line-height:1.6">متخصص في تطوير أنظمة إدارة التعليم<br>جودة عالية • دعم مستمر • تحديثات دورية</p>
 </div>
@@ -905,7 +892,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <!-- Modals -->
 <div id="studentModal" class="modal" onclick="if(event.target.id==='studentModal')app.closeModal()">
 <div class="modal-content" onclick="event.stopPropagation()">
-<h2 style="text-align:center;color:#1976d2;margin-bottom:20px;font-size:20px">بيانات الطالب</h2>
+<h2 style="text-align:center;color:var(--primary-color);margin-bottom:20px;font-size:20px">بيانات الطالب</h2>
 <div id="modalBody"></div>
 <button class="btn btn-primary" onclick="app.closeModal()">إغلاق</button>
 </div>
@@ -917,19 +904,6 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div style="display:flex;gap:12px">
 <button class="btn" style="flex:1;background:#f5f5f5;color:#333" onclick="app.closeConfirm()">إلغاء</button>
 <button class="btn btn-primary" style="flex:1" id="confirmYes">تأكيد</button>
-</div>
-</div>
-</div>
-<div id="dateModal" class="modal" onclick="if(event.target.id==='dateModal')app.closeDateModal()">
-<div class="modal-content" onclick="event.stopPropagation()">
-<h3 style="text-align:center;margin-bottom:20px;color:#1976d2;font-size:20px">اختر التاريخ</h3>
-<div style="margin-bottom:20px;">
-<label style="display:block;margin-bottom:8px;font-weight:600;color:#333;">التاريخ:</label>
-<input type="date" id="exportDate" class="date-input" style="width:100%;">
-</div>
-<div style="display:flex;gap:12px;">
-<button class="btn" style="flex:1;background:#f5f5f5;color:#333" onclick="app.closeDateModal()">إلغاء</button>
-<button class="btn btn-primary" style="flex:1" onclick="app.exportByDate()">تصدير</button>
 </div>
 </div>
 </div>
@@ -945,8 +919,33 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+// إعدادات PDF - مع معالجة الأخطاء
+try {
 
-const app = {
+
+// إعداد PDF Make RTL
+pdfMake.fonts = {
+  Nillima: {
+    normal: 'https://raw.githubusercontent.com/digicole/pdfmake-rtl/master/fonts/Nillima/Nillima-Regular.ttf',
+    bold: 'https://raw.githubusercontent.com/digicole/pdfmake-rtl/master/fonts/Nillima/Nillima-Bold.ttf',
+    italics: 'https://raw.githubusercontent.com/digicole/pdfmake-rtl/master/fonts/Nillima/Nillima-Italic.ttf',
+    bolditalics: 'https://raw.githubusercontent.com/digicole/pdfmake-rtl/master/fonts/Nillima/Nillima-BoldItalic.ttf'
+  },
+  Roboto: {
+    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+  }
+};
+
+    console.log('✓ pdfMake configured successfully');
+} catch(e) {
+    console.warn('⚠️ pdfMake not available:', e.message);
+    // المتابعة بدون PDF
+}
+
+app = {
     // =================== Data & State ===================
     students: [],
     delays: {},
@@ -957,24 +956,9 @@ const app = {
     currentTab: { delay: 'morning', absence: 'daily', notes: 'add', stats: 'daily' },
     levelSettings: { level1: { min: 1, max: 5 }, level2: { min: 6, max: 10 }, level3: { min: 11, max: 15 }, level4: { min: 16, max: 20 } },
     lastUpdate: 0,
-    exportType: '', // نوع التصدير الحالي
 
     // =================== Initialization ===================
-init() {
-  if (typeof pdfMake !== 'undefined') {
-    pdfMake.vfs = vfs;
-    pdfMake.fonts = {
-      Nillima: {
-        normal: 'Nillima.ttf',
-        bold: 'Nillima.ttf',
-        italics: 'Nillima.ttf',
-        bolditalics: 'Nillima.ttf'
-      }
-    };
-  }
-  
-
-        
+    init() {
         this.loadData();
         this.setToday();
         if (!this.checkSubscription()) return;
@@ -1113,7 +1097,7 @@ init() {
         try {
             database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
+                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || {}; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
             });
         } catch (error) { console.error('Error setting up realtime sync:', error); }
     },
@@ -1121,7 +1105,7 @@ init() {
     checkOnlineStatus() {
         const updateOnlineStatus = () => {
             const statusBadge = document.getElementById('subscriptionBadge');
-            if (statusBadge) { if (navigator.onLine) { statusBadge.style.borderLeft = '4px solid #4caf50'; this.syncPendingData(); } else { statusBadge.style.borderLeft = '4px solid #ff9800'; this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال'); } }
+            if (statusBadge) { if (navigator.onLine) { statusBadge.style.borderLeft = '4px solid var(--success-color)'; this.syncPendingData(); } else { statusBadge.style.borderLeft = '4px solid var(--warning-color)'; this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال'); } }
         };
         window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus); updateOnlineStatus();
     },
@@ -1199,10 +1183,6 @@ init() {
     },
 
     closeConfirm() { document.getElementById('confirmModal').classList.remove('active'); },
-    
-    closeDateModal() {
-        document.getElementById('dateModal').classList.remove('active');
-    },
 
     // =================== Data Rendering & Filtering ===================
     renderStudents(list = []) {
@@ -1261,7 +1241,7 @@ init() {
         all.sort((a, b) => new Date(b.d.date) - new Date(a.d.date));
         const div = document.getElementById('delayViewList');
         if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد تأخرات</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #ff9800;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#e65100;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">${item.d.type} - 📅 ${item.d.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('delay','${item.civil}',${item.i})">🗑️</button></div>`).join('');
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid var(--warning-color);padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#e65100;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">${item.d.type} - 📅 ${item.d.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('delay','${item.civil}',${item.i})">🗑️</button></div>`).join('');
     },
 
     renderAbsenceView() {
@@ -1270,7 +1250,7 @@ init() {
         all.sort((a, b) => new Date(b.a.date) - new Date(a.a.date));
         const div = document.getElementById('absenceViewList');
         if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا يوجد غياب</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #f44336;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#c62828;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">غياب يومي - 📅 ${item.a.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('absence','${item.civil}',${item.i})">🗑️</button></div>`).join('');
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid var(--danger-color);padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#c62828;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">غياب يومي - 📅 ${item.a.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('absence','${item.civil}',${item.i})">🗑️</button></div>`).join('');
     },
 
     renderNoteView() {
@@ -1279,13 +1259,13 @@ init() {
         all.sort((a, b) => new Date(b.n.date) - new Date(a.n.date));
         const div = document.getElementById('noteViewList');
         if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد ملاحظات</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #00897b;padding:14px"><div class="record-item-header"><div style="flex:1"><div style="font-weight:600;color:#00695c;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">📅 ${item.n.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('note','${item.civil}',${item.i})">🗑️</button></div><div class="record-note-text">${item.n.text}</div></div>`).join('');
+        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid var(--secondary-color);padding:14px"><div class="record-item-header"><div style="flex:1"><div style="font-weight:600;color:#00695c;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">📅 ${item.n.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('note','${item.civil}',${item.i})">🗑️</button></div><div class="record-note-text">${item.n.text}</div></div>`).join('');
     },
 
     showStudent(idx) {
         const s = this.students[idx]; const delays = this.delays[s.civil] || []; const absences = this.absences[s.civil] || []; const notes = this.notes[s.civil] || [];
         const modal = document.getElementById('studentModal'); const body = document.getElementById('modalBody');
-        body.innerHTML = `<div style="margin-bottom:18px"><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">👤 الاسم:</strong> <span style="font-size:16px">${s.name}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">🆔 السجل المدني:</strong> <span style="font-size:16px">${s.civil}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📱 الجوال:</strong> <span style="font-size:16px">${s.phone}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📚 الصف:</strong> <span style="font-size:16px">${s.class}</span></div><div style="margin:12px 0;padding:12px 0"><strong style="color:#666;font-size:15px">🏫 الفصل:</strong> <span style="font-size:16px">${s.classroom}</span></div></div><div class="record-grid"><div class="record-card delays"><h4>⏰ التأخرات (${delays.length})</h4><div class="record-list">${delays.length > 0 ? delays.map((d, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">${d.type}</div><div class="record-date">📅 ${d.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('delay','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد تأخرات</div>'}</div></div><div class="record-card absences"><h4>📅 الغياب (${absences.length})</h4><div class="record-list">${absences.length > 0 ? absences.map((a, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div style="font-weight:600;color:#c62828;font-size:12px">غياب يومي</div><div class="record-date">📅 ${a.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('absence','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا يوجد غياب</div>'}</div></div><div class="record-card notes"><h4>📝 الملاحظات (${notes.length})</h4><div class="record-list">${notes.length > 0 ? notes.map((n, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">ملاحظة</div><div class="record-date">📅 ${n.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('note','${s.civil}',${i})">🗑️</button></div><div class="record-note-text">${n.text}</div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد ملاحظات</div>'}</div></div></div>`;
+        body.innerHTML = `<div style="margin-bottom:18px"><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">👤 الاسم:</strong> <span style="font-size:16px">${s.name}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">🆔 السجل المدني:</strong> <span style="font-size:16px">${s.civil}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📱 الجوال:</strong> <span style="font-size:16px">${s.phone}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📚 الصف:</strong> <span style="font-size:16px">${s.class}</span></div><div style="margin:12px 0;padding:12px 0"><strong style="color:#666;font-size:15px">🏫 الفصل:</strong> <span style="font-size:16px">${s.classroom}</span></div></div><div class="record-grid"><div class="record-card delays"><h4>⏰ التأخرات (${delays.length})</h4><div class="record-list">${delays.length > 0 ? delays.map((d, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">${d.type}</div><div class="record-date">📅 ${d.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('delay','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:var(--success-color);padding:12px;font-size:13px">✅ لا توجد تأخرات</div>'}</div></div><div class="record-card absences"><h4>📅 الغياب (${absences.length})</h4><div class="record-list">${absences.length > 0 ? absences.map((a, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div style="font-weight:600;color:#c62828;font-size:12px">غياب يومي</div><div class="record-date">📅 ${a.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('absence','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:var(--success-color);padding:12px;font-size:13px">✅ لا يوجد غياب</div>'}</div></div><div class="record-card notes"><h4>📝 الملاحظات (${notes.length})</h4><div class="record-list">${notes.length > 0 ? notes.map((n, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">ملاحظة</div><div class="record-date">📅 ${n.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('note','${s.civil}',${i})">🗑️</button></div><div class="record-note-text">${n.text}</div></div>`).join('') : '<div style="text-align:center;color:var(--success-color);padding:12px;font-size:13px">✅ لا توجد ملاحظات</div>'}</div></div></div>`;
         modal.classList.add('active');
     },
 
@@ -1404,138 +1384,35 @@ init() {
     // =================== Statistics ===================
     updateAllStats() { try { this.calculateDailyStats(); this.calculateWeeklyStats(); this.calculateMonthlyStats(); this.renderAbsenceLevels(); } catch (error) { console.error('Error updating stats:', error); } },
 
-calculateDailyStats() {
-  // تنسيق التاريخ بشكل صحيح (YYYY-MM-DD)
-  const today = new Date().toISOString().split('T')[0];
-  const todayDisplay = new Date().toLocaleDateString('ar-SA');
-  
-  let absentToday = 0;
-  let lateToday = 0;
-  
-  // حساب الغياب اليوم
-  for (const civil in this.absences) {
-    if (this.absences[civil].some(a => {
-      const absDate = a.date.includes('-') ? a.date : 
-                      new Date(a.date.split('/').reverse().join('-')).toISOString().split('T')[0];
-      return absDate === today;
-    })) {
-      absentToday++;
-    }
-  }
-  
-  // حساب التأخير اليوم
-  for (const civil in this.delays) {
-    if (this.delays[civil].some(d => {
-      const delayDate = d.date.includes('-') ? d.date : 
-                        new Date(d.date.split('/').reverse().join('-')).toISOString().split('T')[0];
-      return delayDate === today;
-    })) {
-      lateToday++;
-    }
-  }
-  
-  const total = this.students.length;
-  const present = total - absentToday;
-  const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-  
-  document.getElementById('dailyDate').textContent = todayDisplay;
-  document.getElementById('dailyTotal').textContent = total;
-  document.getElementById('dailyPresent').textContent = present;
-  document.getElementById('dailyAbsent').textContent = absentToday;
-  document.getElementById('dailyLate').textContent = lateToday;
-  document.getElementById('dailyPercentage').textContent = percentage;
-},
+    calculateDailyStats() {
+        const today = new Date().toLocaleDateString('ar-SA'); let absentToday = 0; let lateToday = 0;
+        for (const civil in this.absences) { if (this.absences[civil].some(a => a.date === today)) absentToday++; }
+        for (const civil in this.delays) { if (this.delays[civil].some(d => d.date === today)) lateToday++; }
+        const total = this.students.length; const present = total - absentToday; const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+        document.getElementById('dailyDate').textContent = today; document.getElementById('dailyTotal').textContent = total; document.getElementById('dailyPresent').textContent = present; document.getElementById('dailyAbsent').textContent = absentToday; document.getElementById('dailyLate').textContent = lateToday; document.getElementById('dailyPercentage').textContent = percentage + '%';
+    },
 
+    calculateWeeklyStats() {
+        const now = new Date(); const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)); let totalAbsent = 0; let totalLate = 0;
+        for (const civil in this.absences) { totalAbsent += this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
+        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
+        const avgPresent = this.students.length > 0 ? Math.round((this.students.length * 7 - totalAbsent) / 7) : 0;
+        document.getElementById('weeklyDays').textContent = '7'; document.getElementById('weeklyAvgPresent').textContent = avgPresent; document.getElementById('weeklyTotalAbsent').textContent = totalAbsent; document.getElementById('weeklyTotalLate').textContent = totalLate;
+    },
 
-calculateWeeklyStats() {
-  const now = new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  let totalAbsent = 0;
-  let totalLate = 0;
-  
-  // حساب الغياب خلال الأسبوع
-  for (const civil in this.absences) {
-    totalAbsent += this.absences[civil].filter(a => {
-      const dateStr = a.date.includes('-') ? a.date : 
-                      a.date.split('/').reverse().join('-');
-      const date = new Date(dateStr);
-      return date >= weekAgo && date <= now;
-    }).length;
-  }
-  
-  // حساب التأخير خلال الأسبوع
-  for (const civil in this.delays) {
-    totalLate += this.delays[civil].filter(d => {
-      const dateStr = d.date.includes('-') ? d.date : 
-                      d.date.split('/').reverse().join('-');
-      const date = new Date(dateStr);
-      return date >= weekAgo && date <= now;
-    }).length;
-  }
-  
-  const avgPresent = this.students.length > 0 ? 
-    Math.round(((this.students.length * 7) - totalAbsent) / 7) : 0;
-  
-  document.getElementById('weeklyDays').textContent = 7;
-  document.getElementById('weeklyAvgPresent').textContent = avgPresent;
-  document.getElementById('weeklyTotalAbsent').textContent = totalAbsent;
-  document.getElementById('weeklyTotalLate').textContent = totalLate;
-},
-
-
-calculateMonthlyStats() {
-  const now = new Date();
-  const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
-  let totalAbsent = 0;
-  let totalLate = 0;
-  const absentCounts = {};
-  
-  // حساب الغياب خلال الشهر
-  for (const civil in this.absences) {
-    const count = this.absences[civil].filter(a => {
-      const dateStr = a.date.includes('-') ? a.date : 
-                      a.date.split('/').reverse().join('-');
-      const date = new Date(dateStr);
-      return date >= monthAgo && date <= now;
-    }).length;
-    
-    totalAbsent += count;
-    if (count > 0) absentCounts[civil] = count;
-  }
-  
-  // حساب التأخير خلال الشهر
-  for (const civil in this.delays) {
-    totalLate += this.delays[civil].filter(d => {
-      const dateStr = d.date.includes('-') ? d.date : 
-                      d.date.split('/').reverse().join('-');
-      const date = new Date(dateStr);
-      return date >= monthAgo && date <= now;
-    }).length;
-  },
-  
-  const days = now.getDate();
-  const avgPresent = this.students.length > 0 ? 
-    Math.round(((this.students.length * days) - totalAbsent) / days) : 0;
-  
-  document.getElementById('monthlyDays').textContent = days;
-  document.getElementById('monthlyAvgPresent').textContent = avgPresent;
-  document.getElementById('monthlyTotalAbsent').textContent = totalAbsent;
-  document.getElementById('monthlyTotalLate').textContent = totalLate;
-  
-  // أكثر الطلاب غياباً
-  const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const listDiv = document.getElementById('topAbsentList');
-  
-  if (sorted.length === 0) {
-    listDiv.innerHTML = '<div class="level-empty">✓ لا توجد سجلات غياب</div>';
-  } else {
-    listDiv.innerHTML = sorted.map(([civil, count]) => {
-      const s = this.students.find(st => st.civil === civil);
-      return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : '';
-    }).join('');
-  }
-}
-
+    calculateMonthlyStats() {
+        const now = new Date(); const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1); let totalAbsent = 0; let totalLate = 0; const absentCounts = {};
+        for (const civil in this.absences) {
+            const count = this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length;
+            totalAbsent += count; if (count > 0) absentCounts[civil] = count;
+        }
+        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length; }
+        const days = now.getDate(); const avgPresent = this.students.length > 0 ? Math.round((this.students.length * days - totalAbsent) / days) : 0;
+        document.getElementById('monthlyDays').textContent = days; document.getElementById('monthlyAvgPresent').textContent = avgPresent; document.getElementById('monthlyTotalAbsent').textContent = totalAbsent; document.getElementById('monthlyTotalLate').textContent = totalLate;
+        const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5); const listDiv = document.getElementById('topAbsentList');
+        if (sorted.length === 0) { listDiv.innerHTML = '<div class="level-empty">✅ لا يوجد غياب هذا الشهر</div>'; }
+        else { listDiv.innerHTML = sorted.map(([civil, count]) => { const s = this.students.find(st => st.civil === civil); return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : ''; }).join(''); }
+    },
 
     loadLevelSettings() {
         const stored = localStorage.getItem('levelSettings'); if (stored) { try { this.levelSettings = JSON.parse(stored); this.applyLevelSettings(); } catch (e) { console.error('Error loading level settings:', e); } }
@@ -1574,6 +1451,557 @@ calculateMonthlyStats() {
         }
     },
 
+    // =================== Export Functions ===================
+    showExportDateDialog(type) {
+        const groupId = type + 'ExportDateGroup';
+        const group = document.getElementById(groupId);
+        if (group.style.display === 'none') {
+            group.style.display = 'flex';
+            // إخفاء المجموعات الأخرى
+            ['delays', 'absences', 'notes'].forEach(t => {
+                if (t !== type) {
+                    const otherGroup = document.getElementById(t + 'ExportDateGroup');
+                    const otherStudentGroup = document.getElementById(t + 'ExportStudentGroup');
+                    if (otherGroup) otherGroup.style.display = 'none';
+                    if (otherStudentGroup) otherStudentGroup.style.display = 'none';
+                }
+            });
+        } else {
+            group.style.display = 'none';
+        }
+    },
+
+    showStudentExportDialog(type) {
+        const groupId = type + 'ExportStudentGroup';
+        const group = document.getElementById(groupId);
+        const select = document.getElementById(type + 'ExportStudent');
+        
+        // ملء قائمة الطلاب
+        select.innerHTML = '<option value="">اختر طالب</option>';
+        this.students.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.civil;
+            option.textContent = s.name;
+            select.appendChild(option);
+        });
+        
+        if (group.style.display === 'none') {
+            group.style.display = 'flex';
+            // إخفاء المجموعات الأخرى
+            ['delays', 'absences', 'notes'].forEach(t => {
+                if (t !== type) {
+                    const otherGroup = document.getElementById(t + 'ExportStudentGroup');
+                    const otherDateGroup = document.getElementById(t + 'ExportDateGroup');
+                    if (otherGroup) otherGroup.style.display = 'none';
+                    if (otherDateGroup) otherDateGroup.style.display = 'none';
+                }
+            });
+        } else {
+            group.style.display = 'none';
+        }
+    },
+
+    exportAllDelays() {
+        const allDelays = [];
+        for (const civil in this.delays) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.delays[civil].forEach(delay => {
+                    allDelays.push({
+                        name: student.name,
+                        civil: civil,
+                        class: student.class,
+                        classroom: student.classroom,
+                        type: delay.type,
+                        date: delay.date
+                    });
+                });
+            }
+        }
+        
+        if (allDelays.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات تأخرات للتصدير');
+            return;
+        }
+        
+        this.exportToPDF('تقرير التأخرات', allDelays, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'نوع التأخر', dataKey: 'type' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportDelaysByDate() {
+        const date = document.getElementById('delaysExportDate').value;
+        if (!date) {
+            this.showToast('⚠️ الرجاء اختيار التاريخ');
+            return;
+        }
+        
+        const formattedDate = new Date(date).toLocaleDateString('ar-SA');
+        const delaysByDate = [];
+        
+        for (const civil in this.delays) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.delays[civil].forEach(delay => {
+                    if (delay.date === formattedDate) {
+                        delaysByDate.push({
+                            name: student.name,
+                            civil: civil,
+                            class: student.class,
+                            classroom: student.classroom,
+                            type: delay.type,
+                            date: delay.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (delaysByDate.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات تأخرات في هذا التاريخ');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير التأخرات ليوم ${formattedDate}`, delaysByDate, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'نوع التأخر', dataKey: 'type' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportDelaysByStudent() {
+        const civil = document.getElementById('delaysExportStudent').value;
+        if (!civil) {
+            this.showToast('⚠️ الرجاء اختيار طالب');
+            return;
+        }
+        
+        const student = this.students.find(s => s.civil === civil);
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const studentDelays = [];
+        if (this.delays[civil]) {
+            this.delays[civil].forEach(delay => {
+                studentDelays.push({
+                    name: student.name,
+                    civil: civil,
+                    class: student.class,
+                    classroom: student.classroom,
+                    type: delay.type,
+                    date: delay.date
+                });
+            });
+        }
+        
+        if (studentDelays.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات تأخرات لهذا الطالب');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير تأخرات الطالب ${student.name}`, studentDelays, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'نوع التأخر', dataKey: 'type' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportAllAbsences() {
+        const allAbsences = [];
+        for (const civil in this.absences) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.absences[civil].forEach(absence => {
+                    allAbsences.push({
+                        name: student.name,
+                        civil: civil,
+                        class: student.class,
+                        classroom: student.classroom,
+                        date: absence.date
+                    });
+                });
+            }
+        }
+        
+        if (allAbsences.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات غياب للتصدير');
+            return;
+        }
+        
+        this.exportToPDF('تقرير الغياب', allAbsences, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportAbsencesByDate() {
+        const date = document.getElementById('absencesExportDate').value;
+        if (!date) {
+            this.showToast('⚠️ الرجاء اختيار التاريخ');
+            return;
+        }
+        
+        const formattedDate = new Date(date).toLocaleDateString('ar-SA');
+        const absencesByDate = [];
+        
+        for (const civil in this.absences) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.absences[civil].forEach(absence => {
+                    if (absence.date === formattedDate) {
+                        absencesByDate.push({
+                            name: student.name,
+                            civil: civil,
+                            class: student.class,
+                            classroom: student.classroom,
+                            date: absence.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (absencesByDate.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات غياب في هذا التاريخ');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير الغياب ليوم ${formattedDate}`, absencesByDate, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportAbsencesByStudent() {
+        const civil = document.getElementById('absencesExportStudent').value;
+        if (!civil) {
+            this.showToast('⚠️ الرجاء اختيار طالب');
+            return;
+        }
+        
+        const student = this.students.find(s => s.civil === civil);
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const studentAbsences = [];
+        if (this.absences[civil]) {
+            this.absences[civil].forEach(absence => {
+                studentAbsences.push({
+                    name: student.name,
+                    civil: civil,
+                    class: student.class,
+                    classroom: student.classroom,
+                    date: absence.date
+                });
+            });
+        }
+        
+        if (studentAbsences.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات غياب لهذا الطالب');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير غياب الطالب ${student.name}`, studentAbsences, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportAllNotes() {
+        const allNotes = [];
+        for (const civil in this.notes) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.notes[civil].forEach(note => {
+                    allNotes.push({
+                        name: student.name,
+                        civil: civil,
+                        class: student.class,
+                        classroom: student.classroom,
+                        text: note.text,
+                        date: note.date
+                    });
+                });
+            }
+        }
+        
+        if (allNotes.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات ملاحظات للتصدير');
+            return;
+        }
+        
+        this.exportToPDF('تقرير الملاحظات', allNotes, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'الملاحظة', dataKey: 'text' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportNotesByDate() {
+        const date = document.getElementById('notesExportDate').value;
+        if (!date) {
+            this.showToast('⚠️ الرجاء اختيار التاريخ');
+            return;
+        }
+        
+        const formattedDate = new Date(date).toLocaleDateString('ar-SA');
+        const notesByDate = [];
+        
+        for (const civil in this.notes) {
+            const student = this.students.find(s => s.civil === civil);
+            if (student) {
+                this.notes[civil].forEach(note => {
+                    if (note.date === formattedDate) {
+                        notesByDate.push({
+                            name: student.name,
+                            civil: civil,
+                            class: student.class,
+                            classroom: student.classroom,
+                            text: note.text,
+                            date: note.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (notesByDate.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات ملاحظات في هذا التاريخ');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير الملاحظات ليوم ${formattedDate}`, notesByDate, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'الملاحظة', dataKey: 'text' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportNotesByStudent() {
+        const civil = document.getElementById('notesExportStudent').value;
+        if (!civil) {
+            this.showToast('⚠️ الرجاء اختيار طالب');
+            return;
+        }
+        
+        const student = this.students.find(s => s.civil === civil);
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const studentNotes = [];
+        if (this.notes[civil]) {
+            this.notes[civil].forEach(note => {
+                studentNotes.push({
+                    name: student.name,
+                    civil: civil,
+                    class: student.class,
+                    classroom: student.classroom,
+                    text: note.text,
+                    date: note.date
+                });
+            });
+        }
+        
+        if (studentNotes.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات ملاحظات لهذا الطالب');
+            return;
+        }
+        
+        this.exportToPDF(`تقرير ملاحظات الطالب ${student.name}`, studentNotes, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'الملاحظة', dataKey: 'text' },
+            { header: 'التاريخ', dataKey: 'date' }
+        ]);
+    },
+
+    exportDailyStats() {
+        const today = new Date().toLocaleDateString('ar-SA');
+        const total = parseInt(document.getElementById('dailyTotal').textContent);
+        const present = parseInt(document.getElementById('dailyPresent').textContent);
+        const absent = parseInt(document.getElementById('dailyAbsent').textContent);
+        const late = parseInt(document.getElementById('dailyLate').textContent);
+        const percentage = document.getElementById('dailyPercentage').textContent;
+        
+        const statsData = [
+            { metric: 'إجمالي الطلاب', value: total },
+            { metric: 'الحاضرون', value: present },
+            { metric: 'الغائبون', value: absent },
+            { metric: 'المتأخرون', value: late },
+            { metric: 'نسبة الحضور', value: percentage }
+        ];
+        
+        this.exportToPDF(`إحصائيات اليوم - ${today}`, statsData, [
+            { header: 'المقياس', dataKey: 'metric' },
+            { header: 'القيمة', dataKey: 'value' }
+        ]);
+    },
+
+    exportWeeklyStats() {
+        const days = parseInt(document.getElementById('weeklyDays').textContent);
+        const avgPresent = parseInt(document.getElementById('weeklyAvgPresent').textContent);
+        const totalAbsent = parseInt(document.getElementById('weeklyTotalAbsent').textContent);
+        const totalLate = parseInt(document.getElementById('weeklyTotalLate').textContent);
+        
+        const statsData = [
+            { metric: 'أيام الأسبوع', value: days },
+            { metric: 'متوسط الحضور', value: avgPresent },
+            { metric: 'إجمالي الغياب', value: totalAbsent },
+            { metric: 'إجمالي التأخرات', value: totalLate }
+        ];
+        
+        this.exportToPDF('إحصائيات الأسبوع', statsData, [
+            { header: 'المقياس', dataKey: 'metric' },
+            { header: 'القيمة', dataKey: 'value' }
+        ]);
+    },
+
+    exportMonthlyStats() {
+        const days = parseInt(document.getElementById('monthlyDays').textContent);
+        const avgPresent = parseInt(document.getElementById('monthlyAvgPresent').textContent);
+        const totalAbsent = parseInt(document.getElementById('monthlyTotalAbsent').textContent);
+        const totalLate = parseInt(document.getElementById('monthlyTotalLate').textContent);
+        
+        const statsData = [
+            { metric: 'أيام الدراسة', value: days },
+            { metric: 'متوسط الحضور', value: avgPresent },
+            { metric: 'إجمالي الغياب', value: totalAbsent },
+            { metric: 'إجمالي التأخرات', value: totalLate }
+        ];
+        
+        this.exportToPDF('إحصائيات الشهر', statsData, [
+            { header: 'المقياس', dataKey: 'metric' },
+            { header: 'القيمة', dataKey: 'value' }
+        ]);
+    },
+
+    exportLevelsStats() {
+        const levelsData = [];
+        
+        for (let i = 1; i <= 4; i++) {
+            const levelDiv = document.getElementById(`level${i}Students`);
+            const studentElements = levelDiv.querySelectorAll('.level-student');
+            
+            studentElements.forEach(element => {
+                const nameElement = element.querySelector('.student-name-stat');
+                const daysElement = element.querySelector('.student-days');
+                
+                if (nameElement && daysElement) {
+                    const student = this.students.find(s => s.name === nameElement.textContent);
+                    if (student) {
+                        levelsData.push({
+                            name: student.name,
+                            civil: student.civil,
+                            class: student.class,
+                            classroom: student.classroom,
+                            level: `المستوى ${i}`,
+                            days: daysElement.textContent
+                        });
+                    }
+                }
+            });
+        }
+        
+        if (levelsData.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات مستويات للتصدير');
+            return;
+        }
+        
+        this.exportToPDF('تقرير مستويات الغياب', levelsData, [
+            { header: 'اسم الطالب', dataKey: 'name' },
+            { header: 'السجل المدني', dataKey: 'civil' },
+            { header: 'الصف', dataKey: 'class' },
+            { header: 'الفصل', dataKey: 'classroom' },
+            { header: 'المستوى', dataKey: 'level' },
+            { header: 'أيام الغياب', dataKey: 'days' }
+        ]);
+    },
+
+    exportToPDF(title, data, columns) {
+        this.showToast('🔄 جاري إنشاء ملف PDF...');
+        
+        const docDefinition = {
+            content: [
+                { text: title, style: 'header', alignment: 'center' },
+                { text: `تاريخ الإنشاء: ${new Date().toLocaleDateString('ar-SA')}`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: columns.map(() => '*'),
+                        body: [
+                            columns.map(col => ({ text: col.header, style: 'tableHeader' })),
+                            ...data.map(row => columns.map(col => row[col.dataKey] || ''))
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    font: 'Nillima'
+                },
+                subheader: {
+                    fontSize: 12,
+                    margin: [0, 0, 0, 5],
+                    font: 'Nillima'
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'white',
+                    fillColor: '#1565c0',
+                    font: 'Nillima'
+                }
+            },
+            defaultStyle: {
+                font: 'Nillima',
+                fontSize: 11
+            },
+            pageOrientation: 'landscape',
+            pageSize: 'A4'
+        };
+        
+        pdfMake.createPdf(docDefinition).download(`${title.replace(/\s+/g, '_')}.pdf`);
+        this.showToast('✅ تم إنشاء ملف PDF بنجاح');
+    },
+
     // =================== Utilities ===================
     importExcel(e) {
         const file = e.target.files[0]; if (!file) return;
@@ -1588,64 +2016,10 @@ calculateMonthlyStats() {
         reader.readAsArrayBuffer(file);
     },
 
-resetApp() {
-  // مسح البيانات المحلية
-  this.students = [];
-  this.delays = {};
-  this.absences = {};
-  this.notes = {};
-  this.selected = {
-    morning: new Set(),
-    break: new Set(),
-    departure: new Set(),
-    absence: new Set(),
-    note: new Set()
-  };
-  
-  // مسح localStorage
-  const activationCode = localStorage.getItem('activationCode');
-  const subscriptions = localStorage.getItem('subscriptions');
-  const deviceId = localStorage.getItem('deviceId');
-  const levelSettings = localStorage.getItem('levelSettings');
-  
-  localStorage.clear();
-  
-  // إعادة البيانات المهمة
-  if (activationCode) localStorage.setItem('activationCode', activationCode);
-  if (subscriptions) localStorage.setItem('subscriptions', subscriptions);
-  if (deviceId) localStorage.setItem('deviceId', deviceId);
-  if (levelSettings) localStorage.setItem('levelSettings', levelSettings);
-  
-  // حذف من Firebase
-  const code = localStorage.getItem('activationCode');
-  if (code && typeof database !== 'undefined') {
-    database.ref(`subscriptions/${code}`).update({
-      students: [],
-      delays: {},
-      absences: {},
-      notes: {}
-    }).then(() => {
-      this.showToast('تم مسح جميع البيانات من السحابة ✓');
-    }).catch(error => {
-      console.error('خطأ في مسح البيانات من Firebase:', error);
-    });
-  }
-  
-  // تحديث الواجهة
-  document.getElementById('studentsList').innerHTML = '';
-  document.getElementById('noteTextarea').value = '';
-  document.getElementById('noteCharCount').textContent = 0;
-  
-  // تحديث جميع القوائم
-  this.renderDelayView();
-  this.renderAbsenceView();
-  this.renderNoteView();
-  this.updateAllStats();
-  
-  this.showToast('تم مسح جميع البيانات ✓');
-  this.showPage('main');
-}
-
+    resetApp() {
+        localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
+        document.getElementById('studentsList').innerHTML = ''; document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.showToast('✅ تم مسح جميع البيانات'); this.showPage('main');
+    },
 
     copyText(text) {
         if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.showToast('✅ تم النسخ بنجاح')).catch(() => this.showToast('❌ فشل النسخ')); }
@@ -1654,745 +2028,14 @@ resetApp() {
             try { document.execCommand('copy'); this.showToast('✅ تم النسخ بنجاح'); } catch (err) { this.showToast('❌ فشل النسخ'); }
             document.body.removeChild(textarea);
         }
-    },
-    
-    // =================== PDF Export Functions ===================
-    // إظهار نافذة اختيار التاريخ
-    showDateSelector(type) {
-        this.exportType = type;
-        document.getElementById('dateModal').classList.add('active');
-    },
-    
-    // تصدير حسب التاريخ
-    exportByDate() {
-        const date = document.getElementById('exportDate').value;
-        if (!date) {
-            this.showToast('⚠️ الرجاء اختيار التاريخ');
-            return;
-        }
-        
-        this.closeDateModal();
-        
-        if (this.exportType === 'absence') {
-            this.exportAbsencesByDate(date);
-        } else if (this.exportType === 'delay') {
-            this.exportDelaysByDate(date);
-        } else if (this.exportType === 'note') {
-            this.exportNotesByDate(date);
-        }
-    },
-    
-    // تصدير جميع الغيابات
-    exportAllAbsences() {
-        const all = [];
-        for (const civil in this.absences) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.absences[civil].forEach(a => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        date: a.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateAbsencePDF(all, 'جميع الغيابات');
-    },
-    
-    // تصدير غيابات يوم محدد
-    exportAbsencesByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
-        const filtered = [];
-        
-        for (const civil in this.absences) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.absences[civil].forEach(a => {
-                    if (a.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            date: a.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد غيابات في هذا اليوم');
-            return;
-        }
-        
-        this.generateAbsencePDF(filtered, `غيابات يوم ${selectedDate}`);
-    },
-    
-    // تصدير غيابات طالب محدد
-    exportSelectedStudentAbsences() {
-        const search = document.getElementById('searchAbsenceView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const absences = this.absences[student.civil] || [];
-        if (absences.length === 0) {
-            this.showToast('⚠️ لا توجد غيابات لهذا الطالب');
-            return;
-        }
-        
-        const data = absences.map(a => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            date: a.date
-        }));
-        
-        this.generateAbsencePDF(data, `غيابات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للغيابات
-    generateAbsencePDF(data, title) {
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', '*', '*', '*'],
-                        body: [
-                            [
-                                { text: 'الاسم', style: 'tableHeader' },
-                                { text: 'السجل المدني', style: 'tableHeader' },
-                                { text: 'الصف', style: 'tableHeader' },
-                                { text: 'الفصل', style: 'tableHeader' },
-                                { text: 'التاريخ', style: 'tableHeader' }
-                            ],
-                            ...data.map(item => [
-                                item.name,
-                                item.civil,
-                                item.class,
-                                item.classroom,
-                                item.date
-                            ])
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                },
-                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#1976d2'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#1976d2',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
-        
-        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.showToast('✅ تم تصدير الملف بنجاح');
-    },
-    
-    // تصدير جميع التأخرات
-    exportAllDelays() {
-        const all = [];
-        for (const civil in this.delays) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.delays[civil].forEach(d => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        type: d.type,
-                        date: d.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateDelayPDF(all, 'جميع التأخرات');
-    },
-    
-    // تصدير تأخرات يوم محدد
-    exportDelaysByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
-        const filtered = [];
-        
-        for (const civil in this.delays) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.delays[civil].forEach(d => {
-                    if (d.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            type: d.type,
-                            date: d.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد تأخرات في هذا اليوم');
-            return;
-        }
-        
-        this.generateDelayPDF(filtered, `تأخرات يوم ${selectedDate}`);
-    },
-    
-    // تصدير تأخرات طالب محدد
-    exportSelectedStudentDelays() {
-        const search = document.getElementById('searchDelayView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const delays = this.delays[student.civil] || [];
-        if (delays.length === 0) {
-            this.showToast('⚠️ لا توجد تأخرات لهذا الطالب');
-            return;
-        }
-        
-        const data = delays.map(d => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            type: d.type,
-            date: d.date
-        }));
-        
-        this.generateDelayPDF(data, `تأخرات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للتأخرات
-    generateDelayPDF(data, title) {
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', '*', '*', '*', '*'],
-                        body: [
-                            [
-                                { text: 'الاسم', style: 'tableHeader' },
-                                { text: 'السجل المدني', style: 'tableHeader' },
-                                { text: 'الصف', style: 'tableHeader' },
-                                { text: 'الفصل', style: 'tableHeader' },
-                                { text: 'نوع التأخر', style: 'tableHeader' },
-                                { text: 'التاريخ', style: 'tableHeader' }
-                            ],
-                            ...data.map(item => [
-                                item.name,
-                                item.civil,
-                                item.class,
-                                item.classroom,
-                                item.type,
-                                item.date
-                            ])
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                },
-                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#ff9800'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#ff9800',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
-        
-        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.showToast('✅ تم تصدير الملف بنجاح');
-    },
-    
-    // تصدير جميع الملاحظات
-    exportAllNotes() {
-        const all = [];
-        for (const civil in this.notes) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.notes[civil].forEach(n => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        note: n.text,
-                        date: n.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateNotePDF(all, 'جميع الملاحظات');
-    },
-    
-    // تصدير ملاحظات يوم محدد
-    exportNotesByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
-        const filtered = [];
-        
-        for (const civil in this.notes) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.notes[civil].forEach(n => {
-                    if (n.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            note: n.text,
-                            date: n.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد ملاحظات في هذا اليوم');
-            return;
-        }
-        
-        this.generateNotePDF(filtered, `ملاحظات يوم ${selectedDate}`);
-    },
-    
-    // تصدير ملاحظات طالب محدد
-    exportSelectedStudentNotes() {
-        const search = document.getElementById('searchNoteView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const notes = this.notes[student.civil] || [];
-        if (notes.length === 0) {
-            this.showToast('⚠️ لا توجد ملاحظات لهذا الطالب');
-            return;
-        }
-        
-        const data = notes.map(n => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            note: n.text,
-            date: n.date
-        }));
-        
-        this.generateNotePDF(data, `ملاحظات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للملاحظات
-    generateNotePDF(data, title) {
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', '*', '*', '*'],
-                        body: [
-                            [
-                                { text: 'الاسم', style: 'tableHeader' },
-                                { text: 'السجل المدني', style: 'tableHeader' },
-                                { text: 'الصف', style: 'tableHeader' },
-                                { text: 'الملاحظة', style: 'tableHeader' },
-                                { text: 'التاريخ', style: 'tableHeader' }
-                            ],
-                            ...data.map(item => [
-                                item.name,
-                                item.civil,
-                                `${item.class} - ${item.classroom}`,
-                                { text: item.note, alignment: 'right' },
-                                item.date
-                            ])
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                },
-                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#00897b'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#00897b',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
-        
-        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.showToast('✅ تم تصدير الملف بنجاح');
-    },
-    
-    // تصدير الإحصائيات الحالية
-    exportCurrentStats() {
-        const currentTab = this.currentTab.stats;
-        let title = '';
-        let content = [];
-        
-        if (currentTab === 'daily') {
-            title = 'الإحصائيات اليومية';
-            const today = new Date().toLocaleDateString('ar-SA');
-            content = [
-                { text: `تاريخ: ${today}`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['إجمالي الطلاب', document.getElementById('dailyTotal').textContent],
-                            ['الحاضرون', document.getElementById('dailyPresent').textContent],
-                            ['الغائبون', document.getElementById('dailyAbsent').textContent],
-                            ['المتأخرون', document.getElementById('dailyLate').textContent],
-                            ['نسبة الحضور', document.getElementById('dailyPercentage').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-        } else if (currentTab === 'weekly') {
-            title = 'الإحصائيات الأسبوعية';
-            content = [
-                { text: 'آخر 7 أيام', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['أيام', document.getElementById('weeklyDays').textContent],
-                            ['متوسط الحضور', document.getElementById('weeklyAvgPresent').textContent],
-                            ['إجمالي الغياب', document.getElementById('weeklyTotalAbsent').textContent],
-                            ['إجمالي التأخرات', document.getElementById('weeklyTotalLate').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-        } else if (currentTab === 'monthly') {
-            title = 'الإحصائيات الشهرية';
-            const days = document.getElementById('monthlyDays').textContent;
-            content = [
-                { text: `آخر ${days} يوم`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['أيام الدراسة', document.getElementById('monthlyDays').textContent],
-                            ['متوسط الحضور', document.getElementById('monthlyAvgPresent').textContent],
-                            ['إجمالي الغياب', document.getElementById('monthlyTotalAbsent').textContent],
-                            ['إجمالي التأخرات', document.getElementById('monthlyTotalLate').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-            
-            // إضافة قائمة الطلاب الأكثر غياباً
-            const topAbsentList = document.getElementById('topAbsentList');
-            if (topAbsentList && topAbsentList.innerHTML) {
-                const studentElements = topAbsentList.querySelectorAll('.level-student');
-                if (studentElements.length > 0) {
-                    const topAbsentData = Array.from(studentElements).map(el => {
-                        const name = el.querySelector('.student-name-stat').textContent;
-                        const days = el.querySelector('.student-days').textContent;
-                        return [name, days];
-                    });
-                    
-                    content.push({
-                        text: 'الطلاب الأكثر غياباً',
-                        style: 'subheader',
-                        alignment: 'center',
-                        margin: [0, 20, 0, 10]
-                    });
-                    
-                    content.push({
-                        table: {
-                            headerRows: 1,
-                            widths: ['*', '*'],
-                            body: [
-                                [
-                                    { text: 'اسم الطالب', style: 'tableHeader' },
-                                    { text: 'أيام الغياب', style: 'tableHeader' }
-                                ],
-                                ...topAbsentData
-                            ]
-                        },
-                        layout: 'headerLineOnly'
-                    });
-                }
-            }
-        } else if (currentTab === 'levels') {
-            title = 'مستويات الغياب';
-            content = [
-                { text: 'توزيع الطلاب حسب مستويات الغياب', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] }
-            ];
-            
-            // إضافة بيانات كل مستوى
-            for (let i = 1; i <= 4; i++) {
-                const levelCard = document.getElementById(`level${i}Card`);
-                const levelTitle = levelCard.querySelector('.level-title').textContent;
-                const students = levelCard.querySelectorAll('.level-student');
-                
-                if (students.length > 0) {
-                    const studentData = Array.from(students).map(el => {
-                        const name = el.querySelector('.student-name-stat').textContent;
-                        const days = el.querySelector('.student-days').textContent;
-                        return [name, days];
-                    });
-                    
-                    content.push({
-                        text: levelTitle,
-                        style: 'levelTitle',
-                        margin: [0, 15, 0, 5]
-                    });
-                    
-                    content.push({
-                        table: {
-                            headerRows: 1,
-                            widths: ['*', '*'],
-                            body: [
-                                [
-                                    { text: 'اسم الطالب', style: 'tableHeader' },
-                                    { text: 'أيام الغياب', style: 'tableHeader' }
-                                ],
-                                ...studentData
-                            ]
-                        },
-                        layout: 'headerLineOnly'
-                    });
-                }
-            }
-        }
-        
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                ...content,
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#667eea'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                levelTitle: {
-                    fontSize: 16,
-                    bold: true,
-                    margin: [0, 10, 0, 5]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#667eea',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
-        
-        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.showToast('✅ تم تصدير الملف بنجاح');
     }
 };
+// ربط app بـ window
+window.app = app;
+console.log('✓ Step 2: app fully defined with', Object.keys(app).length, 'properties');
+console.log('✓ Step 3: app.showPage is', typeof app.showPage);
+console.log('✓ Ready! Type "app" in console to test');
+
 
 document.addEventListener('DOMContentLoaded', function () { app.init(); });
 </script>
