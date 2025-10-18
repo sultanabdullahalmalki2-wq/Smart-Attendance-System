@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>نظام الحضور الذكي v4.0</title>
+<title>نظام الحضور الذكي </title>
     
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -23,6 +23,9 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<!-- PDF Export Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <style>
 /* =================== Base & Reset =================== */
 *{margin:0;padding:0;box-sizing:border-box}
@@ -528,7 +531,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <ul id="listDeparture" class="students-list"></ul>
 </div>
 <div id="delayViewTab" class="tab-content">
-<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم...">
+<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+<input type="text" id="searchDelayView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
+<button class="btn btn-primary" onclick="app.exportAllDelays()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
+<button class="btn btn-success" onclick="app.showDateSelector('delay')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
+<button class="btn btn-warning" onclick="app.exportSelectedStudentDelays()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+</div>
 <div id="delayViewList"></div>
 </div>
 <div id="delayActions" class="action-btns">
@@ -555,7 +563,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <ul id="listAbsence" class="students-list"></ul>
 </div>
 <div id="absenceViewTab" class="tab-content">
-<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم...">
+<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+<input type="text" id="searchAbsenceView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
+<button class="btn btn-primary" onclick="app.exportAllAbsences()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
+<button class="btn btn-success" onclick="app.showDateSelector('absence')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
+<button class="btn btn-warning" onclick="app.exportSelectedStudentAbsences()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+</div>
 <div id="absenceViewList"></div>
 </div>
 <div id="absenceActions" class="action-btns">
@@ -572,9 +585,9 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
-<button class="tab" onclick="app.switchTab('notes','view')">استعراض</button>
-</div>
-<div id="noteAddTab" class="tab-content active">
+<button class="tab" onclick="app.switchTab('notes','view')">استعراض</div>
+<div id="noteAddاض</button>
+Tab" class="tab-content active">
 <div class="note-container">
 <label class="note-label">📝 اكتب الملاحظة:</label>
 <textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
@@ -587,7 +600,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <ul id="listNote" class="students-list"></ul>
 </div>
 <div id="noteViewTab" class="tab-content">
-<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم...">
+<div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+<input type="text" id="searchNoteView" class="search-input" placeholder="ابحث بالاسم..." style="flex:1;">
+<button class="btn btn-primary" onclick="app.exportAllNotes()" style="padding:12px 20px;white-space:nowrap;">📄 تصدير الكل</button>
+<button class="btn btn-success" onclick="app.showDateSelector('note')" style="padding:12px 20px;white-space:nowrap;">📅 تصدير يوم محدد</button>
+<button class="btn btn-warning" onclick="app.exportSelectedStudentNotes()" style="padding:12px 20px;white-space:nowrap;">👤 تصدير طالب محدد</button>
+</div>
 <div id="noteViewList"></div>
 </div>
 <div id="noteActions" class="action-btns">
@@ -607,6 +625,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <button class="tab" onclick="app.switchTab('stats','weekly')">الأسبوعية</button>
 <button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
 <button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
+<button class="tab" onclick="app.exportCurrentStats()" style="background:#4caf50;color:white;">📄 تصدير</button>
 </div>
 <div id="statsDailyTab" class="tab-content active">
 <div class="stats-card"><h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
@@ -697,7 +716,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 </div>
 <div class="developer-info">
 <div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
-<div class="developer-name">تكوين</div>
+<div class="developer-name">أ. سلطان عبدالله المالكي</div>
 <div class="developer-role">مطور التطبيق</div>
 <p style="font-size:14px;color:#666;line-height:1.6">متخصص في تطوير أنظمة إدارة التعليم<br>جودة عالية • دعم مستمر • تحديثات دورية</p>
 </div>
@@ -756,6 +775,19 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 </div>
 </div>
 </div>
+<div id="dateModal" class="modal" onclick="if(event.target.id==='dateModal')app.closeDateModal()">
+<div class="modal-content" onclick="event.stopPropagation()">
+<h3 style="text-align:center;margin-bottom:20px;color:#1976d2;font-size:20px">اختر التاريخ</h3>
+<div style="margin-bottom:20px;">
+<label style="display:block;margin-bottom:8px;font-weight:600;color:#333;">التاريخ:</label>
+<input type="date" id="exportDate" class="date-input" style="width:100%;">
+</div>
+<div style="display:flex;gap:12px;">
+<button class="btn" style="flex:1;background:#f5f5f5;color:#333" onclick="app.closeDateModal()">إلغاء</button>
+<button class="btn btn-primary" style="flex:1" onclick="app.exportByDate()">تصدير</button>
+</div>
+</div>
+</div>
 <div id="toast" class="toast"></div>
 
 <script>
@@ -780,9 +812,22 @@ const app = {
     currentTab: { delay: 'morning', absence: 'daily', notes: 'add', stats: 'daily' },
     levelSettings: { level1: { min: 1, max: 5 }, level2: { min: 6, max: 10 }, level3: { min: 11, max: 15 }, level4: { min: 16, max: 20 } },
     lastUpdate: 0,
+    exportType: '', // نوع التصدير الحالي
 
     // =================== Initialization ===================
     init() {
+        // إعداد خط Cairo للتصدير
+        if (typeof pdfMake !== 'undefined') {
+            pdfMake.fonts = {
+                Cairo: {
+                    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+                    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+                    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+                    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+                }
+            };
+        }
+        
         this.loadData();
         this.setToday();
         if (!this.checkSubscription()) return;
@@ -921,7 +966,7 @@ const app = {
         try {
             database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || {}; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
+                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
             });
         } catch (error) { console.error('Error setting up realtime sync:', error); }
     },
@@ -1007,6 +1052,10 @@ const app = {
     },
 
     closeConfirm() { document.getElementById('confirmModal').classList.remove('active'); },
+    
+    closeDateModal() {
+        document.getElementById('dateModal').classList.remove('active');
+    },
 
     // =================== Data Rendering & Filtering ===================
     renderStudents(list = []) {
@@ -1301,6 +1350,743 @@ const app = {
             try { document.execCommand('copy'); this.showToast('✅ تم النسخ بنجاح'); } catch (err) { this.showToast('❌ فشل النسخ'); }
             document.body.removeChild(textarea);
         }
+    },
+    
+    // =================== PDF Export Functions ===================
+    // إظهار نافذة اختيار التاريخ
+    showDateSelector(type) {
+        this.exportType = type;
+        document.getElementById('dateModal').classList.add('active');
+    },
+    
+    // تصدير حسب التاريخ
+    exportByDate() {
+        const date = document.getElementById('exportDate').value;
+        if (!date) {
+            this.showToast('⚠️ الرجاء اختيار التاريخ');
+            return;
+        }
+        
+        this.closeDateModal();
+        
+        if (this.exportType === 'absence') {
+            this.exportAbsencesByDate(date);
+        } else if (this.exportType === 'delay') {
+            this.exportDelaysByDate(date);
+        } else if (this.exportType === 'note') {
+            this.exportNotesByDate(date);
+        }
+    },
+    
+    // تصدير جميع الغيابات
+    exportAllAbsences() {
+        const all = [];
+        for (const civil in this.absences) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.absences[civil].forEach(a => {
+                    all.push({
+                        name: s.name,
+                        civil: s.civil,
+                        class: s.class,
+                        classroom: s.classroom,
+                        date: a.date
+                    });
+                });
+            }
+        }
+        
+        if (all.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات للتصدير');
+            return;
+        }
+        
+        // ترتيب حسب التاريخ
+        all.sort((a, b) => {
+            const dateA = new Date(a.date.split('/').reverse().join('-'));
+            const dateB = new Date(b.date.split('/').reverse().join('-'));
+            return dateB - dateA;
+        });
+        
+        this.generateAbsencePDF(all, 'جميع الغيابات');
+    },
+    
+    // تصدير غيابات يوم محدد
+    exportAbsencesByDate(date) {
+        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+        const filtered = [];
+        
+        for (const civil in this.absences) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.absences[civil].forEach(a => {
+                    if (a.date === selectedDate) {
+                        filtered.push({
+                            name: s.name,
+                            civil: s.civil,
+                            class: s.class,
+                            classroom: s.classroom,
+                            date: a.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (filtered.length === 0) {
+            this.showToast('⚠️ لا توجد غيابات في هذا اليوم');
+            return;
+        }
+        
+        this.generateAbsencePDF(filtered, `غيابات يوم ${selectedDate}`);
+    },
+    
+    // تصدير غيابات طالب محدد
+    exportSelectedStudentAbsences() {
+        const search = document.getElementById('searchAbsenceView').value.toLowerCase();
+        if (!search) {
+            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
+            return;
+        }
+        
+        const student = this.students.find(s => 
+            s.name.toLowerCase().includes(search) || 
+            s.civil.includes(search)
+        );
+        
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const absences = this.absences[student.civil] || [];
+        if (absences.length === 0) {
+            this.showToast('⚠️ لا توجد غيابات لهذا الطالب');
+            return;
+        }
+        
+        const data = absences.map(a => ({
+            name: student.name,
+            civil: student.civil,
+            class: student.class,
+            classroom: student.classroom,
+            date: a.date
+        }));
+        
+        this.generateAbsencePDF(data, `غيابات الطالب ${student.name}`);
+    },
+    
+    // إنشاء PDF للغيابات
+    generateAbsencePDF(data, title) {
+        const docDefinition = {
+            content: [
+                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', '*', '*', '*'],
+                        body: [
+                            [
+                                { text: 'الاسم', style: 'tableHeader' },
+                                { text: 'السجل المدني', style: 'tableHeader' },
+                                { text: 'الصف', style: 'tableHeader' },
+                                { text: 'الفصل', style: 'tableHeader' },
+                                { text: 'التاريخ', style: 'tableHeader' }
+                            ],
+                            ...data.map(item => [
+                                item.name,
+                                item.civil,
+                                item.class,
+                                item.classroom,
+                                item.date
+                            ])
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                },
+                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            ],
+            styles: {
+                header: {
+                    fontSize: 22,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    color: '#1976d2'
+                },
+                subheader: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'white',
+                    fillColor: '#1976d2',
+                    alignment: 'center'
+                },
+                footer: {
+                    fontSize: 11,
+                    italics: true,
+                    color: '#666'
+                }
+            },
+            defaultStyle: {
+                font: 'Cairo',
+                fontSize: 12
+            },
+            pageSize: 'A4',
+            pageMargins: [40, 60, 40, 60]
+        };
+        
+        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+        this.showToast('✅ تم تصدير الملف بنجاح');
+    },
+    
+    // تصدير جميع التأخرات
+    exportAllDelays() {
+        const all = [];
+        for (const civil in this.delays) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.delays[civil].forEach(d => {
+                    all.push({
+                        name: s.name,
+                        civil: s.civil,
+                        class: s.class,
+                        classroom: s.classroom,
+                        type: d.type,
+                        date: d.date
+                    });
+                });
+            }
+        }
+        
+        if (all.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات للتصدير');
+            return;
+        }
+        
+        // ترتيب حسب التاريخ
+        all.sort((a, b) => {
+            const dateA = new Date(a.date.split('/').reverse().join('-'));
+            const dateB = new Date(b.date.split('/').reverse().join('-'));
+            return dateB - dateA;
+        });
+        
+        this.generateDelayPDF(all, 'جميع التأخرات');
+    },
+    
+    // تصدير تأخرات يوم محدد
+    exportDelaysByDate(date) {
+        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+        const filtered = [];
+        
+        for (const civil in this.delays) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.delays[civil].forEach(d => {
+                    if (d.date === selectedDate) {
+                        filtered.push({
+                            name: s.name,
+                            civil: s.civil,
+                            class: s.class,
+                            classroom: s.classroom,
+                            type: d.type,
+                            date: d.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (filtered.length === 0) {
+            this.showToast('⚠️ لا توجد تأخرات في هذا اليوم');
+            return;
+        }
+        
+        this.generateDelayPDF(filtered, `تأخرات يوم ${selectedDate}`);
+    },
+    
+    // تصدير تأخرات طالب محدد
+    exportSelectedStudentDelays() {
+        const search = document.getElementById('searchDelayView').value.toLowerCase();
+        if (!search) {
+            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
+            return;
+        }
+        
+        const student = this.students.find(s => 
+            s.name.toLowerCase().includes(search) || 
+            s.civil.includes(search)
+        );
+        
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const delays = this.delays[student.civil] || [];
+        if (delays.length === 0) {
+            this.showToast('⚠️ لا توجد تأخرات لهذا الطالب');
+            return;
+        }
+        
+        const data = delays.map(d => ({
+            name: student.name,
+            civil: student.civil,
+            class: student.class,
+            classroom: student.classroom,
+            type: d.type,
+            date: d.date
+        }));
+        
+        this.generateDelayPDF(data, `تأخرات الطالب ${student.name}`);
+    },
+    
+    // إنشاء PDF للتأخرات
+    generateDelayPDF(data, title) {
+        const docDefinition = {
+            content: [
+                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', '*', '*', '*', '*'],
+                        body: [
+                            [
+                                { text: 'الاسم', style: 'tableHeader' },
+                                { text: 'السجل المدني', style: 'tableHeader' },
+                                { text: 'الصف', style: 'tableHeader' },
+                                { text: 'الفصل', style: 'tableHeader' },
+                                { text: 'نوع التأخر', style: 'tableHeader' },
+                                { text: 'التاريخ', style: 'tableHeader' }
+                            ],
+                            ...data.map(item => [
+                                item.name,
+                                item.civil,
+                                item.class,
+                                item.classroom,
+                                item.type,
+                                item.date
+                            ])
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                },
+                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            ],
+            styles: {
+                header: {
+                    fontSize: 22,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    color: '#ff9800'
+                },
+                subheader: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'white',
+                    fillColor: '#ff9800',
+                    alignment: 'center'
+                },
+                footer: {
+                    fontSize: 11,
+                    italics: true,
+                    color: '#666'
+                }
+            },
+            defaultStyle: {
+                font: 'Cairo',
+                fontSize: 12
+            },
+            pageSize: 'A4',
+            pageMargins: [40, 60, 40, 60]
+        };
+        
+        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+        this.showToast('✅ تم تصدير الملف بنجاح');
+    },
+    
+    // تصدير جميع الملاحظات
+    exportAllNotes() {
+        const all = [];
+        for (const civil in this.notes) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.notes[civil].forEach(n => {
+                    all.push({
+                        name: s.name,
+                        civil: s.civil,
+                        class: s.class,
+                        classroom: s.classroom,
+                        note: n.text,
+                        date: n.date
+                    });
+                });
+            }
+        }
+        
+        if (all.length === 0) {
+            this.showToast('⚠️ لا توجد بيانات للتصدير');
+            return;
+        }
+        
+        // ترتيب حسب التاريخ
+        all.sort((a, b) => {
+            const dateA = new Date(a.date.split('/').reverse().join('-'));
+            const dateB = new Date(b.date.split('/').reverse().join('-'));
+            return dateB - dateA;
+        });
+        
+        this.generateNotePDF(all, 'جميع الملاحظات');
+    },
+    
+    // تصدير ملاحظات يوم محدد
+    exportNotesByDate(date) {
+        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+        const filtered = [];
+        
+        for (const civil in this.notes) {
+            const s = this.students.find(st => st.civil === civil);
+            if (s) {
+                this.notes[civil].forEach(n => {
+                    if (n.date === selectedDate) {
+                        filtered.push({
+                            name: s.name,
+                            civil: s.civil,
+                            class: s.class,
+                            classroom: s.classroom,
+                            note: n.text,
+                            date: n.date
+                        });
+                    }
+                });
+            }
+        }
+        
+        if (filtered.length === 0) {
+            this.showToast('⚠️ لا توجد ملاحظات في هذا اليوم');
+            return;
+        }
+        
+        this.generateNotePDF(filtered, `ملاحظات يوم ${selectedDate}`);
+    },
+    
+    // تصدير ملاحظات طالب محدد
+    exportSelectedStudentNotes() {
+        const search = document.getElementById('searchNoteView').value.toLowerCase();
+        if (!search) {
+            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
+            return;
+        }
+        
+        const student = this.students.find(s => 
+            s.name.toLowerCase().includes(search) || 
+            s.civil.includes(search)
+        );
+        
+        if (!student) {
+            this.showToast('⚠️ الطالب غير موجود');
+            return;
+        }
+        
+        const notes = this.notes[student.civil] || [];
+        if (notes.length === 0) {
+            this.showToast('⚠️ لا توجد ملاحظات لهذا الطالب');
+            return;
+        }
+        
+        const data = notes.map(n => ({
+            name: student.name,
+            civil: student.civil,
+            class: student.class,
+            classroom: student.classroom,
+            note: n.text,
+            date: n.date
+        }));
+        
+        this.generateNotePDF(data, `ملاحظات الطالب ${student.name}`);
+    },
+    
+    // إنشاء PDF للملاحظات
+    generateNotePDF(data, title) {
+        const docDefinition = {
+            content: [
+                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', '*', '*', '*'],
+                        body: [
+                            [
+                                { text: 'الاسم', style: 'tableHeader' },
+                                { text: 'السجل المدني', style: 'tableHeader' },
+                                { text: 'الصف', style: 'tableHeader' },
+                                { text: 'الملاحظة', style: 'tableHeader' },
+                                { text: 'التاريخ', style: 'tableHeader' }
+                            ],
+                            ...data.map(item => [
+                                item.name,
+                                item.civil,
+                                `${item.class} - ${item.classroom}`,
+                                { text: item.note, alignment: 'right' },
+                                item.date
+                            ])
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                },
+                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            ],
+            styles: {
+                header: {
+                    fontSize: 22,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    color: '#00897b'
+                },
+                subheader: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'white',
+                    fillColor: '#00897b',
+                    alignment: 'center'
+                },
+                footer: {
+                    fontSize: 11,
+                    italics: true,
+                    color: '#666'
+                }
+            },
+            defaultStyle: {
+                font: 'Cairo',
+                fontSize: 12
+            },
+            pageSize: 'A4',
+            pageMargins: [40, 60, 40, 60]
+        };
+        
+        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+        this.showToast('✅ تم تصدير الملف بنجاح');
+    },
+    
+    // تصدير الإحصائيات الحالية
+    exportCurrentStats() {
+        const currentTab = this.currentTab.stats;
+        let title = '';
+        let content = [];
+        
+        if (currentTab === 'daily') {
+            title = 'الإحصائيات اليومية';
+            const today = new Date().toLocaleDateString('ar-SA');
+            content = [
+                { text: `تاريخ: ${today}`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*'],
+                        body: [
+                            [
+                                { text: 'المؤشر', style: 'tableHeader' },
+                                { text: 'القيمة', style: 'tableHeader' }
+                            ],
+                            ['إجمالي الطلاب', document.getElementById('dailyTotal').textContent],
+                            ['الحاضرون', document.getElementById('dailyPresent').textContent],
+                            ['الغائبون', document.getElementById('dailyAbsent').textContent],
+                            ['المتأخرون', document.getElementById('dailyLate').textContent],
+                            ['نسبة الحضور', document.getElementById('dailyPercentage').textContent]
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                }
+            ];
+        } else if (currentTab === 'weekly') {
+            title = 'الإحصائيات الأسبوعية';
+            content = [
+                { text: 'آخر 7 أيام', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*'],
+                        body: [
+                            [
+                                { text: 'المؤشر', style: 'tableHeader' },
+                                { text: 'القيمة', style: 'tableHeader' }
+                            ],
+                            ['أيام', document.getElementById('weeklyDays').textContent],
+                            ['متوسط الحضور', document.getElementById('weeklyAvgPresent').textContent],
+                            ['إجمالي الغياب', document.getElementById('weeklyTotalAbsent').textContent],
+                            ['إجمالي التأخرات', document.getElementById('weeklyTotalLate').textContent]
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                }
+            ];
+        } else if (currentTab === 'monthly') {
+            title = 'الإحصائيات الشهرية';
+            const days = document.getElementById('monthlyDays').textContent;
+            content = [
+                { text: `آخر ${days} يوم`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*'],
+                        body: [
+                            [
+                                { text: 'المؤشر', style: 'tableHeader' },
+                                { text: 'القيمة', style: 'tableHeader' }
+                            ],
+                            ['أيام الدراسة', document.getElementById('monthlyDays').textContent],
+                            ['متوسط الحضور', document.getElementById('monthlyAvgPresent').textContent],
+                            ['إجمالي الغياب', document.getElementById('monthlyTotalAbsent').textContent],
+                            ['إجمالي التأخرات', document.getElementById('monthlyTotalLate').textContent]
+                        ]
+                    },
+                    layout: 'headerLineOnly'
+                }
+            ];
+            
+            // إضافة قائمة الطلاب الأكثر غياباً
+            const topAbsentList = document.getElementById('topAbsentList');
+            if (topAbsentList && topAbsentList.innerHTML) {
+                const studentElements = topAbsentList.querySelectorAll('.level-student');
+                if (studentElements.length > 0) {
+                    const topAbsentData = Array.from(studentElements).map(el => {
+                        const name = el.querySelector('.student-name-stat').textContent;
+                        const days = el.querySelector('.student-days').textContent;
+                        return [name, days];
+                    });
+                    
+                    content.push({
+                        text: 'الطلاب الأكثر غياباً',
+                        style: 'subheader',
+                        alignment: 'center',
+                        margin: [0, 20, 0, 10]
+                    });
+                    
+                    content.push({
+                        table: {
+                            headerRows: 1,
+                            widths: ['*', '*'],
+                            body: [
+                                [
+                                    { text: 'اسم الطالب', style: 'tableHeader' },
+                                    { text: 'أيام الغياب', style: 'tableHeader' }
+                                ],
+                                ...topAbsentData
+                            ]
+                        },
+                        layout: 'headerLineOnly'
+                    });
+                }
+            }
+        } else if (currentTab === 'levels') {
+            title = 'مستويات الغياب';
+            content = [
+                { text: 'توزيع الطلاب حسب مستويات الغياب', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] }
+            ];
+            
+            // إضافة بيانات كل مستوى
+            for (let i = 1; i <= 4; i++) {
+                const levelCard = document.getElementById(`level${i}Card`);
+                const levelTitle = levelCard.querySelector('.level-title').textContent;
+                const students = levelCard.querySelectorAll('.level-student');
+                
+                if (students.length > 0) {
+                    const studentData = Array.from(students).map(el => {
+                        const name = el.querySelector('.student-name-stat').textContent;
+                        const days = el.querySelector('.student-days').textContent;
+                        return [name, days];
+                    });
+                    
+                    content.push({
+                        text: levelTitle,
+                        style: 'levelTitle',
+                        margin: [0, 15, 0, 5]
+                    });
+                    
+                    content.push({
+                        table: {
+                            headerRows: 1,
+                            widths: ['*', '*'],
+                            body: [
+                                [
+                                    { text: 'اسم الطالب', style: 'tableHeader' },
+                                    { text: 'أيام الغياب', style: 'tableHeader' }
+                                ],
+                                ...studentData
+                            ]
+                        },
+                        layout: 'headerLineOnly'
+                    });
+                }
+            }
+        }
+        
+        const docDefinition = {
+            content: [
+                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+                ...content,
+                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] }
+            ],
+            styles: {
+                header: {
+                    fontSize: 22,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    color: '#667eea'
+                },
+                subheader: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                },
+                levelTitle: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 10, 0, 5]
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'white',
+                    fillColor: '#667eea',
+                    alignment: 'center'
+                },
+                footer: {
+                    fontSize: 11,
+                    italics: true,
+                    color: '#666'
+                }
+            },
+            defaultStyle: {
+                font: 'Cairo',
+                fontSize: 12
+            },
+            pageSize: 'A4',
+            pageMargins: [40, 60, 40, 60]
+        };
+        
+        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+        this.showToast('✅ تم تصدير الملف بنجاح');
     }
 };
 
