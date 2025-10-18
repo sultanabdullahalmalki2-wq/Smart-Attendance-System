@@ -24,7 +24,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <!-- PDF Make RTL -->
-<script src="https://unpkg.com/@digicole/pdfmake-rtl@0.2.0/build/pdfmake-rtl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@digicole/pdfmake-rtl@0.2.0/build/pdfmake-rtl.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
 
@@ -453,6 +453,34 @@ header p{font-size:15px;opacity:0.95;font-weight:500}
 var app = {};
 window.app = app;
 console.log('✓ Step 1: app pre-initialized');
+</script>
+
+<!-- Improved script loading for GitHub Pages -->
+<script>
+// Wait for pdfMake to load
+let pdfMakeCheckInterval;
+let pdfMakeCheckAttempts = 0;
+
+function waitForPDFMake(callback) {
+    if (typeof pdfMake !== 'undefined' && pdfMake) {
+        console.log('✅ pdfMake loaded successfully');
+        if (callback) callback();
+        return true;
+    }
+
+    pdfMakeCheckAttempts++;
+    if (pdfMakeCheckAttempts < 30) { // 30 attempts = 15 seconds
+        setTimeout(() => waitForPDFMake(callback), 500);
+    } else {
+        console.error('❌ pdfMake failed to load from CDN');
+        console.error('💡 Check your internet connection or try reloading the page');
+        window.pdfMakeFailed = true;
+    }
+    return false;
+}
+
+// Start checking after 1 second
+setTimeout(() => waitForPDFMake(), 1000);
 </script>
 </head>
     
@@ -1952,6 +1980,23 @@ app = {
     },
 
     exportToPDF(title, data, columns) {
+        // فحص محسّن لـ pdfMake
+        if (typeof pdfMake === 'undefined' || window.pdfMakeFailed) {
+            const isLoading = typeof pdfMake === 'undefined' && !window.pdfMakeFailed;
+
+            if (isLoading) {
+                this.showToast('⏳ المكتبة لا تزال تُحمّل...<br>انتظر 5 ثواني وأعد المحاولة', 5000);
+                console.log('⏳ pdfMake still loading, please wait...');
+            } else {
+                this.showToast('❌ فشل تحميل مكتبة PDF<br>✅ استخدم "تصدير Excel" بدلاً منه<br>أو أعد تحميل الصفحة', 6000);
+                console.error('pdfMake failed to load. Try:');
+                console.error('1. Reload the page (Ctrl+R)');
+                console.error('2. Check your internet connection');
+                console.error('3. Use Excel export instead');
+            }
+            return;
+        }
+
         this.showToast('🔄 جاري إنشاء ملف PDF...');
         
         const docDefinition = {
