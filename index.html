@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>نظام الحضور الذكي v4.0</title>
+<title>نظام الحضور الذكي </title>
     
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -716,7 +716,7 @@ Tab" class="tab-content active">
 </div>
 <div class="developer-info">
 <div style="font-size:40px;margin-bottom:10px">👨‍💻</div>
-<div class="developer-name">أ. سلطان عبدالله المالكي</div>
+<div class="developer-name">تكوين</div>
 <div class="developer-role">مطور التطبيق</div>
 <p style="font-size:14px;color:#666;line-height:1.6">متخصص في تطوير أنظمة إدارة التعليم<br>جودة عالية • دعم مستمر • تحديثات دورية</p>
 </div>
@@ -819,12 +819,12 @@ const app = {
         // إعداد خط Cairo للتصدير
         if (typeof pdfMake !== 'undefined') {
             pdfMake.fonts = {
-			 Cairo: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Bold.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Bold.ttf'
-      }
+                Cairo: {
+                    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+                    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+                    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+                    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+                }
             };
         }
         
