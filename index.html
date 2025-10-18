@@ -24,8 +24,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <!-- PDF Export Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/@digicole/pdfmake-rtl@latest/build/pdfmake.min.js"></script>
-<script src="vfs_fonts.js"></script>
+<script src="https://unpkg.com/@digicole/pdfmake-rtl/build/pdfmake.min.js"></script>
+<script src="https://unpkg.com/@digicole/pdfmake-rtl/build/vfs_fonts.js"></script>
+
 
 <style>
 /* =================== Base & Reset =================== */
@@ -816,18 +817,19 @@ const app = {
     exportType: '', // نوع التصدير الحالي
 
     // =================== Initialization ===================
-    init() {
-    // إعداد خط Amiri
-    if (typeof pdfMake !== 'undefined' && typeof pdfMake.vfs !== 'undefined') {
+init() {
+  if (typeof pdfMake !== 'undefined') {
+    pdfMake.vfs = vfs;
     pdfMake.fonts = {
-      Amiri: {
-        normal: 'Amiri-Regular.ttf',
-        bold: 'Amiri-Bold.ttf',
-        italics: 'Amiri-Regular.ttf',
-        bolditalics: 'Amiri-Bold.ttf'
-       }
+      Nillima: {
+        normal: 'Nillima.ttf',
+        bold: 'Nillima.ttf',
+        italics: 'Nillima.ttf',
+        bolditalics: 'Nillima.ttf'
+      }
     };
   }
+  
 
         
         this.loadData();
@@ -1536,7 +1538,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Amiri',
+                font: 'Nillima',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -1708,7 +1710,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Amiri',
+                font: 'Nillima',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -1878,7 +1880,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Amiri',
+                font: 'Nillima',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -2080,7 +2082,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Amiri',
+                font: 'Nillima',
                 fontSize: 12
             },
             pageSize: 'A4',
