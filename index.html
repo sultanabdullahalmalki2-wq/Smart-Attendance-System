@@ -1444,7 +1444,7 @@ calculateDailyStats() {
   document.getElementById('dailyAbsent').textContent = absentToday;
   document.getElementById('dailyLate').textContent = lateToday;
   document.getElementById('dailyPercentage').textContent = percentage;
-}
+},
 
 
 calculateWeeklyStats() {
@@ -1480,7 +1480,7 @@ calculateWeeklyStats() {
   document.getElementById('weeklyAvgPresent').textContent = avgPresent;
   document.getElementById('weeklyTotalAbsent').textContent = totalAbsent;
   document.getElementById('weeklyTotalLate').textContent = totalLate;
-}
+},
 
 
 calculateMonthlyStats() {
@@ -1511,7 +1511,7 @@ calculateMonthlyStats() {
       const date = new Date(dateStr);
       return date >= monthAgo && date <= now;
     }).length;
-  }
+  },
   
   const days = now.getDate();
   const avgPresent = this.students.length > 0 ? 
