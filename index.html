@@ -1404,35 +1404,138 @@ init() {
     // =================== Statistics ===================
     updateAllStats() { try { this.calculateDailyStats(); this.calculateWeeklyStats(); this.calculateMonthlyStats(); this.renderAbsenceLevels(); } catch (error) { console.error('Error updating stats:', error); } },
 
-    calculateDailyStats() {
-        const today = new Date().toLocaleDateString('ar-SA'); let absentToday = 0; let lateToday = 0;
-        for (const civil in this.absences) { if (this.absences[civil].some(a => a.date === today)) absentToday++; }
-        for (const civil in this.delays) { if (this.delays[civil].some(d => d.date === today)) lateToday++; }
-        const total = this.students.length; const present = total - absentToday; const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-        document.getElementById('dailyDate').textContent = today; document.getElementById('dailyTotal').textContent = total; document.getElementById('dailyPresent').textContent = present; document.getElementById('dailyAbsent').textContent = absentToday; document.getElementById('dailyLate').textContent = lateToday; document.getElementById('dailyPercentage').textContent = percentage + '%';
-    },
+calculateDailyStats() {
+  // تنسيق التاريخ بشكل صحيح (YYYY-MM-DD)
+  const today = new Date().toISOString().split('T')[0];
+  const todayDisplay = new Date().toLocaleDateString('ar-SA');
+  
+  let absentToday = 0;
+  let lateToday = 0;
+  
+  // حساب الغياب اليوم
+  for (const civil in this.absences) {
+    if (this.absences[civil].some(a => {
+      const absDate = a.date.includes('-') ? a.date : 
+                      new Date(a.date.split('/').reverse().join('-')).toISOString().split('T')[0];
+      return absDate === today;
+    })) {
+      absentToday++;
+    }
+  }
+  
+  // حساب التأخير اليوم
+  for (const civil in this.delays) {
+    if (this.delays[civil].some(d => {
+      const delayDate = d.date.includes('-') ? d.date : 
+                        new Date(d.date.split('/').reverse().join('-')).toISOString().split('T')[0];
+      return delayDate === today;
+    })) {
+      lateToday++;
+    }
+  }
+  
+  const total = this.students.length;
+  const present = total - absentToday;
+  const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+  
+  document.getElementById('dailyDate').textContent = todayDisplay;
+  document.getElementById('dailyTotal').textContent = total;
+  document.getElementById('dailyPresent').textContent = present;
+  document.getElementById('dailyAbsent').textContent = absentToday;
+  document.getElementById('dailyLate').textContent = lateToday;
+  document.getElementById('dailyPercentage').textContent = percentage;
+}
 
-    calculateWeeklyStats() {
-        const now = new Date(); const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)); let totalAbsent = 0; let totalLate = 0;
-        for (const civil in this.absences) { totalAbsent += this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
-        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
-        const avgPresent = this.students.length > 0 ? Math.round((this.students.length * 7 - totalAbsent) / 7) : 0;
-        document.getElementById('weeklyDays').textContent = '7'; document.getElementById('weeklyAvgPresent').textContent = avgPresent; document.getElementById('weeklyTotalAbsent').textContent = totalAbsent; document.getElementById('weeklyTotalLate').textContent = totalLate;
-    },
 
-    calculateMonthlyStats() {
-        const now = new Date(); const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1); let totalAbsent = 0; let totalLate = 0; const absentCounts = {};
-        for (const civil in this.absences) {
-            const count = this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length;
-            totalAbsent += count; if (count > 0) absentCounts[civil] = count;
-        }
-        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length; }
-        const days = now.getDate(); const avgPresent = this.students.length > 0 ? Math.round((this.students.length * days - totalAbsent) / days) : 0;
-        document.getElementById('monthlyDays').textContent = days; document.getElementById('monthlyAvgPresent').textContent = avgPresent; document.getElementById('monthlyTotalAbsent').textContent = totalAbsent; document.getElementById('monthlyTotalLate').textContent = totalLate;
-        const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5); const listDiv = document.getElementById('topAbsentList');
-        if (sorted.length === 0) { listDiv.innerHTML = '<div class="level-empty">✅ لا يوجد غياب هذا الشهر</div>'; }
-        else { listDiv.innerHTML = sorted.map(([civil, count]) => { const s = this.students.find(st => st.civil === civil); return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : ''; }).join(''); }
-    },
+calculateWeeklyStats() {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  let totalAbsent = 0;
+  let totalLate = 0;
+  
+  // حساب الغياب خلال الأسبوع
+  for (const civil in this.absences) {
+    totalAbsent += this.absences[civil].filter(a => {
+      const dateStr = a.date.includes('-') ? a.date : 
+                      a.date.split('/').reverse().join('-');
+      const date = new Date(dateStr);
+      return date >= weekAgo && date <= now;
+    }).length;
+  }
+  
+  // حساب التأخير خلال الأسبوع
+  for (const civil in this.delays) {
+    totalLate += this.delays[civil].filter(d => {
+      const dateStr = d.date.includes('-') ? d.date : 
+                      d.date.split('/').reverse().join('-');
+      const date = new Date(dateStr);
+      return date >= weekAgo && date <= now;
+    }).length;
+  }
+  
+  const avgPresent = this.students.length > 0 ? 
+    Math.round(((this.students.length * 7) - totalAbsent) / 7) : 0;
+  
+  document.getElementById('weeklyDays').textContent = 7;
+  document.getElementById('weeklyAvgPresent').textContent = avgPresent;
+  document.getElementById('weeklyTotalAbsent').textContent = totalAbsent;
+  document.getElementById('weeklyTotalLate').textContent = totalLate;
+}
+
+
+calculateMonthlyStats() {
+  const now = new Date();
+  const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
+  let totalAbsent = 0;
+  let totalLate = 0;
+  const absentCounts = {};
+  
+  // حساب الغياب خلال الشهر
+  for (const civil in this.absences) {
+    const count = this.absences[civil].filter(a => {
+      const dateStr = a.date.includes('-') ? a.date : 
+                      a.date.split('/').reverse().join('-');
+      const date = new Date(dateStr);
+      return date >= monthAgo && date <= now;
+    }).length;
+    
+    totalAbsent += count;
+    if (count > 0) absentCounts[civil] = count;
+  }
+  
+  // حساب التأخير خلال الشهر
+  for (const civil in this.delays) {
+    totalLate += this.delays[civil].filter(d => {
+      const dateStr = d.date.includes('-') ? d.date : 
+                      d.date.split('/').reverse().join('-');
+      const date = new Date(dateStr);
+      return date >= monthAgo && date <= now;
+    }).length;
+  }
+  
+  const days = now.getDate();
+  const avgPresent = this.students.length > 0 ? 
+    Math.round(((this.students.length * days) - totalAbsent) / days) : 0;
+  
+  document.getElementById('monthlyDays').textContent = days;
+  document.getElementById('monthlyAvgPresent').textContent = avgPresent;
+  document.getElementById('monthlyTotalAbsent').textContent = totalAbsent;
+  document.getElementById('monthlyTotalLate').textContent = totalLate;
+  
+  // أكثر الطلاب غياباً
+  const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const listDiv = document.getElementById('topAbsentList');
+  
+  if (sorted.length === 0) {
+    listDiv.innerHTML = '<div class="level-empty">✓ لا توجد سجلات غياب</div>';
+  } else {
+    listDiv.innerHTML = sorted.map(([civil, count]) => {
+      const s = this.students.find(st => st.civil === civil);
+      return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : '';
+    }).join('');
+  }
+}
+
 
     loadLevelSettings() {
         const stored = localStorage.getItem('levelSettings'); if (stored) { try { this.levelSettings = JSON.parse(stored); this.applyLevelSettings(); } catch (e) { console.error('Error loading level settings:', e); } }
@@ -1485,10 +1588,64 @@ init() {
         reader.readAsArrayBuffer(file);
     },
 
-    resetApp() {
-        localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
-        document.getElementById('studentsList').innerHTML = ''; document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.showToast('✅ تم مسح جميع البيانات'); this.showPage('main');
-    },
+resetApp() {
+  // مسح البيانات المحلية
+  this.students = [];
+  this.delays = {};
+  this.absences = {};
+  this.notes = {};
+  this.selected = {
+    morning: new Set(),
+    break: new Set(),
+    departure: new Set(),
+    absence: new Set(),
+    note: new Set()
+  };
+  
+  // مسح localStorage
+  const activationCode = localStorage.getItem('activationCode');
+  const subscriptions = localStorage.getItem('subscriptions');
+  const deviceId = localStorage.getItem('deviceId');
+  const levelSettings = localStorage.getItem('levelSettings');
+  
+  localStorage.clear();
+  
+  // إعادة البيانات المهمة
+  if (activationCode) localStorage.setItem('activationCode', activationCode);
+  if (subscriptions) localStorage.setItem('subscriptions', subscriptions);
+  if (deviceId) localStorage.setItem('deviceId', deviceId);
+  if (levelSettings) localStorage.setItem('levelSettings', levelSettings);
+  
+  // حذف من Firebase
+  const code = localStorage.getItem('activationCode');
+  if (code && typeof database !== 'undefined') {
+    database.ref(`subscriptions/${code}`).update({
+      students: [],
+      delays: {},
+      absences: {},
+      notes: {}
+    }).then(() => {
+      this.showToast('تم مسح جميع البيانات من السحابة ✓');
+    }).catch(error => {
+      console.error('خطأ في مسح البيانات من Firebase:', error);
+    });
+  }
+  
+  // تحديث الواجهة
+  document.getElementById('studentsList').innerHTML = '';
+  document.getElementById('noteTextarea').value = '';
+  document.getElementById('noteCharCount').textContent = 0;
+  
+  // تحديث جميع القوائم
+  this.renderDelayView();
+  this.renderAbsenceView();
+  this.renderNoteView();
+  this.updateAllStats();
+  
+  this.showToast('تم مسح جميع البيانات ✓');
+  this.showPage('main');
+}
+
 
     copyText(text) {
         if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.showToast('✅ تم النسخ بنجاح')).catch(() => this.showToast('❌ فشل النسخ')); }
