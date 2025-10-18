@@ -25,7 +25,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <!-- PDF Export Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="vfs_fonts.js"></script>
+
 <style>
 /* =================== Base & Reset =================== */
 *{margin:0;padding:0;box-sizing:border-box}
@@ -585,7 +586,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div class="content">
 <div class="tabs">
 <button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
-<button class="tab" onclick="app.switchTab('notes','view')">استعر</div>
+<button class="tab" onclick="app.switchTab('notes','view')">استعراض</div>
 <div id="noteAddاض</button>
 Tab" class="tab-content active">
 <div class="note-container">
@@ -817,16 +818,17 @@ const app = {
     // =================== Initialization ===================
     init() {
         // إعداد خط Cairo للتصدير
-        if (typeof pdfMake !== 'undefined') {
-            pdfMake.fonts = {
-                Cairo: {
-                    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
-                    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
-                    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
-                    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
-                }
-            };
-        }
+        if (typeof pdfMake !== 'undefined' && typeof pdfMake.vfs !== 'undefined') {
+  pdfMake.fonts = {
+    Cairo: {
+      normal: 'Cairo-Regular.ttf',
+      bold: 'Cairo-Bold.ttf',
+      italics: 'Cairo-Regular.ttf',
+      bolditalics: 'Cairo-Bold.ttf'
+    }
+  };
+}
+
         
         this.loadData();
         this.setToday();
