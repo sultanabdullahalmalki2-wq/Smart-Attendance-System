@@ -817,17 +817,17 @@ const app = {
 
     // =================== Initialization ===================
     init() {
-        // إعداد خط Cairo للتصدير
-        if (typeof pdfMake !== 'undefined' && typeof pdfMake.vfs !== 'undefined') {
-  pdfMake.fonts = {
-    Cairo: {
-      normal: 'Cairo-Regular.ttf',
-      bold: 'Cairo-Bold.ttf',
-      italics: 'Cairo-Regular.ttf',
-      bolditalics: 'Cairo-Bold.ttf'
-    }
-  };
-}
+    // إعداد خط Amiri
+    if (typeof pdfMake !== 'undefined' && typeof pdfMake.vfs !== 'undefined') {
+    pdfMake.fonts = {
+      Amiri: {
+        normal: 'Amiri-Regular.ttf',
+        bold: 'Amiri-Bold.ttf',
+        italics: 'Amiri-Regular.ttf',
+        bolditalics: 'Amiri-Bold.ttf'
+       }
+    };
+  }
 
         
         this.loadData();
@@ -1536,7 +1536,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Cairo',
+                font: 'Amiri',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -1708,7 +1708,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Cairo',
+                font: 'Amiri',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -1878,7 +1878,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Cairo',
+                font: 'Amiri',
                 fontSize: 12
             },
             pageSize: 'A4',
@@ -2080,7 +2080,7 @@ const app = {
                 }
             },
             defaultStyle: {
-                font: 'Cairo',
+                font: 'Amiri',
                 fontSize: 12
             },
             pageSize: 'A4',
