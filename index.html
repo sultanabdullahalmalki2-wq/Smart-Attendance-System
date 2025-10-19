@@ -2134,6 +2134,24 @@ app.updateSubscriptionBadge = function(days) {
 };
 
 document.addEventListener('DOMContentLoaded', function () { app.init(); });
+
+	if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+          nw.postMessage({ type: 'SKIP_WAITING' }); // فعّل النسخة فورًا
+        }
+      });
+    });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    location.reload(); // أعد التحميل عند تبدّل المتحكم
+  });
+}
+	
 </script>
 </body>
 </html>
