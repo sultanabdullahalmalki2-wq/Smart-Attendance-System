@@ -926,6 +926,9 @@ const app = {
         this.subscriptions = this.subscriptions || {};
         this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: isTrial, paid: !isTrial };
         localStorage.setItem('activationCode', code); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); this.saveData();
+		this.savePendingData({ reason: 'activate' });
+this.syncPendingData();
+
         document.getElementById('lockScreen').style.display = 'none'; this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
         setTimeout(() => { this.showPage('main'); location.reload(); }, 2000);
     },
