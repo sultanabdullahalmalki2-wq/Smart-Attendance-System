@@ -394,7 +394,11 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .actions-menu[open] > summary { /* حالة الفتح */ }
 .actions-menu > *:not(summary) { display: block; margin-top: 8px; }
 
-	
+	  #subscriptionBadge .badge-code {
+    font-size: 10px;
+    color: #777;
+    margin-top: 3px;
+  }
 	
 </style>
 </head>
@@ -937,7 +941,7 @@ updateSubscriptionBadge(days) {
   if (days <= 3) badge.classList.add('warning');
   else if (days <= 7) badge.classList.add('trial');
   else badge.classList.add('active');
-}
+};
 
 
     async checkExpiredTrials() {
