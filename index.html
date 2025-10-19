@@ -395,6 +395,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .actions-menu > *:not(summary) { display: block; margin-top: 8px; }
 
 	
+  #subscriptionBadge .badge-code {
+    font-size: 10px;
+    color: #777;
+    margin-top: 3px;
+  }
+	
 </style>
 </head>
     
@@ -899,17 +905,45 @@ const app = {
         return Math.ceil(diff / (1000 * 60 * 60 * 24));
     },
 
-    updateSubscriptionBadge(days) {
-        const badge = document.getElementById('subscriptionBadge');
-        if (!badge) return;
-        const daysEl = badge.querySelector('.badge-days'); const labelEl = badge.querySelector('.badge-label');
-        if (daysEl) daysEl.textContent = days;
-        if (labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
-        badge.classList.remove('trial', 'warning', 'active');
-        if (days <= 3) badge.classList.add('warning');
-        else if (days <= 7) badge.classList.add('trial');
-        else badge.classList.add('active');
-    },
+updateSubscriptionBadge(days) {
+  const badge = document.getElementById('subscriptionBadge');
+  if (!badge) return;
+
+  const daysEl = badge.querySelector('.badge-days');
+  const labelEl = badge.querySelector('.badge-label');
+  let codeEl = badge.querySelector('.badge-code');
+
+  // إنشاء سطر الكود إذا لم يوجد
+  if (!codeEl) {
+    const textWrap = badge.querySelector('.badge-text') || badge;
+    codeEl = document.createElement('span');
+    codeEl.className = 'badge-code';
+    codeEl.dir = 'ltr'; // عرض الكود باتجاه يسار-يمين
+    textWrap.appendChild(codeEl);
+  }
+
+  // تحديث الأيام والوسم
+  if (daysEl) daysEl.textContent = days;
+  if (labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
+
+  // جلب وعرض الكود الفعال
+  const code = localStorage.getItem('activationCode') || '';
+  const isTrial = code.includes('TRIAL');
+  if (isTrial) {
+    codeEl.textContent = 'كود: تجريبي';
+  } else if (code.startsWith('SK-')) {
+    codeEl.textContent = `كود: ${code}`;
+  } else {
+    codeEl.textContent = ''; // إخفاء إن لم يكن كودًا صالحًا
+  }
+
+  // ألوان وحالات الشارة
+  badge.classList.remove('trial', 'warning', 'active');
+  if (days <= 3) badge.classList.add('warning');
+  else if (days <= 7) badge.classList.add('trial');
+  else badge.classList.add('active');
+}
+
 
     async checkExpiredTrials() {
         const deviceId = this.getDeviceId(); if (typeof database === 'undefined') return;
