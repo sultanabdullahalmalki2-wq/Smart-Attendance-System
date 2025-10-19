@@ -383,6 +383,18 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
   }
 }
 
+.actions-menu { position: relative; }
+.actions-menu > summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  list-style: none;
+}
+.actions-menu[open] > summary { /* حالة الفتح */ }
+.actions-menu > *:not(summary) { display: block; margin-top: 8px; }
+
+	
 </style>
 </head>
     
