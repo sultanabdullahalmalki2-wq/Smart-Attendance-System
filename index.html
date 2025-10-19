@@ -75,7 +75,7 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .nav-icon{font-size:22px;display:block;margin-bottom:3px}
 .page{display:none}
 .page.active{display:block}
-.tabs{display:flex;gap:10px;margin:16px 0;position:sticky;top:84px;background:white;padding:12px 0;z-index:90}
+.tabs{display:flex;flex-wrap: wrap;gap:10px;margin:16px 0;position:sticky;top:84px;background:white;padding:12px 0;z-index:90}
 .tab{flex:1;padding:13px 16px;border:2px solid #e0e0e0;background:white;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .tab.active{background:#1976d2;color:white;border-color:#1976d2}
 .notes-page .tab.active{background:#00897b;border-color:#00897b}
@@ -620,12 +620,12 @@ Tab" class="tab-content active">
 <div id="statsPage" class="page stats-page">
 <header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"><h1>📊 الإحصائيات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
-<div class="tabs">
+<div class="stats-toolbar">
 <button class="tab active" onclick="app.switchTab('stats','daily')">اليومية</button>
 <button class="tab" onclick="app.switchTab('stats','weekly')">الأسبوعية</button>
 <button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
 <button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
-<button class="tab" onclick="app.exportCurrentStats()" style="background:#4caf50;color:white;">📄 تصدير</button>
+<button class="btn btn-success" onclick="app.exportCurrentStats()" style="background:#4caf50;color:white;">📄 تصدير</button>
 </div>
 <div id="statsDailyTab" class="tab-content active">
 <div class="stats-card"><h3>📅 إحصائيات اليوم - <span id="dailyDate"></span></h3>
