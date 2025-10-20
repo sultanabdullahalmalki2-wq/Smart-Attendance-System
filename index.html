@@ -1106,14 +1106,15 @@ switchTab(page, tab, el) {
     if (tab === 'view') this.renderNoteView(); else this.renderList('note');
   } else if (page === 'stats') {
     this.currentTab.stats = tab;
-    document.querySelectorAll(`#statsPage .tab`).forEach(t => t.classList.remove('active'));
-    document.querySelectorAll(`#statsPage .tab-content`).forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active'));
     if (el) el.classList.add('active');
     document.getElementById('stats' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
     this.updateAllStats();
   }
   this.updateActions();
-}
+},
+
 
 
     showToast(msg, duration = 3000) {
