@@ -761,12 +761,14 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 
 <!-- أيقونة حالة الاشتراك -->
 <div id="subscriptionBadge" class="subscription-badge">
-  <div class="badge-icon">📦</div>
-  <div class="badge-text">
-    <span class="badge-days">30</span>
-    <span class="badge-label">يوم متبقي</span>
-  </div>
+    <div class="badge-icon"></div>
+    <div class="badge-text">
+        <span class="badge-days">7</span>
+        <span class="badge-label">المدة المتبقية</span>
+        <span class="badge-code" dir="ltr"></span>
+    </div>
 </div>
+
 
 <!-- Navigation Bar -->
 <div class="bottom-nav">
@@ -872,24 +874,30 @@ async init() {
 
     // =================== Subscription & Trial Management ===================
     initTrialSubscription() {
-        const code = 'SK-TRIAL-' + Date.now();
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 7);
-        this.subscriptions = this.subscriptions || {};
-        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: true };
-        localStorage.setItem('activationCode', code);
-        localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-        if (typeof database !== 'undefined') {
-  database.ref('trialDevices/' + this.getDeviceId()).set({
-    used: true,
-    at: Date.now()
-  });
-}
+    const code = `SK-TRIAL-${Date.now()}`;
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 7); // تعيين 7 أيام للفترة التجريبية
 
-        this.saveData();
-        this.showToast('🎉 مرحباً! لديك 7 أيام تجربة مجانية', 5000);
-        return code;
-    },
+    this.subscriptions = this.subscriptions || {};
+    this.subscriptions[code] = {
+        active: true,
+        startDate: new Date().toISOString(),
+        endDate: endDate.toISOString(),
+        isTrial: true
+    };
+    
+    localStorage.setItem('activationCode', code);
+    localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+
+    if (typeof database !== 'undefined') {
+        database.ref(`trialDevices/${this.getDeviceId()}`).set({ used: true, at: Date.now() });
+    }
+    
+    this.saveData();
+    this.showToast('تم تفعيل الفترة التجريبية لمدة 7 أيام!', 5000);
+    return code;
+},
+
 
     getDeviceId() {
         let deviceId = localStorage.getItem('deviceId');
@@ -898,45 +906,75 @@ async init() {
     },
 
 async checkSubscription() {
-  let code = localStorage.getItem('activationCode');
+    let code = localStorage.getItem('activationCode');
+    if (!code) {
+        const deviceId = this.getDeviceId();
+        if (typeof database !== 'undefined') {
+            const snap = await database.ref(`trialDevices/${deviceId}`).once('value');
+            if (snap.exists()) {
+                const lock = document.getElementById('lockScreen');
+                if (lock) lock.style.display = 'flex';
+                return false;
+            }
+        }
+        code = await this.initTrialSubscription();
+    }
 
-  // منع التجربة إذا سُجّل هذا الجهاز سابقًا
-  if (!code) {
-    const deviceId = this.getDeviceId();
-    if (typeof database !== 'undefined') {
-      const snap = await database.ref('trialDevices/' + deviceId).once('value');
-      if (snap.exists()) {
-        // اقفل الشاشة وارفض إنشاء تجربة جديدة
+    try {
+        this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || {};
+    } catch (e) {
+        this.subscriptions = {};
+    }
+
+    const subscription = this.subscriptions[code];
+    if (!subscription || !subscription.active) {
         const lock = document.getElementById('lockScreen');
         if (lock) lock.style.display = 'flex';
         return false;
-      }
     }
-    // إنشاء تجربة لأول مرة فقط
-    code = await this.initTrialSubscription();
-  }
 
-  try { this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || {}; } catch(e){ this.subscriptions = {}; }
-  const subscription = this.subscriptions[code];
-  if (!subscription || !subscription.active) {
-    const lock = document.getElementById('lockScreen');
-    if (lock) lock.style.display = 'flex';
-    return false;
-  }
-  const days = this.calculateRemainingDays(subscription.endDate);
-  if (subscription.isTrial) {
-    if (days === 2) this.showToast('تبقّت يومان من التجربة', 8000);
-    else if (days === 1) this.showToast('تبقّى يوم واحد من التجربة', 10000);
-    else if (days <= 0) this.showToast('انتهت الفترة التجريبية', 5000);
-  }
-  this.updateSubscriptionBadge(days);
-  if (days <= 0) {
-    const lock = document.getElementById('lockScreen');
-    if (lock) lock.style.display = 'flex';
-    return false;
-  }
-  return true;
+    const days = this.calculateRemainingDays(subscription.endDate);
+
+    // --- بداية الكود المدمج لتحديث الواجهة ---
+    const badge = document.getElementById('subscriptionBadge');
+    if (badge) {
+        const daysEl = badge.querySelector('.badge-days');
+        const labelEl = badge.querySelector('.badge-label');
+        const codeEl = badge.querySelector('.badge-code');
+
+        if (daysEl) daysEl.textContent = days;
+        if (labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
+
+        if (codeEl && code) {
+            codeEl.textContent = code;
+        }
+
+        badge.classList.remove('trial', 'warning', 'active');
+        if (days <= 3) {
+            badge.classList.add('warning');
+        } else if (days <= 7 && subscription.isTrial) {
+            badge.classList.add('trial');
+        } else {
+            badge.classList.add('active');
+        }
+    }
+    // --- نهاية الكود المدمج ---
+
+    if (subscription.isTrial) {
+        if (days === 2) this.showToast('تبقى يومان على انتهاء الفترة التجريبية!', 8000);
+        else if (days === 1) this.showToast('تبقى يوم واحد على انتهاء الفترة التجريبية!', 10000);
+        else if (days === 0) this.showToast('انتهت الفترة التجريبية اليوم!', 5000);
+    }
+    
+    if (days < 0) {
+        const lock = document.getElementById('lockScreen');
+        if (lock) lock.style.display = 'flex';
+        return false;
+    }
+    
+    return true;
 },
+
 
     calculateRemainingDays(endDate) {
         const now = new Date(); const end = new Date(endDate); const diff = end - now;
