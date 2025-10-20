@@ -1753,13 +1753,13 @@ importExcel(e) {
                     italics: true,
                     color: '#666'
                 }
-            },    defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4', pageMargins: [40,60,40,60]
+            },       
+	  defaultStyle: { font: 'Nillima', fontSize: 12 },
+    pageSize: 'A4',
+    pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-		  this.showToast('✅ تم تصدير الملف بنجاح');
-		
- },
+},
       
    
     
@@ -1920,12 +1920,12 @@ importExcel(e) {
                     color: '#666'
                 }
             },
-                defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4', pageMargins: [40,60,40,60]
+                    defaultStyle: { font: 'Nillima', fontSize: 12 },
+    pageSize: 'A4',
+    pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-	this.showToast('✅ تم تصدير الملف بنجاح');	
- },
+},
 	
    
     
@@ -2053,7 +2053,8 @@ importExcel(e) {
             ...data.map((item, i) => ([
               { text: String(i + 1), alignment: 'center' },
               item.name, item.civil, item.class, item.classroom,
-              { text: item.note, alignment: 'right' }, item.date
+              { text: item.note, alignment: 'right' },
+              item.date
             ]))
           ]
         },
@@ -2087,12 +2088,12 @@ importExcel(e) {
                     color: '#666'
                 }
             },
-               defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4', pageMargins: [40,60,40,60]
+                   defaultStyle: { font: 'Nillima', fontSize: 12 },
+    pageSize: 'A4',
+    pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-	 this.showToast('✅ تم تصدير الملف بنجاح');	
- },
+},
        
    
     
