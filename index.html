@@ -1703,68 +1703,45 @@ importExcel(e) {
     
     // إنشاء PDF للغيابات
     generateAbsencePDF(data, title) {
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', '*', '*', '*'],
-                        body: [
-                            [
-                                { text: 'الاسم', style: 'tableHeader' },
-                                { text: 'السجل المدني', style: 'tableHeader' },
-                                { text: 'الصف', style: 'tableHeader' },
-                                { text: 'الفصل', style: 'tableHeader' },
-                                { text: 'التاريخ', style: 'tableHeader' }
-                            ],
-                            ...data.map(item => [
-                                item.name,
-                                item.civil,
-                                item.class,
-                                item.classroom,
-                                item.date
-                            ])
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                },
-                { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#1976d2'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#1976d2',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
+        // داخل generateDelayPDF(data, title)
+		
+const docDefinition = {
+  content: [
+    { text: 'سجل التأخرات', style: 'header', alignment: 'center' },
+    { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+    {
+  table: {
+    headerRows: 1,
+    widths: [22, '*', 'auto', 'auto', 'auto', 'auto'],
+    body: [
+      [
+        { text: 'م', style: 'tableHeader' },
+        { text: 'الاسم', style: 'tableHeader' },
+        { text: 'السجل', style: 'tableHeader' },
+        { text: 'الصف', style: 'tableHeader' },
+        { text: 'الفصل', style: 'tableHeader' },
+        { text: 'التاريخ', style: 'tableHeader' }
+      ],
+      ...data.map((item, i) => ([
+        { text: String(i + 1), alignment: 'center' },
+        item.name,
+        item.civil,
+        item.class,
+        item.classroom,
+        item.date
+      ]))
+    ]
+  },
+  layout: 'headerLineOnly'
+},
+    { text: String(data.length), style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+    { text: new Date().toLocaleDateString('ar-SA'), style: 'footer', alignment: 'center' }
+  ],
+  styles: { /* كما هو لديك */ },
+  defaultStyle: { font: 'Nillima', fontSize: 12 },
+  pageSize: 'A4',
+  pageMargins: [40, 60, 40, 60]
+};
         
         pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
         this.showToast('✅ تم تصدير الملف بنجاح');
@@ -2050,28 +2027,32 @@ importExcel(e) {
                 { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
                 { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
                 {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', '*', '*', '*'],
-                        body: [
-                            [
-                                { text: 'الاسم', style: 'tableHeader' },
-                                { text: 'السجل المدني', style: 'tableHeader' },
-                                { text: 'الصف', style: 'tableHeader' },
-                                { text: 'الملاحظة', style: 'tableHeader' },
-                                { text: 'التاريخ', style: 'tableHeader' }
-                            ],
-                            ...data.map(item => [
-                                item.name,
-                                item.civil,
-                                `${item.class} - ${item.classroom}`,
-                                { text: item.note, alignment: 'right' },
-                                item.date
-                            ])
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                },
+  table: {
+    headerRows: 1,
+    widths: [22, '*', 'auto', 'auto', 'auto', '*', 'auto'],
+    body: [
+      [
+        { text: 'م', style: 'tableHeader' },
+        { text: 'الاسم', style: 'tableHeader' },
+        { text: 'السجل', style: 'tableHeader' },
+        { text: 'الصف', style: 'tableHeader' },
+        { text: 'الفصل', style: 'tableHeader' },
+        { text: 'الملاحظة', style: 'tableHeader' },
+        { text: 'التاريخ', style: 'tableHeader' }
+      ],
+      ...data.map((item, i) => ([
+        { text: String(i + 1), alignment: 'center' },
+        item.name,
+        item.civil,
+        item.class,
+        item.classroom,
+        { text: item.note, alignment: 'right' },
+        item.date
+      ]))
+    ]
+  },
+  layout: 'headerLineOnly'
+},
                 { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
                 { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
             ],
