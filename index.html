@@ -1036,16 +1036,41 @@ this.syncPendingData();
         window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus); updateOnlineStatus();
     },
 
-    savePendingData(data) {
-        const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]'); pending.push({ ...data, timestamp: Date.now() }); localStorage.setItem('pendingSync', JSON.stringify(pending));
-    },
+savePendingData(data) {
+  try {
+    const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+    pending.push({ ...data, timestamp: Date.now() });
+    localStorage.setItem('pendingSync', JSON.stringify(pending));
+  } catch (e) {
+    console.error('Error queueing sync:', e);
+  }
+},
 
-    syncPendingData() {
-        const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]'); if (pending.length === 0) return;
-        const activationCode = localStorage.getItem('activationCode'); if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
-        this.showToast('🔄 جارٍ المزامنة...');
-        database.ref('subscriptions/' + activationCode).set({ students: this.students, delays: this.delays, absences: this.absences, notes: this.notes, lastUpdate: Date.now() }).then(() => { localStorage.setItem('pendingSync', '[]'); this.showToast('✅ تمت المزامنة بنجاح'); }).catch((error) => { console.log('خطأ في المزامنة:', error); this.showToast('❌ فشلت المزامنة، سيتم المحاولة لاحقاً'); });
-    },
+syncPendingData() {
+  try {
+    const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+    if (pending.length === 0) return;
+
+    const activationCode = localStorage.getItem('activationCode');
+    if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
+
+    database.ref('subscriptions/' + activationCode).set({
+      students: this.students,
+      delays: this.delays,
+      absences: this.absences,
+      notes: this.notes,
+      lastUpdate: Date.now()
+    }).then(() => {
+      localStorage.setItem('pendingSync', '[]');
+      this.showToast('✅ تمت المزامنة');
+    }).catch((error) => {
+      console.log('خطأ في المزامنة:', error);
+      this.showToast('⚠️ تعذر المزامنة الآن، ستُعاد المحاولة تلقائياً');
+    });
+  } catch (e) {
+    console.error('Error in syncPendingData:', e);
+  }
+},
 
     // =================== UI & Navigation ===================
     setToday() {
