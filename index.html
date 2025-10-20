@@ -1710,10 +1710,9 @@ importExcel(e) {
                 {
                     table: {
                         headerRows: 1,
-                        widths: ['auto','*', '*', '*', '*', '*'],
+                        widths: ['*', '*', '*', '*', '*'],
                         body: [
                             [
-								{ text: 'العدد التسلسلي', style: 'tableHeader' },
                                 { text: 'الاسم', style: 'tableHeader' },
                                 { text: 'السجل المدني', style: 'tableHeader' },
                                 { text: 'الصف', style: 'tableHeader' },
@@ -1721,7 +1720,6 @@ importExcel(e) {
                                 { text: 'التاريخ', style: 'tableHeader' }
                             ],
                             ...data.map(item => [
-								index + 1,
                                 item.name,
                                 item.civil,
                                 item.class,
@@ -1882,10 +1880,9 @@ importExcel(e) {
                 {
                     table: {
                         headerRows: 1,
-                        widths: ['auto','auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                        widths: ['*', '*', '*', '*', '*', '*'],
                         body: [
                             [
-								{ text: 'العدد التسلسلي', style: 'tableHeader' },
                                 { text: 'الاسم', style: 'tableHeader' },
                                 { text: 'السجل المدني', style: 'tableHeader' },
                                 { text: 'الصف', style: 'tableHeader' },
@@ -1894,7 +1891,6 @@ importExcel(e) {
                                 { text: 'التاريخ', style: 'tableHeader' }
                             ],
                             ...data.map(item => [
-								index + 1,
                                 item.name,
                                 item.civil,
                                 item.class,
@@ -2056,10 +2052,9 @@ importExcel(e) {
                 {
                     table: {
                         headerRows: 1,
-                        widths: ['auto','*', '*', '*', '*', '*'],
+                        widths: ['*', '*', '*', '*', '*'],
                         body: [
                             [
-								{ text: 'العدد التسلسلي', style: 'tableHeader' },
                                 { text: 'الاسم', style: 'tableHeader' },
                                 { text: 'السجل المدني', style: 'tableHeader' },
                                 { text: 'الصف', style: 'tableHeader' },
@@ -2067,7 +2062,6 @@ importExcel(e) {
                                 { text: 'التاريخ', style: 'tableHeader' }
                             ],
                             ...data.map(item => [
-								index + 1,
                                 item.name,
                                 item.civil,
                                 `${item.class} - ${item.classroom}`,
@@ -2215,10 +2209,9 @@ importExcel(e) {
                     content.push({
                         table: {
                             headerRows: 1,
-                            widths: ['auto','*', '*'],
+                            widths: ['*', '*'],
                             body: [
                                 [
-									{ text: 'العدد التسلسلي', style: 'tableHeader' },
                                     { text: 'اسم الطالب', style: 'tableHeader' },
                                     { text: 'أيام الغياب', style: 'tableHeader' }
                                 ],
@@ -2257,10 +2250,9 @@ importExcel(e) {
                     content.push({
                         table: {
                             headerRows: 1,
-                            widths: ['auto','*', '*'],
+                            widths: ['*', '*'],
                             body: [
                                 [
-									{ text: 'العدد التسلسلي', style: 'tableHeader' },
                                     { text: 'اسم الطالب', style: 'tableHeader' },
                                     { text: 'أيام الغياب', style: 'tableHeader' }
                                 ],
