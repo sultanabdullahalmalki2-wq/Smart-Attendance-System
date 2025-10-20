@@ -1113,7 +1113,7 @@ switchTab(page, tab, el) {
     this.updateAllStats();
   }
   this.updateActions();
-},
+}
 
 
 
@@ -1268,35 +1268,103 @@ switchTab(page, tab, el) {
         this.renderList('absence'); this.saveData(); this.updateActions(); this.showToast('✅ تم الحفظ بنجاح');
     },
 
-    saveNote() {
-        const noteText = document.getElementById('noteTextarea').value.trim(); if (!noteText) { this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); return; }
-        const date = new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
-        this.selected.note.forEach(i => { const civil = this.students[i].civil; if (!this.notes[civil]) this.notes[civil] = []; this.notes[civil].push({ text: noteText, date }); });
-        document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.renderList('note'); this.saveData(); this.updateActions(); this.showToast('✅ تم حفظ الملاحظة بنجاح');
-    },
 
-    sendDelay() {
-        const key = this.currentTab.delay; const selected = Array.from(this.selected[key]); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
-        const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-        selected.forEach((i, index) => {
-            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
-            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\nنود إعلامكم بأن ابنكم/ابنتكم سجل *${typeName}*\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n🕐 الوقت: ${new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}\n\nنأمل منكم المتابعة والتعاون\n\n_نظام الحضور الذكي_`;
-            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
-            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
-        });
-        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-    },
+saveNote() {
+    const noteText = document.getElementById('noteTextarea').value.trim();
+    if (!noteText) { this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); return; }
 
-    sendAbsence() {
-        const selected = Array.from(this.selected.absence); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
-        selected.forEach((i, index) => {
-            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
-            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\nنود إعلامكم بأن ابنكم/ابنتكم *غائب/ة اليوم*\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\nنأمل منكم المتابعة والاطمئنان على الطالب/ة\n\n_نظام الحضور الذكي_`;
-            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
-            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
-        });
-        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-    },
+    const date = new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
+    this.selected.note.forEach(i => {
+        const civil = this.students[i].civil;
+        if (!this.notes[civil]) this.notes[civil] = [];
+        this.notes[civil].push({ text: noteText, date });
+    });
+
+    document.getElementById('noteTextarea').value = '';
+    document.getElementById('noteCharCount').textContent = '0';
+    this.renderList('note');
+    this.saveData();
+
+    // مزامنة فورية بين الأجهزة
+    this.savePendingData({ reason: 'saveNote' });
+    this.syncPendingData();
+
+    this.updateActions();
+    this.showToast('✅ تم حفظ الملاحظة بنجاح');
+},
+
+
+sendDelay() {
+    const key = this.currentTab.delay;
+    const selected = Array.from(this.selected[key]);
+    if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
+
+    const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
+
+    selected.forEach((i, index) => {
+        const student = this.students[i];
+        const phone = student.parentPhone || student.phone;
+        if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
+
+        const message =
+`السلام عليكم ورحمة الله
+
+عزيزي ولي أمر الطالب/ة: *${student.name}*
+
+نود إعلامكم بأن ابنكم/ابنتكم سجل *${typeName}*
+
+📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}
+🕐 الوقت: ${new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+
+نأمل منكم المتابعة والتعاون
+
+_نظام الحضور الذكي_`;
+
+        let phoneNumber = phone.replace(/\D/g, '');
+        if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
+
+        setTimeout(() => {
+            window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
+        }, index * 3000);
+    });
+
+    this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+},
+
+
+sendAbsence() {
+    const selected = Array.from(this.selected.absence);
+    if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
+
+    selected.forEach((i, index) => {
+        const student = this.students[i];
+        const phone = student.parentPhone || student.phone;
+        if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
+
+        const message =
+`السلام عليكم ورحمة الله
+
+عزيزي ولي أمر الطالب/ة: *${student.name}*
+
+نود إعلامكم بأن ابنكم/ابنتكم *غائب/ة اليوم*
+
+📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}
+
+نأمل منكم المتابعة والاطمئنان على الطالب/ة
+
+_نظام الحضور الذكي_`;
+
+        let phoneNumber = phone.replace(/\D/g, '');
+        if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
+
+        setTimeout(() => {
+            window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
+        }, index * 3000);
+    });
+
+    this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
+},
+
 
     sendNote() {
         const selected = Array.from(this.selected.note); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
@@ -1319,21 +1387,60 @@ switchTab(page, tab, el) {
         this.updateActions();
     },
 
-    deleteRecord(type, civil, idx) {
-        if (!confirm('هل تريد حذف هذا السجل؟')) return;
-        if (type === 'delay') { this.delays[civil].splice(idx, 1); if (this.delays[civil].length === 0) delete this.delays[civil]; this.renderDelayView(); }
-        else if (type === 'absence') { this.absences[civil].splice(idx, 1); if (this.absences[civil].length === 0) delete this.absences[civil]; this.renderAbsenceView(); }
-        else if (type === 'note') { this.notes[civil].splice(idx, 1); if (this.notes[civil].length === 0) delete this.notes[civil]; this.renderNoteView(); }
-        this.saveData(); this.showToast('✅ تم الحذف');
-    },
 
-    deleteFromModal(type, civil, idx) {
-        if (!confirm('هل تريد حذف هذا السجل؟')) return;
-        if (type === 'delay') { this.delays[civil].splice(idx, 1); if (this.delays[civil].length === 0) delete this.delays[civil]; }
-        else if (type === 'absence') { this.absences[civil].splice(idx, 1); if (this.absences[civil].length === 0) delete this.absences[civil]; }
-        else if (type === 'note') { this.notes[civil].splice(idx, 1); if (this.notes[civil].length === 0) delete this.notes[civil]; }
-        this.saveData(); this.closeModal(); this.renderStudents(); this.showToast('✅ تم الحذف');
-    },
+deleteRecord(type, civil, idx) {
+    if (!confirm('هل تريد حذف هذا السجل؟')) return;
+
+    if (type === 'delay') {
+        this.delays[civil].splice(idx, 1);
+        if (this.delays[civil].length === 0) delete this.delays[civil];
+        this.renderDelayView();
+    } else if (type === 'absence') {
+        this.absences[civil].splice(idx, 1);
+        if (this.absences[civil].length === 0) delete this.absences[civil];
+        this.renderAbsenceView();
+    } else if (type === 'note') {
+        this.notes[civil].splice(idx, 1);
+        if (this.notes[civil].length === 0) delete this.notes[civil];
+        this.renderNoteView();
+    }
+
+    this.saveData();
+
+    // مزامنة فورية بين الأجهزة
+    this.savePendingData({ reason: 'deleteRecord', type, civil, idx });
+    this.syncPendingData();
+
+    this.showToast('✅ تم الحذف');
+},
+
+
+
+deleteFromModal(type, civil, idx) {
+    if (!confirm('هل تريد حذف هذا السجل؟')) return;
+
+    if (type === 'delay') {
+        this.delays[civil].splice(idx, 1);
+        if (this.delays[civil].length === 0) delete this.delays[civil];
+    } else if (type === 'absence') {
+        this.absences[civil].splice(idx, 1);
+        if (this.absences[civil].length === 0) delete this.absences[civil];
+    } else if (type === 'note') {
+        this.notes[civil].splice(idx, 1);
+        if (this.notes[civil].length === 0) delete this.notes[civil];
+    }
+
+    this.saveData();
+
+    // مزامنة فورية بين الأجهزة
+    this.savePendingData({ reason: 'deleteFromModal', type, civil, idx });
+    this.syncPendingData();
+
+    this.closeModal();
+    this.renderStudents();
+    this.showToast('✅ تم الحذف');
+},
+
 
     // =================== Statistics ===================
     updateAllStats() { try { this.calculateDailyStats(); this.calculateWeeklyStats(); this.calculateMonthlyStats(); this.renderAbsenceLevels(); } catch (error) { console.error('Error updating stats:', error); } },
@@ -1406,18 +1513,44 @@ switchTab(page, tab, el) {
     },
 
     // =================== Utilities ===================
-    importExcel(e) {
-        const file = e.target.files[0]; if (!file) return;
-        const reader = new FileReader(); const self = this;
-        reader.onload = function (ev) {
-            try {
-                const data = new Uint8Array(ev.target.result); const wb = XLSX.read(data, { type: 'array' }); const sheet = wb.Sheets[wb.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(sheet);
-                self.students = json.map(r => ({ name: r['الاسم'] || r['Name'] || '', civil: String(r['السجل المدني'] || r['Civil'] || ''), phone: String(r['الجوال'] || r['Phone'] || ''), class: r['الصف'] || r['Class'] || '', classroom: r['الفصل'] || r['Classroom'] || '' }));
-                self.saveData(); self.populateFilters(); self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`); e.target.value = '';
-            } catch (err) { self.showToast('❌ خطأ في قراءة الملف'); }
-        };
-        reader.readAsArrayBuffer(file);
-    },
+
+importExcel(e) {
+    const file = e.target.files[0]; if (!file) return;
+
+    const reader = new FileReader();
+    const self = this;
+
+    reader.onload = function (ev) {
+        try {
+            const data = new Uint8Array(ev.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const sheet = wb.Sheets[wb.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            self.students = json.map(r => ({
+                name: r['الاسم'] || r['Name'] || '',
+                civil: String(r['السجل المدني'] || r['Civil'] || ''),
+                phone: String(r['الجوال'] || r['Phone'] || ''),
+                class: r['الصف'] || r['Class'] || '',
+                classroom: r['الفصل'] || r['Classroom'] || ''
+            }));
+
+            self.saveData();
+
+            // مزامنة فورية بين الأجهزة
+            self.savePendingData({ reason: 'importExcel', count: self.students.length });
+            self.syncPendingData();
+
+            self.populateFilters();
+            self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`);
+            e.target.value = '';
+        } catch (err) {
+            self.showToast('❌ خطأ في قراءة الملف');
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+},
 
     resetApp() {
         localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
