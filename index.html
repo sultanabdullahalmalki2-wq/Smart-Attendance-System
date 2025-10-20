@@ -837,27 +837,22 @@ const app = {
 
     // =================== Initialization ===================
 async init() {
-  // إعداد خط Nillima للتصدير
+  // إعداد خط Nillima للتصدير (كما هو لديك)
   if (typeof pdfMake !== 'undefined') {
     pdfMake.fonts = {
-      Nillima: {
-        normal: 'Nillima.ttf',
-        bold: 'Nillima.ttf',
-        italics: 'Nillima.ttf',
-        bolditalics: 'Nillima.ttf'
-      },
-      Roboto: {
-        normal: 'Roboto-Regular.ttf',
-        bold: 'Roboto-Medium.ttf',
-        italics: 'Roboto-Italic.ttf',
-        bolditalics: 'Roboto-MediumItalic.ttf'
-      }
+      Nillima: { normal: 'Nillima.ttf', bold: 'Nillima.ttf', italics: 'Nillima.ttf', bolditalics: 'Nillima.ttf' },
+      Roboto:  { normal: 'Roboto-Regular.ttf', bold: 'Roboto-Medium.ttf', italics: 'Roboto-Italic.ttf', bolditalics: 'Roboto-MediumItalic.ttf' }
     };
+  }
+
+  // تهيئة طابور المزامنة مرة واحدة
+  if (!localStorage.getItem('pendingSync')) {
+    localStorage.setItem('pendingSync', '[]');
   }
 
   this.loadData();
   this.setToday();
-  if (!(await this.checkSubscription())) return; // ← هذا هو التعديل
+  if (!(await this.checkSubscription())) return;
   this.checkExpiredTrials();
   this.setupEvents();
   this.renderStudents();
@@ -866,9 +861,11 @@ async init() {
   setTimeout(() => this.populateFilters(), 300);
   this.setupRealtimeSync();
   this.checkOnlineStatus();
+
   const badge = document.getElementById('subscriptionBadge');
   if (badge) { badge.onclick = () => this.showPage('settings'); badge.style.cursor = 'pointer'; }
-},
+}
+
 
 
     // =================== Subscription & Trial Management ===================
@@ -993,20 +990,75 @@ this.syncPendingData();
     contactWhatsApp() { window.open('https://wa.me/966533371147?text=مرحباً، أريد الاشتراك في نظام الحضور الذكي', '_blank'); },
 
     // =================== Data Management & Sync ===================
-    loadData() {
-        const activationCode = localStorage.getItem('activationCode');
-        if (!activationCode || !activationCode.startsWith('SK-')) {
-            try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; }
-            return;
+loadData() {
+  const activationCode = localStorage.getItem('activationCode');
+
+  // وضع محلي بدون كود SK-
+  if (!activationCode || !activationCode.startsWith('SK-')) {
+    try {
+      this.students = JSON.parse(localStorage.getItem('students') || '[]');
+      this.delays   = JSON.parse(localStorage.getItem('delays')   || '{}');
+      this.absences = JSON.parse(localStorage.getItem('absences') || '{}');
+      this.notes    = JSON.parse(localStorage.getItem('notes')    || '{}');
+    } catch (e) {
+      console.error('Error loading local data:', e);
+      this.students = []; this.delays = {}; this.absences = {}; this.notes = {};
+    }
+    return;
+  }
+
+  // تحميل من Realtime Database
+  if (typeof database !== 'undefined') {
+    database.ref('subscriptions/' + activationCode).once('value')
+      .then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          this.students = data.students || [];
+          this.delays   = data.delays   || {};
+          this.absences = data.absences || {};
+          this.notes    = data.notes    || {}; // ← كانت [] وصُححت إلى {}
+          localStorage.setItem('students', JSON.stringify(this.students));
+          localStorage.setItem('delays',   JSON.stringify(this.delays));
+          localStorage.setItem('absences', JSON.stringify(this.absences));
+          localStorage.setItem('notes',    JSON.stringify(this.notes));
+          this.renderStudents();
+        } else {
+          try {
+            this.students = JSON.parse(localStorage.getItem('students') || '[]');
+            this.delays   = JSON.parse(localStorage.getItem('delays')   || '{}');
+            this.absences = JSON.parse(localStorage.getItem('absences') || '{}');
+            this.notes    = JSON.parse(localStorage.getItem('notes')    || '{}');
+          } catch (e) {
+            console.error('Error loading local data:', e);
+            this.students = []; this.delays = {}; this.absences = {}; this.notes = {};
+          }
         }
-        if (typeof database !== 'undefined') {
-            database.ref('subscriptions/' + activationCode).once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (data) { this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); this.renderStudents(); }
-                else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
-            }).catch((error) => { console.log('خطأ في التحميل:', error); try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } });
-        } else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
-    },
+      })
+      .catch((error) => {
+        console.log('خطأ في التحميل:', error);
+        try {
+          this.students = JSON.parse(localStorage.getItem('students') || '[]');
+          this.delays   = JSON.parse(localStorage.getItem('delays')   || '{}');
+          this.absences = JSON.parse(localStorage.getItem('absences') || '{}');
+          this.notes    = JSON.parse(localStorage.getItem('notes')    || '{}');
+        } catch (e) {
+          console.error('Error loading local data:', e);
+          this.students = []; this.delays = {}; this.absences = {}; this.notes = {};
+        }
+      });
+  } else {
+    try {
+      this.students = JSON.parse(localStorage.getItem('students') || '[]');
+      this.delays   = JSON.parse(localStorage.getItem('delays')   || '{}');
+      this.absences = JSON.parse(localStorage.getItem('absences') || '{}');
+      this.notes    = JSON.parse(localStorage.getItem('notes')    || '{}');
+    } catch (e) {
+      console.error('Error loading local data:', e);
+      this.students = []; this.delays = {}; this.absences = {}; this.notes = {};
+    }
+  }
+}
+
 
     saveData() {
         try { localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); } catch (e) { console.error('Error saving local data:', e); }
@@ -1017,16 +1069,25 @@ this.syncPendingData();
         }
     },
 
-    setupRealtimeSync() {
-        const activationCode = localStorage.getItem('activationCode');
-        if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
-        try {
-            database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
-            });
-        } catch (error) { console.error('Error setting up realtime sync:', error); }
-    },
+setupRealtimeSync() {
+  const activationCode = localStorage.getItem('activationCode');
+  if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
+  try {
+    database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) {
+        this.lastUpdate = data.lastUpdate;
+        this.students = data.students || [];
+        this.delays   = data.delays   || {};
+        this.absences = data.absences || {};
+        this.notes    = data.notes    || {}; // ← كانت [] وصُححت إلى {}
+        this.renderStudents();
+        this.showToast('✅ تم تحديث البيانات');
+      }
+    });
+  } catch (error) { console.error('Error setting up realtime sync:', error); }
+}
+
 
     checkOnlineStatus() {
         const updateOnlineStatus = () => {
@@ -1281,17 +1342,46 @@ switchTab(page, tab, el) {
         } else if (action === 'reset') { this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.', () => this.resetApp()); }
     },
 
-    saveDelay() {
-        const key = this.currentTab.delay; const T = key.charAt(0).toUpperCase() + key.slice(1); const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA'); const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-        this.selected[key].forEach(i => { const civil = this.students[i].civil; if (!this.delays[civil]) this.delays[civil] = []; this.delays[civil].push({ type: typeName, date }); });
-        this.renderList(key); this.saveData(); this.showToast('✅ تم الحفظ');
-    },
+saveDelay() {
+  const key = this.currentTab.delay;
+  const T = key.charAt(0).toUpperCase() + key.slice(1);
+  const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA');
+  const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
 
-    saveAbsence() {
-        const date = new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
-        this.selected.absence.forEach(i => { const civil = this.students[i].civil; if (!this.absences[civil]) this.absences[civil] = []; this.absences[civil].push({ date }); });
-        this.renderList('absence'); this.saveData(); this.updateActions(); this.showToast('✅ تم الحفظ بنجاح');
-    },
+  this.selected[key].forEach(i => {
+    const civil = this.students[i].civil;
+    if (!this.delays[civil]) this.delays[civil] = [];
+    this.delays[civil].push({ type: typeName, date });
+  });
+
+  this.renderList(key);
+  this.saveData();
+
+  // مزامنة فورية
+  this.savePendingData({ reason: 'saveDelay', key, count: this.selected[key].size });
+  this.syncPendingData();
+
+  this.showToast('✅ تم الحفظ');
+}
+
+saveAbsence() {
+  const date = new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
+  this.selected.absence.forEach(i => {
+    const civil = this.students[i].civil;
+    if (!this.absences[civil]) this.absences[civil] = [];
+    this.absences[civil].push({ date });
+  });
+
+  this.renderList('absence');
+  this.saveData();
+
+  // مزامنة فورية
+  this.savePendingData({ reason: 'saveAbsence', count: this.selected.absence.size });
+  this.syncPendingData();
+
+  this.updateActions();
+  this.showToast('✅ تم الحفظ بنجاح');
+}
 
 
 saveNote() {
@@ -2328,6 +2418,10 @@ importExcel(e) {
         this.showToast('✅ تم تصدير الملف بنجاح');
     }
 };
+	
+	  window.app = app; // يتيح استخدام onclick="app...." في عناصر HTML
+  document.addEventListener('DOMContentLoaded', () => app.init()); // تشغيل التهيئة بعد تحميل الصفحة
+
 
 	
 app.updateSubscriptionBadge = function(days) {
