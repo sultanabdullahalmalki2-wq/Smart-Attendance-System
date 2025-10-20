@@ -1525,41 +1525,43 @@ deleteFromModal(type, civil, idx) {
 
     // =================== Utilities ===================
 
-// استبدل جسم importExcel بهذا
 importExcel(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  const self = this;
-  reader.onload = function (ev) {
-    try {
-      const data = new Uint8Array(ev.target.result);
-      const wb = XLSX.read(data, { type: 'array' });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    const file = e.target.files[0]; if (!file) return;
 
-      self.students = json.map(r => ({
-        name: r.Name || r['الاسم'] || r.name || r.rName || '',
-        civil: String(r.Civil || r['السجل'] || r.civil || r.rCivil || ''),
-        phone: String(r.Phone || r['الجوال'] || r.phone || r.rPhone || ''),
-        class: r.Class || r['الصف'] || r.class || r.rClass || '',
-        classroom: r.Classroom || r['الفصل'] || r.classroom || r.rClassroom || ''
-      }));
+    const reader = new FileReader();
+    const self = this;
 
-      self.saveData();
-      self.savePendingData({ reason: 'importExcel', count: self.students.length });
-      self.syncPendingData();
-      self.populateFilters();
-      self.renderStudents(self.students);
-      self.showToast(`تم استيراد ${self.students.length} طالب`);
-      e.target.value = '';
-    } catch (err) {
-      self.showToast('فشل الاستيراد، تأكد من الأعمدة');
-      e.target.value = '';
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
+    reader.onload = function (ev) {
+        try {
+            const data = new Uint8Array(ev.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const sheet = wb.Sheets[wb.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            self.students = json.map(r => ({
+                name: r['الاسم'] || r['Name'] || '',
+                civil: String(r['السجل المدني'] || r['Civil'] || ''),
+                phone: String(r['الجوال'] || r['Phone'] || ''),
+                class: r['الصف'] || r['Class'] || '',
+                classroom: r['الفصل'] || r['Classroom'] || ''
+            }));
+
+            self.saveData();
+
+            // مزامنة فورية بين الأجهزة
+            self.savePendingData({ reason: 'importExcel', count: self.students.length });
+            self.syncPendingData();
+
+            self.populateFilters();
+            self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`);
+            e.target.value = '';
+        } catch (err) {
+            self.showToast('❌ خطأ في قراءة الملف');
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+},
 
     resetApp() {
         localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
@@ -1700,67 +1702,79 @@ importExcel(e) {
     },
     
     // إنشاء PDF للغيابات
-    generateAbsencePDF(data, title) {
-  const docDefinition = {
-    content: [
-      { text: 'سجل الغياب', style: 'header', alignment: 'center' },
-      { text: title, style: 'subheader', alignment: 'center', margin: [0,0,0,20] },
-      {
-        table: {
-          headerRows: 1,
-          widths: [22, '*', 'auto', 'auto', 'auto', 'auto'],
-          body: [
-            [
-              { text: 'م', style: 'tableHeader' },
-              { text: 'الاسم', style: 'tableHeader' },
-              { text: 'السجل', style: 'tableHeader' },
-              { text: 'الصف', style: 'tableHeader' },
-              { text: 'الفصل', style: 'tableHeader' },
-              { text: 'التاريخ', style: 'tableHeader' }
-            ],
-            ...data.map((item, i) => ([
-              { text: String(i + 1), alignment: 'center' },
-              item.name, item.civil, item.class, item.classroom, item.date
-            ]))
-          ]
+generateAbsencePDF(data, title) {
+    const docDefinition = {
+        content: [
+            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+            {
+                table: {
+                    headerRows: 1,
+                    // تم تعديل عرض الأعمدة
+                    widths: ['auto', '*', '*', '*', '*', '*'],
+                    body: [
+                        [
+                            // تم إضافة رأس العمود التسلسلي
+                            { text: 'م', style: 'tableHeader' },
+                            { text: 'الاسم', style: 'tableHeader' },
+                            { text: 'السجل المدني', style: 'tableHeader' },
+                            { text: 'الصف', style: 'tableHeader' },
+                            { text: 'الفصل', style: 'tableHeader' },
+                            { text: 'التاريخ', style: 'tableHeader' }
+                        ],
+                        // تم تعديل البيانات لإضافة الرقم التسلسلي
+                        ...data.map((item, index) => [
+                            index + 1,
+                            item.name,
+                            item.civil,
+                            item.class,
+                            item.classroom,
+                            item.date
+                        ])
+                    ]
+                },
+                layout: 'headerLineOnly'
+            },
+            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+        ],
+        styles: {
+            header: {
+                fontSize: 22,
+                bold: true,
+                margin: [0, 0, 0, 10],
+                color: '#1976d2'
+            },
+            subheader: {
+                fontSize: 18,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            },
+            tableHeader: {
+                bold: true,
+                fontSize: 13,
+                color: 'white',
+                fillColor: '#1976d2',
+                alignment: 'center'
+            },
+            footer: {
+                fontSize: 11,
+                italics: true,
+                color: '#666'
+            }
         },
-        layout: 'headerLineOnly'
-      },
-      { text: String(data.length), style: 'footer', alignment: 'center', margin: [0,20,0,0] },
-      { text: new Date().toLocaleDateString('ar-SA'), style: 'footer', alignment: 'center' }
-    ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#1976d2'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#1976d2',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },       
-	  defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4',
-    pageMargins: [40,60,40,60]
-  };
-  pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-}
-   
+        defaultStyle: {
+            font: 'Nillima',
+            fontSize: 12
+        },
+        pageSize: 'A4',
+        pageMargins: [40, 60, 40, 60]
+    };
+    
+    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+    this.showToast('✅ تم تصدير الملف بنجاح');
+},
+
     
     // تصدير جميع التأخرات
     exportAllDelays() {
@@ -1864,69 +1878,81 @@ importExcel(e) {
     },
     
     // إنشاء PDF للتأخرات
-    generateDelayPDF(data, title) {
-  const docDefinition = {
-    content: [
-      { text: 'سجل التأخرات', style: 'header', alignment: 'center' },
-      { text: title, style: 'subheader', alignment: 'center', margin: [0,0,0,20] },
-      {
-        table: {
-          headerRows: 1,
-          widths: [22, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
-          body: [
-            [
-              { text: 'م', style: 'tableHeader' },
-              { text: 'الاسم', style: 'tableHeader' },
-              { text: 'السجل', style: 'tableHeader' },
-              { text: 'الصف', style: 'tableHeader' },
-              { text: 'الفصل', style: 'tableHeader' },
-              { text: 'النوع', style: 'tableHeader' },
-              { text: 'التاريخ', style: 'tableHeader' }
-            ],
-            ...data.map((item, i) => ([
-              { text: String(i + 1), alignment: 'center' },
-              item.name, item.civil, item.class, item.classroom, item.type, item.date
-            ]))
-          ]
-        },
-        layout: 'headerLineOnly'
-      },
-      { text: String(data.length), style: 'footer', alignment: 'center', margin: [0,20,0,0] },
-      { text: new Date().toLocaleDateString('ar-SA'), style: 'footer', alignment: 'center' }
-    ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#ff9800'
+generateDelayPDF(data, title) {
+    const docDefinition = {
+        content: [
+            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+            {
+                table: {
+                    headerRows: 1,
+                    // تم تعديل عرض الأعمدة لإضافة العمود الجديد
+                    widths: ['auto', '*', '*', '*', '*', '*', '*'],
+                    body: [
+                        [
+                            // تم إضافة رأس العمود التسلسلي
+                            { text: 'م', style: 'tableHeader' },
+                            { text: 'الاسم', style: 'tableHeader' },
+                            { text: 'السجل المدني', style: 'tableHeader' },
+                            { text: 'الصف', style: 'tableHeader' },
+                            { text: 'الفصل', style: 'tableHeader' },
+                            { text: 'نوع التأخر', style: 'tableHeader' },
+                            { text: 'التاريخ', style: 'tableHeader' }
+                        ],
+                        // تم تعديل البيانات لإضافة الرقم التسلسلي في بداية كل صف
+                        ...data.map((item, index) => [
+                            index + 1,
+                            item.name,
+                            item.civil,
+                            item.class,
+                            item.classroom,
+                            item.type,
+                            item.date
+                        ])
+                    ]
                 },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#ff9800',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
+                layout: 'headerLineOnly'
             },
-                    defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4',
-    pageMargins: [40,60,40,60]
-  };
-  pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-}
-	
-   
+            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+        ],
+        styles: {
+            header: {
+                fontSize: 22,
+                bold: true,
+                margin: [0, 0, 0, 10],
+                color: '#ff9800'
+            },
+            subheader: {
+                fontSize: 18,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            },
+            tableHeader: {
+                bold: true,
+                fontSize: 13,
+                color: 'white',
+                fillColor: '#ff9800',
+                alignment: 'center'
+            },
+            footer: {
+                fontSize: 11,
+                italics: true,
+                color: '#666'
+            }
+        },
+        defaultStyle: {
+            font: 'Nillima',
+            fontSize: 12
+        },
+        pageSize: 'A4',
+        pageMargins: [40, 60, 40, 60]
+    };
+    
+    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+    this.showToast('✅ تم تصدير الملف بنجاح');
+},
+
     
     // تصدير جميع الملاحظات
     exportAllNotes() {
@@ -2030,71 +2056,79 @@ importExcel(e) {
     },
     
     // إنشاء PDF للملاحظات
-    generateNotePDF(data, title) {
-  const docDefinition = {
-    content: [
-      { text: 'سجل الملاحظات', style: 'header', alignment: 'center' },
-      { text: title, style: 'subheader', alignment: 'center', margin: [0,0,0,20] },
-      {
-        table: {
-          headerRows: 1,
-          widths: [22, '*', 'auto', 'auto', 'auto', '*', 'auto'],
-          body: [
-            [
-              { text: 'م', style: 'tableHeader' },
-              { text: 'الاسم', style: 'tableHeader' },
-              { text: 'السجل', style: 'tableHeader' },
-              { text: 'الصف', style: 'tableHeader' },
-              { text: 'الفصل', style: 'tableHeader' },
-              { text: 'الملاحظة', style: 'tableHeader' },
-              { text: 'التاريخ', style: 'tableHeader' }
-            ],
-            ...data.map((item, i) => ([
-              { text: String(i + 1), alignment: 'center' },
-              item.name, item.civil, item.class, item.classroom,
-              { text: item.note, alignment: 'right' },
-              item.date
-            ]))
-          ]
-        },
-        layout: 'headerLineOnly'
-      },
-      { text: String(data.length), style: 'footer', alignment: 'center', margin: [0,20,0,0] },
-      { text: new Date().toLocaleDateString('ar-SA'), style: 'footer', alignment: 'center' }
-    ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#00897b'
+generateNotePDF(data, title) {
+    const docDefinition = {
+        content: [
+            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
+            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+            {
+                table: {
+                    headerRows: 1,
+                    // تم تعديل عرض الأعمدة
+                    widths: ['auto', '*', '*', '*', '*', '*'],
+                    body: [
+                        [
+                            // تم إضافة رأس العمود التسلسلي
+                            { text: 'م', style: 'tableHeader' },
+                            { text: 'الاسم', style: 'tableHeader' },
+                            { text: 'السجل المدني', style: 'tableHeader' },
+                            { text: 'الصف', style: 'tableHeader' },
+                            { text: 'الملاحظة', style: 'tableHeader' },
+                            { text: 'التاريخ', style: 'tableHeader' }
+                        ],
+                        // تم تعديل البيانات لإضافة الرقم التسلسلي
+                        ...data.map((item, index) => [
+                            index + 1,
+                            item.name,
+                            item.civil,
+                            `${item.class} - ${item.classroom}`,
+                            { text: item.note, alignment: 'right' },
+                            item.date
+                        ])
+                    ]
                 },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#00897b',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
+                layout: 'headerLineOnly'
             },
-                   defaultStyle: { font: 'Nillima', fontSize: 12 },
-    pageSize: 'A4',
-    pageMargins: [40,60,40,60]
-  };
-  pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-}
-       
-   
+            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
+            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+        ],
+        styles: {
+            header: {
+                fontSize: 22,
+                bold: true,
+                margin: [0, 0, 0, 10],
+                color: '#00897b'
+            },
+            subheader: {
+                fontSize: 18,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            },
+            tableHeader: {
+                bold: true,
+                fontSize: 13,
+                color: 'white',
+                fillColor: '#00897b',
+                alignment: 'center'
+            },
+            footer: {
+                fontSize: 11,
+                italics: true,
+                color: '#666'
+            }
+        },
+        defaultStyle: {
+            font: 'Nillima',
+            fontSize: 12
+        },
+        pageSize: 'A4',
+        pageMargins: [40, 60, 40, 60]
+    };
+    
+    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+    this.showToast('✅ تم تصدير الملف بنجاح');
+},
+
     
     // تصدير الإحصائيات الحالية
     exportCurrentStats() {
