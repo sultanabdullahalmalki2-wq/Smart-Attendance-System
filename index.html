@@ -1676,7 +1676,9 @@ importExcel(e) {
     
     // تصدير غيابات يوم محدد
     exportAbsencesByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+        const selectedDate = new Date(date).toLocaleDateString('ar-SA');         // يبقى للتصفية الداخلية
+        const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض الميلادي في PDF
+
         const filtered = [];
         
         for (const civil in this.absences) {
@@ -1774,7 +1776,7 @@ generateAbsencePDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
+            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
@@ -1850,7 +1852,8 @@ generateAbsencePDF(data, title) {
     
     // تصدير تأخرات يوم محدد
     exportDelaysByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+const selectedDate = new Date(date).toLocaleDateString('ar-SA');          // للتطابق مع التخزين
+const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض في PDF
         const filtered = [];
         
         for (const civil in this.delays) {
@@ -1952,7 +1955,7 @@ generateDelayPDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
+{ text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
@@ -2028,7 +2031,8 @@ generateDelayPDF(data, title) {
     
     // تصدير ملاحظات يوم محدد
     exportNotesByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');
+const selectedDate = new Date(date).toLocaleDateString('ar-SA');           // يبقى للتصفية
+const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض الميلادي
         const filtered = [];
         
         for (const civil in this.notes) {
@@ -2128,7 +2132,7 @@ generateNotePDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
+{ text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
