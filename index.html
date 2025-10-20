@@ -1774,7 +1774,7 @@ generateAbsencePDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
@@ -1952,7 +1952,7 @@ generateDelayPDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
@@ -2128,7 +2128,7 @@ generateNotePDF(data, title) {
                 layout: 'headerLineOnly'
             },
             { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center' }
+            { text: `تاريخ التصدير: ${new Date().toISOString().split('T')[0]}`, style: 'footer', alignment: 'center' }
         ],
         styles: {
             header: {
