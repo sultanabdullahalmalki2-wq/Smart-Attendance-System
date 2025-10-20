@@ -521,10 +521,11 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <header><h1>⏰ التأخرات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
-<button class="tab active" onclick="app.switchTab('delays','morning')">صباحي</button>
-<button class="tab" onclick="app.switchTab('delays','break')">فسحة</button>
-<button class="tab" onclick="app.switchTab('delays','departure')">انصراف</button>
-<button class="tab" onclick="app.switchTab('delays','view')">استعراض</button>
+<button class="tab active" onclick="app.switchTab('delays','morning', this)">صباحي</button>
+<button class="tab" onclick="app.switchTab('delays','break', this)">فسحة</button>
+<button class="tab" onclick="app.switchTab('delays','departure', this)">انصراف</button>
+<button class="tab" onclick="app.switchTab('delays','view', this)">استعراض</button>
+
 </div>
 <div id="delayMorningTab" class="tab-content active">
 <input type="date" id="dateMorning" class="date-input">
@@ -569,8 +570,9 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <header class="absence"><h1>📅 الغياب</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
-<button class="tab active" onclick="app.switchTab('absence','daily')">غياب يومي</button>
-<button class="tab" onclick="app.switchTab('absence','view')">استعراض</button>
+<button class="tab active" onclick="app.switchTab('absence','daily', this)">غياب يومي</button>
+<button class="tab" onclick="app.switchTab('absence','view', this)">استعراض</button>
+
 </div>
 <div id="absenceDailyTab" class="tab-content active">
 <input type="date" id="dateAbsence" class="date-input">
@@ -601,10 +603,11 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <header class="notes"><h1>📝 الملاحظات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="tabs">
-<button class="tab active" onclick="app.switchTab('notes','add')">إضافة ملاحظة</button>
-<button class="tab" onclick="app.switchTab('notes','view')">استعراض</div>
-<div id="noteAddاض</button>
-Tab" class="tab-content active">
+  <button class="tab active" onclick="app.switchTab('notes','add', this)">إضافة ملاحظة</button>
+  <button class="tab" onclick="app.switchTab('notes','view', this)">استعراض</button>
+</div>
+<div id="noteAddTab" class="tab-content active">
+
 <div class="note-container">
 <label class="note-label">📝 اكتب الملاحظة:</label>
 <textarea id="noteTextarea" class="note-textarea" placeholder="مثال: تميز في الإجابة - لم يحضر الكتاب - سلوك ممتاز..." maxlength="500"></textarea>
@@ -638,10 +641,11 @@ Tab" class="tab-content active">
 <header style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"><h1>📊 الإحصائيات</h1><p>ذكاء في التنظيم… ووضوح في المتابعة</p></header>
 <div class="content">
 <div class="stats-toolbar">
-<button class="tab active" onclick="app.switchTab('stats','daily')">اليومية</button>
-<button class="tab" onclick="app.switchTab('stats','weekly')">الأسبوعية</button>
-<button class="tab" onclick="app.switchTab('stats','monthly')">الشهرية</button>
-<button class="tab" onclick="app.switchTab('stats','levels')">مستويات الغياب</button>
+<button class="tab active" onclick="app.switchTab('stats','daily', this)">اليومية</button>
+<button class="tab" onclick="app.switchTab('stats','weekly', this)">الأسبوعية</button>
+<button class="tab" onclick="app.switchTab('stats','monthly', this)">الشهرية</button>
+<button class="tab" onclick="app.switchTab('stats','levels', this)">مستويات الغياب</button>
+
 <button class="btn btn-success" onclick="app.exportCurrentStats()" style="background:#4caf50;color:white;">📄 تصدير</button>
 </div>
 <div id="statsDailyTab" class="tab-content active">
@@ -1078,16 +1082,39 @@ this.syncPendingData();
         this.updateActions();
     },
 
-    switchTab(page, tab) {
-        const container = page === 'delays' ? 'delaysPage' : page === 'absence' ? 'absencesPage' : page === 'notes' ? 'notesPage' : 'statsPage';
-        document.querySelectorAll(`#${container} .tab`).forEach(t => t.classList.remove('active')); document.querySelectorAll(`#${container} .tab-content`).forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        if (page === 'delays') { this.currentTab.delay = tab; document.getElementById('delay' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderDelayView(); else this.renderList(tab); }
-        else if (page === 'absence') { this.currentTab.absence = tab; document.getElementById('absence' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderAbsenceView(); else this.renderList('absence'); }
-        else if (page === 'notes') { this.currentTab.notes = tab; document.getElementById('note' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); if (tab === 'view') this.renderNoteView(); else this.renderList('note'); }
-        else if (page === 'stats') { this.currentTab.stats = tab; document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active')); event.target.classList.add('active'); document.getElementById('stats' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active'); this.updateAllStats(); }
-        this.updateActions();
-    },
+switchTab(page, tab, el) {
+  const container = page === 'delays' ? 'delaysPage'
+    : page === 'absence' ? 'absencesPage'
+    : page === 'notes' ? 'notesPage'
+    : 'statsPage';
+
+  document.querySelectorAll(`#${container} .tab`).forEach(t => t.classList.remove('active'));
+  document.querySelectorAll(`#${container} .tab-content`).forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  if (page === 'delays') {
+    this.currentTab.delay = tab;
+    document.getElementById('delay' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
+    if (tab === 'view') this.renderDelayView(); else this.renderList(tab);
+  } else if (page === 'absence') {
+    this.currentTab.absence = tab;
+    document.getElementById('absence' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
+    if (tab === 'view') this.renderAbsenceView(); else this.renderList('absence');
+  } else if (page === 'notes') {
+    this.currentTab.notes = tab;
+    document.getElementById('note' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
+    if (tab === 'view') this.renderNoteView(); else this.renderList('note');
+  } else if (page === 'stats') {
+    this.currentTab.stats = tab;
+    document.querySelectorAll(`#statsPage .tab`).forEach(t => t.classList.remove('active'));
+    document.querySelectorAll(`#statsPage .tab-content`).forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
+    document.getElementById('stats' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
+    this.updateAllStats();
+  }
+  this.updateActions();
+}
+
 
     showToast(msg, duration = 3000) {
         const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show');
