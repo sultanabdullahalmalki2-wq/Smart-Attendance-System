@@ -1559,7 +1559,7 @@ importExcel(e) {
     }
   };
   reader.readAsArrayBuffer(file);
-},
+}
 
     resetApp() {
         localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
@@ -1759,8 +1759,7 @@ importExcel(e) {
     pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-},
-      
+}
    
     
     // تصدير جميع التأخرات
@@ -1925,7 +1924,7 @@ importExcel(e) {
     pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-},
+}
 	
    
     
@@ -2093,7 +2092,7 @@ importExcel(e) {
     pageMargins: [40,60,40,60]
   };
   pdfMake.createPdf(docDefinition).download(`${title}-${new Date().toISOString().split('T')[0]}.pdf`);
-},
+}
        
    
     
