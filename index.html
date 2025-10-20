@@ -394,12 +394,12 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 .actions-menu[open] > summary { /* حالة الفتح */ }
 .actions-menu > *:not(summary) { display: block; margin-top: 8px; }
 
-	  #subscriptionBadge .badge-code {
+      #subscriptionBadge .badge-code {
     font-size: 10px;
     color: #777;
     margin-top: 3px;
   }
-	
+    
 </style>
 </head>
     
@@ -801,1633 +801,2976 @@ header p{font-size:14px;margin-top:6px;opacity:0.95;font-weight:500}
 <div id="dateModal" class="modal" onclick="if(event.target.id==='dateModal')app.closeDateModal()">
 <div class="modal-content" onclick="event.stopPropagation()">
 <h3 style="text-align:center;margin-bottom:20px;color:#1976d2;font-size:20px">اختر التاريخ</h3>
-<div style="margin-bottom:20px;">
-<label style="display:block;margin-bottom:8px;font-weight:600;color:#333;">التاريخ:</label>
-<input type="date" id="exportDate" class="date-input" style="width:100%;">
-</div>
-<div style="display:flex;gap:12px;">
+<input type="date" id="exportDate" class="date-input" style="margin-bottom:20px">
+<div style="display:flex;gap:12px">
 <button class="btn" style="flex:1;background:#f5f5f5;color:#333" onclick="app.closeDateModal()">إلغاء</button>
-<button class="btn btn-primary" style="flex:1" onclick="app.exportByDate()">تصدير</button>
+<button class="btn btn-primary" style="flex:1" id="exportDateBtn">تصدير</button>
 </div>
 </div>
 </div>
-<div id="toast" class="toast"></div>
+
+</div>
 
 <script>
-// إعداد Firebase
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDV9YcTWPcGCJDAx5hoy4xz2i6Adg_3F5k",
-  authDomain: "smart-attendance-system-63a71.firebaseapp.com",
-  databaseURL: "https://smart-attendance-system-63a71-default-rtdb.firebaseio.com",
-  projectId: "smart-attendance-system-63a71"
+  apiKey: "AIzaSyBfX3dU3d7a4a5a6a7a8a9a0a1a2a3a4a5",
+  authDomain: "attendance-app.firebaseapp.com",
+  databaseURL: "https://attendance-app-default-rtdb.firebaseio.com",
+  projectId: "attendance-app",
+  storageBucket: "attendance-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
 };
+
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// App Object
 const app = {
-    // =================== Data & State ===================
-    students: [],
-    delays: {},
-    absences: {},
-    notes: {},
-    subscriptions: {},
-    selected: { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() },
-    currentTab: { delay: 'morning', absence: 'daily', notes: 'add', stats: 'daily' },
-    levelSettings: { level1: { min: 1, max: 5 }, level2: { min: 6, max: 10 }, level3: { min: 11, max: 15 }, level4: { min: 16, max: 20 } },
-    lastUpdate: 0,
-    exportType: '', // نوع التصدير الحالي
-
-    // =================== Initialization ===================
-async init() {
-  // إعداد خط Nillima للتصدير
-  if (typeof pdfMake !== 'undefined') {
-    pdfMake.fonts = {
-      Nillima: {
-        normal: 'Nillima.ttf',
-        bold: 'Nillima.ttf',
-        italics: 'Nillima.ttf',
-        bolditalics: 'Nillima.ttf'
-      },
-      Roboto: {
-        normal: 'Roboto-Regular.ttf',
-        bold: 'Roboto-Medium.ttf',
-        italics: 'Roboto-Italic.ttf',
-        bolditalics: 'Roboto-MediumItalic.ttf'
+  currentPage: 'main',
+  students: [],
+  selectedStudents: {
+    morning: [],
+    break: [],
+    departure: [],
+    absence: [],
+    note: []
+  },
+  subscription: {
+    status: 'trial', // trial, active, expired
+    daysLeft: 7,
+    code: null
+  },
+  
+  // Initialize the app
+  init: function() {
+    this.setupEventListeners();
+    this.loadStudents();
+    this.checkSubscription();
+    this.setDefaultDates();
+    this.loadClassFilters();
+  },
+  
+  // Setup event listeners
+  setupEventListeners: function() {
+    // Search inputs
+    document.getElementById('searchInput').addEventListener('input', () => this.filterStudents('main'));
+    document.getElementById('searchMorning').addEventListener('input', () => this.filterStudents('delays', 'morning'));
+    document.getElementById('searchBreak').addEventListener('input', () => this.filterStudents('delays', 'break'));
+    document.getElementById('searchDeparture').addEventListener('input', () => this.filterStudents('delays', 'departure'));
+    document.getElementById('searchAbsence').addEventListener('input', () => this.filterStudents('absence', 'daily'));
+    document.getElementById('searchNote').addEventListener('input', () => this.filterStudents('notes', 'add'));
+    
+    // View search inputs
+    document.getElementById('searchDelayView').addEventListener('input', () => this.filterRecords('delays'));
+    document.getElementById('searchAbsenceView').addEventListener('input', () => this.filterRecords('absence'));
+    document.getElementById('searchNoteView').addEventListener('input', () => this.filterRecords('notes'));
+    
+    // Date inputs
+    document.getElementById('dateMorning').addEventListener('change', () => this.loadRecords('delays', 'morning'));
+    document.getElementById('dateBreak').addEventListener('change', () => this.loadRecords('delays', 'break'));
+    document.getElementById('dateDeparture').addEventListener('change', () => this.loadRecords('delays', 'departure'));
+    document.getElementById('dateAbsence').addEventListener('change', () => this.loadRecords('absence', 'daily'));
+    document.getElementById('dateNote').addEventListener('change', () => this.loadRecords('notes', 'add'));
+    
+    // Filter selects
+    document.getElementById('classMorning').addEventListener('change', () => this.filterStudents('delays', 'morning'));
+    document.getElementById('classroomMorning').addEventListener('change', () => this.filterStudents('delays', 'morning'));
+    document.getElementById('classBreak').addEventListener('change', () => this.filterStudents('delays', 'break'));
+    document.getElementById('classroomBreak').addEventListener('change', () => this.filterStudents('delays', 'break'));
+    document.getElementById('classDeparture').addEventListener('change', () => this.filterStudents('delays', 'departure'));
+    document.getElementById('classroomDeparture').addEventListener('change', () => this.filterStudents('delays', 'departure'));
+    document.getElementById('classAbsence').addEventListener('change', () => this.filterStudents('absence', 'daily'));
+    document.getElementById('classroomAbsence').addEventListener('change', () => this.filterStudents('absence', 'daily'));
+    document.getElementById('classNote').addEventListener('change', () => this.filterStudents('notes', 'add'));
+    document.getElementById('classroomNote').addEventListener('change', () => this.filterStudents('notes', 'add'));
+    
+    // Note textarea
+    document.getElementById('noteTextarea').addEventListener('input', () => this.updateNoteCharCount());
+    
+    // File input
+    document.getElementById('excelFile').addEventListener('change', (e) => this.importExcel(e));
+  },
+  
+  // Set default dates to today
+  setDefaultDates: function() {
+    const today = this.formatDate(new Date());
+    document.getElementById('dateMorning').value = today;
+    document.getElementById('dateBreak').value = today;
+    document.getElementById('dateDeparture').value = today;
+    document.getElementById('dateAbsence').value = today;
+    document.getElementById('dateNote').value = today;
+    document.getElementById('dailyDate').textContent = today;
+  },
+  
+  // Format date as YYYY-MM-DD
+  formatDate: function(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+  
+  // Load students from Firebase
+  loadStudents: function() {
+    database.ref('students').once('value', (snapshot) => {
+      if (snapshot.exists()) {
+        this.students = snapshot.val();
+        this.displayStudents('main');
+      } else {
+        this.showToast('لا يوجد طلاب مسجلين. قم باستيراد بيانات الطلاب من صفحة الإعدادات.');
       }
-    };
-  }
-
-  this.loadData();
-  this.setToday();
-  if (!(await this.checkSubscription())) return; // ← هذا هو التعديل
-  this.checkExpiredTrials();
-  this.setupEvents();
-  this.renderStudents();
-  this.loadLevelSettings();
-  this.updateAllStats();
-  setTimeout(() => this.populateFilters(), 300);
-  this.setupRealtimeSync();
-  this.checkOnlineStatus();
-  const badge = document.getElementById('subscriptionBadge');
-  if (badge) { badge.onclick = () => this.showPage('settings'); badge.style.cursor = 'pointer'; }
-},
-
-    // =================== Subscription & Trial Management ===================
-    initTrialSubscription() {
-    const code = `SK-TRIAL-${Date.now()}`;
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 7); // تعيين 7 أيام للفترة التجريبية
-
-    this.subscriptions = this.subscriptions || {};
-    this.subscriptions[code] = {
-        active: true,
-        startDate: new Date().toISOString(),
-        endDate: endDate.toISOString(),
-        isTrial: true
+    });
+  },
+  
+  // Load class filters
+  loadClassFilters: function() {
+    const classes = [...new Set(this.students.map(student => student.class))].sort();
+    const classrooms = [...new Set(this.students.map(student => student.classroom))].sort();
+    
+    // Populate class filters
+    const classFilters = [
+      'classMorning', 'classBreak', 'classDeparture', 
+      'classAbsence', 'classNote'
+    ];
+    
+    classFilters.forEach(id => {
+      const select = document.getElementById(id);
+      select.innerHTML = '<option value="">جميع الصفوف</option>';
+      classes.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        select.appendChild(option);
+      });
+    });
+    
+    // Populate classroom filters
+    const classroomFilters = [
+      'classroomMorning', 'classroomBreak', 'classroomDeparture', 
+      'classroomAbsence', 'classroomNote'
+    ];
+    
+    classroomFilters.forEach(id => {
+      const select = document.getElementById(id);
+      select.innerHTML = '<option value="">جميع الفصول</option>';
+      classrooms.forEach(room => {
+        const option = document.createElement('option');
+        option.value = room;
+        option.textContent = room;
+        select.appendChild(option);
+      });
+    });
+  },
+  
+  // Display students
+  displayStudents: function(page, type = null) {
+    let listId, searchId;
+    
+    switch(page) {
+      case 'main':
+        listId = 'studentsList';
+        searchId = 'searchInput';
+        break;
+      case 'delays':
+        listId = `list${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        searchId = `search${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        break;
+      case 'absence':
+        listId = 'listAbsence';
+        searchId = 'searchAbsence';
+        break;
+      case 'notes':
+        listId = 'listNote';
+        searchId = 'searchNote';
+        break;
+    }
+    
+    const list = document.getElementById(listId);
+    const searchValue = document.getElementById(searchId).value.toLowerCase();
+    
+    // Get filter values
+    let classFilter = '', classroomFilter = '';
+    if (page !== 'main') {
+      classFilter = document.getElementById(`class${type.charAt(0).toUpperCase() + type.slice(1)}`).value;
+      classroomFilter = document.getElementById(`classroom${type.charAt(0).toUpperCase() + type.slice(1)}`).value;
+    }
+    
+    // Filter students
+    let filteredStudents = this.students.filter(student => {
+      const matchesSearch = student.name.toLowerCase().includes(searchValue) || 
+                           student.id.toLowerCase().includes(searchValue);
+      const matchesClass = !classFilter || student.class === classFilter;
+      const matchesClassroom = !classroomFilter || student.classroom === classroomFilter;
+      
+      return matchesSearch && matchesClass && matchesClassroom;
+    });
+    
+    // Clear list
+    list.innerHTML = '';
+    
+    if (filteredStudents.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:#999">لا يوجد طلاب مطابقين للبحث</div>';
+      return;
+    }
+    
+    // Create student items
+    filteredStudents.forEach(student => {
+      const item = document.createElement('li');
+      item.className = 'student-item';
+      item.dataset.id = student.id;
+      
+      // Check if student is selected
+      let isSelected = false;
+      if (page === 'delays' && type) {
+        isSelected = this.selectedStudents[type].includes(student.id);
+      } else if (page === 'absence') {
+        isSelected = this.selectedStudents.absence.includes(student.id);
+      } else if (page === 'notes') {
+        isSelected = this.selectedStudents.note.includes(student.id);
+      }
+      
+      if (isSelected) {
+        item.style.background = '#e3f2fd';
+        item.style.border = '2px solid #1976d2';
+      }
+      
+      // Get student records for today
+      const today = this.formatDate(new Date());
+      const records = this.getStudentRecords(student.id, today);
+      
+      // Create badges
+      let badges = '';
+      if (records.delays.morning) badges += '<span class="badge delay">صباحي</span>';
+      if (records.delays.break) badges += '<span class="badge delay">فسحة</span>';
+      if (records.delays.departure) badges += '<span class="badge delay">انصراف</span>';
+      if (records.absence) badges += '<span class="badge absence">غياب</span>';
+      if (records.notes.length > 0) badges += '<span class="badge note">ملاحظة</span>';
+      
+      item.innerHTML = `
+        <div class="student-name">${student.name} ${badges}</div>
+        <div style="font-size:14px;color:#666;margin-top:4px">
+          ${student.class} - ${student.classroom} | ${student.id}
+        </div>
+      `;
+      
+      item.addEventListener('click', () => this.toggleStudentSelection(page, type, student.id));
+      list.appendChild(item);
+    });
+    
+    // Update selected count
+    if (page !== 'main') {
+      this.updateSelectedCount(page, type);
+    }
+  },
+  
+  // Toggle student selection
+  toggleStudentSelection: function(page, type, studentId) {
+    let selectedArray;
+    
+    if (page === 'delays' && type) {
+      selectedArray = this.selectedStudents[type];
+    } else if (page === 'absence') {
+      selectedArray = this.selectedStudents.absence;
+    } else if (page === 'notes') {
+      selectedArray = this.selectedStudents.note;
+    }
+    
+    const index = selectedArray.indexOf(studentId);
+    if (index > -1) {
+      selectedArray.splice(index, 1);
+    } else {
+      selectedArray.push(studentId);
+    }
+    
+    this.displayStudents(page, type);
+  },
+  
+  // Update selected count
+  updateSelectedCount: function(page, type) {
+    let countId, selectedArray;
+    
+    if (page === 'delays' && type) {
+      countId = `count${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      selectedArray = this.selectedStudents[type];
+    } else if (page === 'absence') {
+      countId = 'countAbsence';
+      selectedArray = this.selectedStudents.absence;
+    } else if (page === 'notes') {
+      countId = 'countNote';
+      selectedArray = this.selectedStudents.note;
+    }
+    
+    const countElement = document.getElementById(countId);
+    if (selectedArray.length > 0) {
+      countElement.classList.remove('hidden');
+      countElement.querySelector('span').textContent = selectedArray.length;
+      
+      // Show action buttons
+      let actionsId;
+      if (page === 'delays') {
+        actionsId = 'delayActions';
+      } else if (page === 'absence') {
+        actionsId = 'absenceActions';
+      } else if (page === 'notes') {
+        actionsId = 'noteActions';
+      }
+      
+      document.getElementById(actionsId).classList.add('show');
+    } else {
+      countElement.classList.add('hidden');
+      
+      // Hide action buttons
+      let actionsId;
+      if (page === 'delays') {
+        actionsId = 'delayActions';
+      } else if (page === 'absence') {
+        actionsId = 'absenceActions';
+      } else if (page === 'notes') {
+        actionsId = 'noteActions';
+      }
+      
+      document.getElementById(actionsId).classList.remove('show');
+    }
+  },
+  
+  // Filter students
+  filterStudents: function(page, type = null) {
+    this.displayStudents(page, type);
+  },
+  
+  // Get student records for a specific date
+  getStudentRecords: function(studentId, date) {
+    const records = {
+      delays: {
+        morning: false,
+        break: false,
+        departure: false
+      },
+      absence: false,
+      notes: []
     };
     
-    localStorage.setItem('activationCode', code);
-    localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-
-    if (typeof database !== 'undefined') {
-        database.ref(`trialDevices/${this.getDeviceId()}`).set({ used: true, at: Date.now() });
-    }
+    // Get delays
+    database.ref(`delays/${date}/${studentId}`).once('value', (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        records.delays.morning = data.morning || false;
+        records.delays.break = data.break || false;
+        records.delays.departure = data.departure || false;
+      }
+    });
     
-    this.saveData();
-    this.showToast('تم تفعيل الفترة التجريبية لمدة 7 أيام!', 5000);
-    return code;
-},
-
-
-    getDeviceId() {
-        let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) { deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9); localStorage.setItem('deviceId', deviceId); }
-        return deviceId;
-    },
-
-async checkSubscription() {
-    let code = localStorage.getItem('activationCode');
-    if (!code) {
-        const deviceId = this.getDeviceId();
-        if (typeof database !== 'undefined') {
-            const snap = await database.ref(`trialDevices/${deviceId}`).once('value');
-            if (snap.exists()) {
-                const lock = document.getElementById('lockScreen');
-                if (lock) lock.style.display = 'flex';
-                return false;
-            }
-        }
-        code = await this.initTrialSubscription();
-    }
-
-    try {
-        this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || {};
-    } catch (e) {
-        this.subscriptions = {};
-    }
-
-    const subscription = this.subscriptions[code];
-    if (!subscription || !subscription.active) {
-        const lock = document.getElementById('lockScreen');
-        if (lock) lock.style.display = 'flex';
-        return false;
-    }
-
-    const days = this.calculateRemainingDays(subscription.endDate);
-
-    // --- بداية الكود المدمج لتحديث الواجهة ---
-    const badge = document.getElementById('subscriptionBadge');
-    if (badge) {
-        const daysEl = badge.querySelector('.badge-days');
-        const labelEl = badge.querySelector('.badge-label');
-        const codeEl = badge.querySelector('.badge-code');
-
-        if (daysEl) daysEl.textContent = days;
-        if (labelEl) labelEl.textContent = days === 1 ? 'يوم متبقي' : 'أيام متبقية';
-
-        if (codeEl && code) {
-            codeEl.textContent = code;
-        }
-
-        badge.classList.remove('trial', 'warning', 'active');
-        if (days <= 3) {
-            badge.classList.add('warning');
-        } else if (days <= 7 && subscription.isTrial) {
-            badge.classList.add('trial');
+    // Get absence
+    database.ref(`absences/${date}/${studentId}`).once('value', (snapshot) => {
+      if (snapshot.exists()) {
+        records.absence = true;
+      }
+    });
+    
+    // Get notes
+    database.ref(`notes/${date}/${studentId}`).once('value', (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (Array.isArray(data)) {
+          records.notes = data;
         } else {
-            badge.classList.add('active');
+          records.notes = [data];
         }
-    }
-    // --- نهاية الكود المدمج ---
-
-    if (subscription.isTrial) {
-        if (days === 2) this.showToast('تبقى يومان على انتهاء الفترة التجريبية!', 8000);
-        else if (days === 1) this.showToast('تبقى يوم واحد على انتهاء الفترة التجريبية!', 10000);
-        else if (days === 0) this.showToast('انتهت الفترة التجريبية اليوم!', 5000);
+      }
+    });
+    
+    return records;
+  },
+  
+  // Load records for view tabs
+  loadRecords: function(page, type) {
+    let dateId, listId;
+    
+    if (page === 'delays') {
+      dateId = `date${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      listId = 'delayViewList';
+    } else if (page === 'absence') {
+      dateId = 'dateAbsence';
+      listId = 'absenceViewList';
+    } else if (page === 'notes') {
+      dateId = 'dateNote';
+      listId = 'noteViewList';
     }
     
-    if (days < 0) {
-        const lock = document.getElementById('lockScreen');
-        if (lock) lock.style.display = 'flex';
-        return false;
+    const date = document.getElementById(dateId).value;
+    const list = document.getElementById(listId);
+    
+    // Clear list
+    list.innerHTML = '<div style="text-align:center;padding:20px"><div class="spinner"></div></div>';
+    
+    // Get records for the selected date
+    if (page === 'delays') {
+      this.loadDelayRecords(date);
+    } else if (page === 'absence') {
+      this.loadAbsenceRecords(date);
+    } else if (page === 'notes') {
+      this.loadNoteRecords(date);
+    }
+  },
+  
+  // Load delay records
+  loadDelayRecords: function(date) {
+    const list = document.getElementById('delayViewList');
+    list.innerHTML = '';
+    
+    database.ref(`delays/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#999">لا توجد سجلات تأخر في هذا اليوم</div>';
+        return;
+      }
+      
+      const delays = snapshot.val();
+      const records = [];
+      
+      // Process each student's delays
+      Object.keys(delays).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const studentDelays = delays[studentId];
+        
+        if (studentDelays.morning) {
+          records.push({
+            studentId,
+            studentName: student.name,
+            studentClass: student.class,
+            studentClassroom: student.classroom,
+            type: 'صباحي',
+            date
+          });
+        }
+        
+        if (studentDelays.break) {
+          records.push({
+            studentId,
+            studentName: student.name,
+            studentClass: student.class,
+            studentClassroom: student.classroom,
+            type: 'فسحة',
+            date
+          });
+        }
+        
+        if (studentDelays.departure) {
+          records.push({
+            studentId,
+            studentName: student.name,
+            studentClass: student.class,
+            studentClassroom: student.classroom,
+            type: 'انصراف',
+            date
+          });
+        }
+      });
+      
+      // Sort by name
+      records.sort((a, b) => a.studentName.localeCompare(b.studentName));
+      
+      // Display records
+      if (records.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#999">لا توجد سجلات تأخر في هذا اليوم</div>';
+        return;
+      }
+      
+      const grid = document.createElement('div');
+      grid.className = 'record-grid';
+      
+      const morningRecords = records.filter(r => r.type === 'صباحي');
+      const breakRecords = records.filter(r => r.type === 'فسحة');
+      const departureRecords = records.filter(r => r.type === 'انصراف');
+      
+      // Morning delays card
+      const morningCard = document.createElement('div');
+      morningCard.className = 'record-card delays';
+      morningCard.innerHTML = `
+        <h4>تأخر صباحي (${morningRecords.length})</h4>
+        <div class="record-list">
+          ${morningRecords.map(record => `
+            <div class="record-item">
+              <div class="record-item-header">
+                <div>
+                  <div class="record-type">${record.studentName}</div>
+                  <div class="record-date">${record.studentClass} - ${record.studentClassroom}</div>
+                </div>
+                <button class="delete-btn" onclick="app.deleteRecord('delays', '${record.date}', '${record.studentId}', 'morning')">حذف</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Break delays card
+      const breakCard = document.createElement('div');
+      breakCard.className = 'record-card delays';
+      breakCard.innerHTML = `
+        <h4>تأخر فسحة (${breakRecords.length})</h4>
+        <div class="record-list">
+          ${breakRecords.map(record => `
+            <div class="record-item">
+              <div class="record-item-header">
+                <div>
+                  <div class="record-type">${record.studentName}</div>
+                  <div class="record-date">${record.studentClass} - ${record.studentClassroom}</div>
+                </div>
+                <button class="delete-btn" onclick="app.deleteRecord('delays', '${record.date}', '${record.studentId}', 'break')">حذف</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Departure delays card
+      const departureCard = document.createElement('div');
+      departureCard.className = 'record-card delays';
+      departureCard.innerHTML = `
+        <h4>تأخر انصراف (${departureRecords.length})</h4>
+        <div class="record-list">
+          ${departureRecords.map(record => `
+            <div class="record-item">
+              <div class="record-item-header">
+                <div>
+                  <div class="record-type">${record.studentName}</div>
+                  <div class="record-date">${record.studentClass} - ${record.studentClassroom}</div>
+                </div>
+                <button class="delete-btn" onclick="app.deleteRecord('delays', '${record.date}', '${record.studentId}', 'departure')">حذف</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      grid.appendChild(morningCard);
+      grid.appendChild(breakCard);
+      grid.appendChild(departureCard);
+      
+      list.appendChild(grid);
+    });
+  },
+  
+  // Load absence records
+  loadAbsenceRecords: function(date) {
+    const list = document.getElementById('absenceViewList');
+    list.innerHTML = '';
+    
+    database.ref(`absences/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#999">لا توجد سجلات غياب في هذا اليوم</div>';
+        return;
+      }
+      
+      const absences = snapshot.val();
+      const records = [];
+      
+      // Process each student's absence
+      Object.keys(absences).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        records.push({
+          studentId,
+          studentName: student.name,
+          studentClass: student.class,
+          studentClassroom: student.classroom,
+          date
+        });
+      });
+      
+      // Sort by name
+      records.sort((a, b) => a.studentName.localeCompare(b.studentName));
+      
+      // Display records
+      const card = document.createElement('div');
+      card.className = 'record-card absences';
+      card.innerHTML = `
+        <h4>سجلات الغياب (${records.length})</h4>
+        <div class="record-list">
+          ${records.map(record => `
+            <div class="record-item">
+              <div class="record-item-header">
+                <div>
+                  <div class="record-type">${record.studentName}</div>
+                  <div class="record-date">${record.studentClass} - ${record.studentClassroom}</div>
+                </div>
+                <button class="delete-btn" onclick="app.deleteRecord('absences', '${record.date}', '${record.studentId}')">حذف</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      list.appendChild(card);
+    });
+  },
+  
+  // Load note records
+  loadNoteRecords: function(date) {
+    const list = document.getElementById('noteViewList');
+    list.innerHTML = '';
+    
+    database.ref(`notes/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#999">لا توجد ملاحظات في هذا اليوم</div>';
+        return;
+      }
+      
+      const notes = snapshot.val();
+      const records = [];
+      
+      // Process each student's notes
+      Object.keys(notes).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const studentNotes = notes[studentId];
+        const notesArray = Array.isArray(studentNotes) ? studentNotes : [studentNotes];
+        
+        notesArray.forEach(note => {
+          records.push({
+            studentId,
+            studentName: student.name,
+            studentClass: student.class,
+            studentClassroom: student.classroom,
+            note,
+            date
+          });
+        });
+      });
+      
+      // Sort by name
+      records.sort((a, b) => a.studentName.localeCompare(b.studentName));
+      
+      // Display records
+      const card = document.createElement('div');
+      card.className = 'record-card notes';
+      card.innerHTML = `
+        <h4>سجلات الملاحظات (${records.length})</h4>
+        <div class="record-list">
+          ${records.map(record => `
+            <div class="record-item">
+              <div class="record-item-header">
+                <div>
+                  <div class="record-type">${record.studentName}</div>
+                  <div class="record-date">${record.studentClass} - ${record.studentClassroom}</div>
+                </div>
+                <button class="delete-btn" onclick="app.deleteRecord('notes', '${record.date}', '${record.studentId}', '${record.note}')">حذف</button>
+              </div>
+              <div class="record-note-text">${record.note}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      list.appendChild(card);
+    });
+  },
+  
+  // Filter records in view tabs
+  filterRecords: function(page) {
+    let searchId, listId;
+    
+    if (page === 'delays') {
+      searchId = 'searchDelayView';
+      listId = 'delayViewList';
+    } else if (page === 'absence') {
+      searchId = 'searchAbsenceView';
+      listId = 'absenceViewList';
+    } else if (page === 'notes') {
+      searchId = 'searchNoteView';
+      listId = 'noteViewList';
     }
     
-    return true;
-},
-
-
-    calculateRemainingDays(endDate) {
-        const now = new Date(); const end = new Date(endDate); const diff = end - now;
-        return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    },
-
-    async checkExpiredTrials() {
-        const deviceId = this.getDeviceId(); if (typeof database === 'undefined') return;
-        try {
-            const code = localStorage.getItem('activationCode'); if (!code || !code.includes('TRIAL')) return;
-            const subscription = this.subscriptions[code]; if (!subscription) return;
-            const endDate = new Date(subscription.endDate); const now = new Date(); const daysSinceExpiry = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
-            if (daysSinceExpiry === 18) this.showToast('⚠️ تبقى 5 أيام وسيتم حذف بياناتك نهائياً! اشترك الآن.', 15000);
-            if (daysSinceExpiry >= 23) { await database.ref('backups/' + deviceId).remove(); localStorage.clear(); alert('⚠️ تم حذف بياناتك بسبب انتهاء الفترة التجريبية.\n\nيمكنك البدء من جديد بالاشتراك.'); location.reload(); }
-        } catch (error) { console.error('خطأ في فحص التجارب:', error); }
-    },
-
-    activateSubscription() {
-        let code = document.getElementById('activationCodeInput')?.value?.trim().toUpperCase();
-        if (!code) { this.showToast('⚠️ الرجاء إدخال كود التفعيل'); return; }
-        if (!code.startsWith('SK-')) { this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-'); return; }
-        const isTrial = code.includes('TRIAL'); const endDate = new Date();
-        if (isTrial) endDate.setDate(endDate.getDate() + 7); else endDate.setFullYear(endDate.getFullYear() + 1);
-        this.subscriptions = this.subscriptions || {};
-        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: isTrial, paid: !isTrial };
-        localStorage.setItem('activationCode', code); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); this.saveData();
-        this.savePendingData({ reason: 'activate' });
-this.syncPendingData();
-
-        document.getElementById('lockScreen').style.display = 'none'; this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
-        setTimeout(() => { this.showPage('main'); location.reload(); }, 2000);
-    },
+    const searchValue = document.getElementById(searchId).value.toLowerCase();
+    const list = document.getElementById(listId);
     
-    activateSubscriptionFromSettings() {
-        let code = document.getElementById('activationCodeSettings')?.value?.trim().toUpperCase();
-        if (!code) { this.showToast('⚠️ الرجاء إدخال كود التفعيل'); return; }
-        if (!code.startsWith('SK-')) { this.showToast('⚠️ الكود غير صحيح - يجب أن يبدأ بـ SK-'); return; }
-        const isTrial = code.includes('TRIAL'); const endDate = new Date();
-        if (isTrial) endDate.setDate(endDate.getDate() + 7); else endDate.setFullYear(endDate.getFullYear() + 1);
-        this.subscriptions = this.subscriptions || {};
-        this.subscriptions[code] = { active: true, startDate: new Date().toISOString(), endDate: endDate.toISOString(), isTrial: isTrial, paid: !isTrial };
-        localStorage.setItem('activationCode', code); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); this.saveData();
-        this.showToast('✅ تم تفعيل اشتراكك بنجاح!', 5000);
-        setTimeout(() => { this.showPage('main'); location.reload(); }, 2000);
-    },
-
-    showPaymentPage() { document.getElementById('lockScreen').style.display = 'none'; document.getElementById('paymentPage').style.display = 'block'; },
-    hidePaymentPage() { document.getElementById('paymentPage').style.display = 'none'; document.getElementById('lockScreen').style.display = 'flex'; },
-    selectPaymentMethod(method) { const details = document.getElementById('bankDetails'); const arrow = event.currentTarget.querySelector('.method-arrow'); if (details.style.display === 'none') { details.style.display = 'block'; arrow.style.transform = 'rotate(180deg)'; } else { details.style.display = 'none'; arrow.style.transform = 'rotate(0deg)'; } },
-    contactWhatsApp() { window.open('https://wa.me/966533371147?text=مرحباً، أريد الاشتراك في نظام الحضور الذكي', '_blank'); },
-
-    // =================== Data Management & Sync ===================
-    loadData() {
-        const activationCode = localStorage.getItem('activationCode');
-        if (!activationCode || !activationCode.startsWith('SK-')) {
-            try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; }
-            return;
-        }
-        if (typeof database !== 'undefined') {
-            database.ref('subscriptions/' + activationCode).once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (data) { this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); this.renderStudents(); }
-                else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
-            }).catch((error) => { console.log('خطأ في التحميل:', error); try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } });
-        } else { try { this.students = JSON.parse(localStorage.getItem('students') || '[]'); this.delays = JSON.parse(localStorage.getItem('delays') || '{}'); this.absences = JSON.parse(localStorage.getItem('absences') || '{}'); this.notes = JSON.parse(localStorage.getItem('notes') || '{}'); } catch (e) { console.error('Error loading local data:', e); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; } }
-    },
-
-    saveData() {
-        try { localStorage.setItem('students', JSON.stringify(this.students)); localStorage.setItem('delays', JSON.stringify(this.delays)); localStorage.setItem('absences', JSON.stringify(this.absences)); localStorage.setItem('notes', JSON.stringify(this.notes)); localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)); } catch (e) { console.error('Error saving local data:', e); }
-        const code = localStorage.getItem('activationCode');
-        if (code && typeof database !== 'undefined') {
-            const deviceId = this.getDeviceId();
-            database.ref('backups/' + deviceId).set({ code: code, students: this.students, delays: this.delays, absences: this.absences, notes: this.notes, lastBackup: new Date().toISOString(), studentCount: this.students.length }).catch(error => console.error('خطأ في النسخ الاحتياطي:', error));
-        }
-    },
-
-    setupRealtimeSync() {
-        const activationCode = localStorage.getItem('activationCode');
-        if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
-        try {
-            database.ref('subscriptions/' + activationCode).on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.lastUpdate && data.lastUpdate !== this.lastUpdate) { this.lastUpdate = data.lastUpdate; this.students = data.students || []; this.delays = data.delays || {}; this.absences = data.absences || {}; this.notes = data.notes || []; this.renderStudents(); this.showToast('✅ تم تحديث البيانات'); }
+    // Get all record items
+    const recordItems = list.querySelectorAll('.record-item');
+    
+    recordItems.forEach(item => {
+      const studentName = item.querySelector('.record-type').textContent.toLowerCase();
+      if (studentName.includes(searchValue)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  },
+  
+  // Delete record
+  deleteRecord: function(type, date, studentId, subType = null) {
+    this.showConfirm(
+      'حذف السجل',
+      'هل أنت متأكد من حذف هذا السجل؟',
+      () => {
+        if (type === 'delays') {
+          database.ref(`delays/${date}/${studentId}/${subType}`).remove()
+            .then(() => {
+              this.showToast('تم حذف السجل بنجاح');
+              this.loadRecords(type, subType);
+            })
+            .catch(error => {
+              this.showToast('حدث خطأ أثناء حذف السجل');
+              console.error(error);
             });
-        } catch (error) { console.error('Error setting up realtime sync:', error); }
-    },
-
-    checkOnlineStatus() {
-        const updateOnlineStatus = () => {
-            const statusBadge = document.getElementById('subscriptionBadge');
-            if (statusBadge) { if (navigator.onLine) { statusBadge.style.borderLeft = '4px solid #4caf50'; this.syncPendingData(); } else { statusBadge.style.borderLeft = '4px solid #ff9800'; this.showToast('⚠️ وضع أوفلاين - سيتم المزامنة عند الاتصال'); } }
-        };
-        window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus); updateOnlineStatus();
-    },
-
-savePendingData(data) {
-  try {
-    const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
-    pending.push({ ...data, timestamp: Date.now() });
-    localStorage.setItem('pendingSync', JSON.stringify(pending));
-  } catch (e) {
-    console.error('Error queueing sync:', e);
-  }
-},
-
-syncPendingData() {
-  try {
-    const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
-    if (pending.length === 0) return;
-
-    const activationCode = localStorage.getItem('activationCode');
-    if (!activationCode || !activationCode.startsWith('SK-') || typeof database === 'undefined') return;
-
-    database.ref('subscriptions/' + activationCode).set({
-      students: this.students,
-      delays: this.delays,
-      absences: this.absences,
-      notes: this.notes,
-      lastUpdate: Date.now()
-    }).then(() => {
-      localStorage.setItem('pendingSync', '[]');
-      this.showToast('✅ تمت المزامنة');
-    }).catch((error) => {
-      console.log('خطأ في المزامنة:', error);
-      this.showToast('⚠️ تعذر المزامنة الآن، ستُعاد المحاولة تلقائياً');
-    });
-  } catch (e) {
-    console.error('Error in syncPendingData:', e);
-  }
-},
-
-    // =================== UI & Navigation ===================
-    setToday() {
-        const today = new Date().toISOString().split('T')[0];
-        ['dateMorning', 'dateBreak', 'dateDeparture', 'dateAbsence', 'dateNote'].forEach(id => { const el = document.getElementById(id); if (el) el.value = today; });
-    },
-
-    setupEvents() {
-        const self = this;
-        document.getElementById('searchInput').addEventListener('input', function (e) {
-            const q = e.target.value.toLowerCase(); if (!q) { document.getElementById('studentsList').innerHTML = ''; document.getElementById('emptyState').style.display = 'block'; return; }
-            document.getElementById('emptyState').style.display = 'none';
-            const filtered = self.students.filter(s => s.name.toLowerCase().includes(q) || s.phone.includes(q) || s.class.toLowerCase().includes(q));
-            self.renderStudents(filtered);
-        });
-        ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
-            const search = document.getElementById('search' + t); if (search) search.addEventListener('input', function () { self.filterList(t.toLowerCase()); });
-            const cls = document.getElementById('class' + t); if (cls) cls.addEventListener('change', function () { self.filterList(t.toLowerCase()); });
-            const clsr = document.getElementById('classroom' + t); if (clsr) clsr.addEventListener('change', function () { self.filterList(t.toLowerCase()); });
-        });
-        const views = ['DelayView', 'AbsenceView', 'NoteView']; views.forEach(v => { const el = document.getElementById('search' + v); if (el) el.addEventListener('input', function () { if (v === 'DelayView') self.renderDelayView(); else if (v === 'AbsenceView') self.renderAbsenceView(); else if (v === 'NoteView') self.renderNoteView(); }); });
-        const noteTextarea = document.getElementById('noteTextarea'); if (noteTextarea) { noteTextarea.addEventListener('input', function (e) { document.getElementById('noteCharCount').textContent = e.target.value.length; }); }
-        const excelFile = document.getElementById('excelFile'); if (excelFile) { excelFile.addEventListener('change', function (e) { self.importExcel(e); }); }
-    },
-
-    showPage(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        const pages = ['main', 'delays', 'absences', 'notes', 'stats', 'settings']; const idx = pages.indexOf(page);
-        document.getElementById(page + 'Page').classList.add('active'); document.querySelectorAll('.nav-item')[idx].classList.add('active');
-        if (page === 'delays') this.renderList(this.currentTab.delay);
-        if (page === 'absences') this.currentTab.absence === 'daily' ? this.renderList('absence') : this.renderAbsenceView();
-        if (page === 'notes') this.currentTab.notes === 'add' ? this.renderList('note') : this.renderNoteView();
-        if (page === 'stats') { this.currentTab.stats = 'daily'; document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active')); document.querySelector('#statsPage .tab').classList.add('active'); document.getElementById('statsDailyTab').classList.add('active'); this.updateAllStats(); }
-        this.updateActions();
-    },
-
-switchTab(page, tab, el) {
-  const container = page === 'delays' ? 'delaysPage'
-    : page === 'absence' ? 'absencesPage'
-    : page === 'notes' ? 'notesPage'
-    : 'statsPage';
-
-  document.querySelectorAll(`#${container} .tab`).forEach(t => t.classList.remove('active'));
-  document.querySelectorAll(`#${container} .tab-content`).forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-
-  if (page === 'delays') {
-    this.currentTab.delay = tab;
-    document.getElementById('delay' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
-    if (tab === 'view') this.renderDelayView(); else this.renderList(tab);
-  } else if (page === 'absence') {
-    this.currentTab.absence = tab;
-    document.getElementById('absence' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
-    if (tab === 'view') this.renderAbsenceView(); else this.renderList('absence');
-  } else if (page === 'notes') {
-    this.currentTab.notes = tab;
-    document.getElementById('note' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
-    if (tab === 'view') this.renderNoteView(); else this.renderList('note');
-  } else if (page === 'stats') {
-    this.currentTab.stats = tab;
-    document.querySelectorAll('#statsPage .tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('#statsPage .tab-content').forEach(c => c.classList.remove('active'));
-    if (el) el.classList.add('active');
-    document.getElementById('stats' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
-    this.updateAllStats();
-  }
-  this.updateActions();
-},
-
-    showToast(msg, duration = 3000) {
-        const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show');
-        setTimeout(function () { toast.classList.remove('show'); }, duration);
-    },
-
-    showModal(title, content) {
-        document.getElementById('confirmTitle').textContent = title; document.getElementById('confirmMsg').innerHTML = content; document.getElementById('confirmModal').classList.add('active');
-    },
-
-    closeModal() { document.getElementById('studentModal').classList.remove('active'); },
-
-    showConfirm(msg, onYes) {
-        document.getElementById('confirmMsg').textContent = msg; document.getElementById('confirmYes').onclick = function () { app.closeConfirm(); onYes(); }; document.getElementById('confirmModal').classList.add('active');
-    },
-
-    closeConfirm() { document.getElementById('confirmModal').classList.remove('active'); },
-    
-    closeDateModal() {
-        document.getElementById('dateModal').classList.remove('active');
-    },
-
-    // =================== Data Rendering & Filtering ===================
-    renderStudents(list = []) {
-        const ul = document.getElementById('studentsList');
-        ul.innerHTML = list.map((s, i) => {
-            const idx = this.students.indexOf(s); const dCount = (this.delays[s.civil] || []).length; const aCount = (this.absences[s.civil] || []).length; const nCount = (this.notes[s.civil] || []).length;
-            let badges = ''; if (dCount > 0) badges += `<span class="badge delay">${dCount} تأخر</span>`; if (aCount > 0) badges += `<span class="badge absence">${aCount} غياب</span>`; if (nCount > 0) badges += `<span class="badge note">${nCount} ملاحظة</span>`;
-            return `<li class="student-item" onclick="app.showStudent(${idx})"><div class="student-name">${badges}${s.name}</div><div style="font-size:15px;color:#666;margin-top:4px">${s.class} - ${s.classroom} | 📞 ${s.phone}</div></li>`;
-        }).join('');
-    },
-
-    populateFilters() {
-        if (!this.students || this.students.length === 0) return;
-        const classes = [...new Set(this.students.map(s => s.class))].filter(c => c).sort();
-        const classrooms = [...new Set(this.students.map(s => s.classroom))].filter(c => c).sort();
-        ['Morning', 'Break', 'Departure', 'Absence', 'Note'].forEach(t => {
-            const cls = document.getElementById(`class${t}`); const clsr = document.getElementById(`classroom${t}`);
-            if (cls) { cls.innerHTML = ''; const defaultOption = document.createElement('option'); defaultOption.value = ''; defaultOption.textContent = 'الكل'; cls.appendChild(defaultOption); classes.forEach(c => { const option = document.createElement('option'); option.value = c; option.textContent = c; cls.appendChild(option); }); }
-            if (clsr) { clsr.innerHTML = ''; const defaultOption = document.createElement('option'); defaultOption.value = ''; defaultOption.textContent = 'الكل'; clsr.appendChild(defaultOption); classrooms.forEach(c => { const option = document.createElement('option'); option.value = c; option.textContent = c; clsr.appendChild(option); }); }
-        });
-        setTimeout(() => { document.querySelectorAll('.filter-select').forEach(select => { select.style.display = 'none'; select.offsetHeight; select.style.display = ''; }); }, 100);
-    },
-
-    renderList(type) {
-        const list = document.getElementById('list' + type.charAt(0).toUpperCase() + type.slice(1));
-        const key = type === 'absence' ? 'absence' : type === 'note' ? 'note' : type;
-        list.innerHTML = this.students.map((s, i) => {
-            const idx = this.students.indexOf(s); const checked = this.selected[key].has(idx) ? 'checked' : '';
-            return `<li class="student-item"><label style="display:flex;align-items:center;gap:12px;cursor:pointer"><input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer"><div style="flex:1"><div style="font-weight:600;font-size:16px">${s.name}</div><div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div></div></label></li>`;
-        }).join('');
-        this.updateCount(key);
-    },
-
-    filterList(type) {
-        const T = type.charAt(0).toUpperCase() + type.slice(1);
-        const search = document.getElementById('search' + T).value.toLowerCase();
-        const cls = document.getElementById('class' + T).value;
-        const clsr = document.getElementById('classroom' + T).value;
-        const filtered = this.students.filter(s => {
-            const matchSearch = !search || s.name.toLowerCase().includes(search);
-            const matchClass = !cls || s.class === cls;
-            const matchClassroom = !clsr || s.classroom === clsr;
-            return matchSearch && matchClass && matchClassroom;
-        });
-        const list = document.getElementById('list' + T);
-        const key = type === 'absence' ? 'absence' : type === 'note' ? 'note' : type;
-        list.innerHTML = filtered.map((s) => {
-            const idx = this.students.indexOf(s); const checked = this.selected[key].has(idx) ? 'checked' : '';
-            return `<li class="student-item"><label style="display:flex;align-items:center;gap:12px;cursor:pointer"><input type="checkbox" ${checked} onchange="app.toggleStudent('${key}',${idx})" style="width:22px;height:22px;cursor:pointer"><div style="flex:1"><div style="font-weight:600;font-size:16px">${s.name}</div><div style="font-size:14px;color:#666;margin-top:3px">${s.class} - ${s.classroom}</div></div></label></li>`;
-        }).join('');
-    },
-
-    renderDelayView() {
-        const search = document.getElementById('searchDelayView').value.toLowerCase(); const all = [];
-        for (const civil in this.delays) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.delays[civil].forEach((d, i) => all.push({ s, d, civil, i })); } }
-        all.sort((a, b) => new Date(b.d.date) - new Date(a.d.date));
-        const div = document.getElementById('delayViewList');
-        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد تأخرات</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #ff9800;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#e65100;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">${item.d.type} - 📅 ${item.d.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('delay','${item.civil}',${item.i})">🗑️</button></div>`).join('');
-    },
-
-    renderAbsenceView() {
-        const search = document.getElementById('searchAbsenceView').value.toLowerCase(); const all = [];
-        for (const civil in this.absences) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.absences[civil].forEach((a, i) => all.push({ s, a, civil, i })); } }
-        all.sort((a, b) => new Date(b.a.date) - new Date(a.a.date));
-        const div = document.getElementById('absenceViewList');
-        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا يوجد غياب</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #f44336;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;color:#c62828;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">غياب يومي - 📅 ${item.a.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('absence','${item.civil}',${item.i})">🗑️</button></div>`).join('');
-    },
-
-    renderNoteView() {
-        const search = document.getElementById('searchNoteView').value.toLowerCase(); const all = [];
-        for (const civil in this.notes) { const s = this.students.find(st => st.civil === civil); if (s && (!search || s.name.toLowerCase().includes(search))) { this.notes[civil].forEach((n, i) => all.push({ s, n, civil, i })); } }
-        all.sort((a, b) => new Date(b.n.date) - new Date(a.n.date));
-        const div = document.getElementById('noteViewList');
-        if (all.length === 0) { div.innerHTML = '<div style="text-align:center;padding:50px;color:#999;font-size:15px">لا توجد ملاحظات</div>'; return; }
-        div.innerHTML = all.map(item => `<div class="record-item" style="border-right:4px solid #00897b;padding:14px"><div class="record-item-header"><div style="flex:1"><div style="font-weight:600;color:#00695c;font-size:15px">${item.s.name}</div><div style="font-size:13px;color:#666;margin-top:4px">📅 ${item.n.date}</div></div><button class="delete-btn" onclick="app.deleteRecord('note','${item.civil}',${item.i})">🗑️</button></div><div class="record-note-text">${item.n.text}</div></div>`).join('');
-    },
-
-    showStudent(idx) {
-        const s = this.students[idx]; const delays = this.delays[s.civil] || []; const absences = this.absences[s.civil] || []; const notes = this.notes[s.civil] || [];
-        const modal = document.getElementById('studentModal'); const body = document.getElementById('modalBody');
-        body.innerHTML = `<div style="margin-bottom:18px"><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">👤 الاسم:</strong> <span style="font-size:16px">${s.name}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">🆔 السجل المدني:</strong> <span style="font-size:16px">${s.civil}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📱 الجوال:</strong> <span style="font-size:16px">${s.phone}</span></div><div style="margin:12px 0;padding:12px 0;border-bottom:1px solid #f0f0f0"><strong style="color:#666;font-size:15px">📚 الصف:</strong> <span style="font-size:16px">${s.class}</span></div><div style="margin:12px 0;padding:12px 0"><strong style="color:#666;font-size:15px">🏫 الفصل:</strong> <span style="font-size:16px">${s.classroom}</span></div></div><div class="record-grid"><div class="record-card delays"><h4>⏰ التأخرات (${delays.length})</h4><div class="record-list">${delays.length > 0 ? delays.map((d, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">${d.type}</div><div class="record-date">📅 ${d.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('delay','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد تأخرات</div>'}</div></div><div class="record-card absences"><h4>📅 الغياب (${absences.length})</h4><div class="record-list">${absences.length > 0 ? absences.map((a, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div style="font-weight:600;color:#c62828;font-size:12px">غياب يومي</div><div class="record-date">📅 ${a.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('absence','${s.civil}',${i})">🗑️</button></div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا يوجد غياب</div>'}</div></div><div class="record-card notes"><h4>📝 الملاحظات (${notes.length})</h4><div class="record-list">${notes.length > 0 ? notes.map((n, i) => `<div class="record-item"><div class="record-item-header"><div class="record-info"><div class="record-type">ملاحظة</div><div class="record-date">📅 ${n.date}</div></div><button class="delete-btn" onclick="app.deleteFromModal('note','${s.civil}',${i})">🗑️</button></div><div class="record-note-text">${n.text}</div></div>`).join('') : '<div style="text-align:center;color:#4caf50;padding:12px;font-size:13px">✅ لا توجد ملاحظات</div>'}</div></div></div>`;
-        modal.classList.add('active');
-    },
-
-    // =================== User Actions (CRUD) ===================
-    toggleStudent(key, idx) { this.selected[key].has(idx) ? this.selected[key].delete(idx) : this.selected[key].add(idx); this.updateCount(key); this.updateActions(); },
-
-    updateCount(key) {
-        const T = key === 'absence' ? 'Absence' : key === 'note' ? 'Note' : key.charAt(0).toUpperCase() + key.slice(1);
-        const div = document.getElementById('count' + T); const count = this.selected[key].size;
-        if (count > 0) { div.classList.remove('hidden'); div.querySelector('span').textContent = count; } else { div.classList.add('hidden'); }
-    },
-
-    updateActions() {
-        const page = document.querySelector('.page.active').id;
-        if (page === 'delaysPage') { const key = this.currentTab.delay; const actions = document.getElementById('delayActions'); this.selected[key].size > 0 && this.currentTab.delay !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
-        else if (page === 'absencesPage') { const actions = document.getElementById('absenceActions'); this.selected.absence.size > 0 && this.currentTab.absence !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
-        else if (page === 'notesPage') { const actions = document.getElementById('noteActions'); this.selected.note.size > 0 && this.currentTab.notes !== 'view' ? actions.classList.add('show') : actions.classList.remove('show'); }
-    },
-
-    confirmAction(action) {
-        if (action === 'saveDelay' || action === 'saveAndSendDelay' || action === 'sendDelay') {
-            const key = this.currentTab.delay; const count = this.selected[key].size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
-            let msg = ''; if (action === 'saveDelay') msg = `هل تريد حفظ تأخر ${count} طالب؟`; else if (action === 'saveAndSendDelay') msg = `هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`; else msg = `هل تريد إرسال إشعار لـ ${count} طالب؟`;
-            this.showConfirm(msg, () => { if (action === 'saveDelay') { this.saveDelay(); this.clearSelection('delay'); } else if (action === 'saveAndSendDelay') { this.saveDelay(); setTimeout(() => { this.sendDelay(); setTimeout(() => this.clearSelection('delay'), 1000); }, 500); } else this.sendDelay(); });
-        } else if (action === 'saveAbsence' || action === 'saveAndSendAbsence' || action === 'sendAbsence') {
-            const count = this.selected.absence.size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
-            let msg = ''; if (action === 'saveAbsence') msg = `هل تريد حفظ غياب ${count} طالب؟`; else if (action === 'saveAndSendAbsence') msg = `هل تريد حفظ وإرسال إشعار لـ ${count} طالب؟`; else msg = `هل تريد إرسال إشعار لـ ${count} طالب؟`;
-            this.showConfirm(msg, () => { if (action === 'saveAbsence') { this.saveAbsence(); this.clearSelection('absence'); } else if (action === 'saveAndSendAbsence') { this.saveAbsence(); setTimeout(() => { this.sendAbsence(); setTimeout(() => this.clearSelection('absence'), 1000); }, 500); } else this.sendAbsence(); });
-        } else if (action === 'saveNote' || action === 'saveAndSendNote' || action === 'sendNote') {
-            const count = this.selected.note.size; if (count === 0) return this.showToast('⚠️ لم يتم اختيار أي طالب');
-            if (action === 'saveNote' || action === 'saveAndSendNote') { const noteText = document.getElementById('noteTextarea').value.trim(); if (!noteText) return this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); }
-            let msg = ''; if (action === 'saveNote') msg = `هل تريد حفظ ملاحظة لـ ${count} طالب؟`; else if (action === 'saveAndSendNote') msg = `هل تريد حفظ وإرسال ملاحظة لـ ${count} طالب؟`; else msg = `هل تريد إرسال ملاحظة لـ ${count} طالب؟`;
-            this.showConfirm(msg, () => { if (action === 'saveNote') { this.saveNote(); this.clearSelection('note'); } else if (action === 'saveAndSendNote') { this.saveNote(); setTimeout(() => { this.sendNote(); setTimeout(() => this.clearSelection('note'), 1000); }, 500); } else this.sendNote(); });
-        } else if (action === 'reset') { this.showConfirm('هل تريد حذف جميع البيانات والتأخرات والغياب والملاحظات؟\nلا يمكن التراجع عن هذا الإجراء.', () => this.resetApp()); }
-    },
-
-    saveDelay() {
-        const key = this.currentTab.delay; const T = key.charAt(0).toUpperCase() + key.slice(1); const date = new Date(document.getElementById(`date${T}`).value).toLocaleDateString('ar-SA'); const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-        this.selected[key].forEach(i => { const civil = this.students[i].civil; if (!this.delays[civil]) this.delays[civil] = []; this.delays[civil].push({ type: typeName, date }); });
-        this.renderList(key); this.saveData(); this.showToast('✅ تم الحفظ');
-    },
-
-    saveAbsence() {
-        const date = new Date(document.getElementById('dateAbsence').value).toLocaleDateString('ar-SA');
-        this.selected.absence.forEach(i => { const civil = this.students[i].civil; if (!this.absences[civil]) this.absences[civil] = []; this.absences[civil].push({ date }); });
-        this.renderList('absence'); this.saveData(); this.updateActions(); this.showToast('✅ تم الحفظ بنجاح');
-    },
-
-saveNote() {
-    const noteText = document.getElementById('noteTextarea').value.trim();
-    if (!noteText) { this.showToast('⚠️ يجب كتابة الملاحظة أولاً'); return; }
-
-    const date = new Date(document.getElementById('dateNote').value).toLocaleDateString('ar-SA');
-    this.selected.note.forEach(i => {
-        const civil = this.students[i].civil;
-        if (!this.notes[civil]) this.notes[civil] = [];
-        this.notes[civil].push({ text: noteText, date });
-    });
-
-    document.getElementById('noteTextarea').value = '';
-    document.getElementById('noteCharCount').textContent = '0';
-    this.renderList('note');
-    this.saveData();
-
-    // مزامنة فورية بين الأجهزة
-    this.savePendingData({ reason: 'saveNote' });
-    this.syncPendingData();
-
-    this.updateActions();
-    this.showToast('✅ تم حفظ الملاحظة بنجاح');
-},
-
-sendDelay() {
-    const key = this.currentTab.delay;
-    const selected = Array.from(this.selected[key]);
-    if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
-
-    const typeName = key === 'morning' ? 'تأخر صباحي' : key === 'break' ? 'تأخر بعد الفسحة' : 'تأخر الانصراف';
-
-    selected.forEach((i, index) => {
-        const student = this.students[i];
-        const phone = student.parentPhone || student.phone;
-        if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
-
-        const message =
-`السلام عليكم ورحمة الله
-
-عزيزي ولي أمر الطالب/ة: *${student.name}*
-
-نود إعلامكم بأن ابنكم/ابنتكم سجل *${typeName}*
-
-📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}
-🕐 الوقت: ${new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
-
-نأمل منكم المتابعة والتعاون
-
-_نظام الحضور الذكي_`;
-
-        let phoneNumber = phone.replace(/\D/g, '');
-        if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
-
-        setTimeout(() => {
-            window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
-        }, index * 3000);
-    });
-
-    this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-},
-
-sendAbsence() {
-    const selected = Array.from(this.selected.absence);
-    if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
-
-    selected.forEach((i, index) => {
-        const student = this.students[i];
-        const phone = student.parentPhone || student.phone;
-        if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
-
-        const message =
-`السلام عليكم ورحمة الله
-
-عزيزي ولي أمر الطالب/ة: *${student.name}*
-
-نود إعلامكم بأن ابنكم/ابنتكم *غائب/ة اليوم*
-
-📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}
-
-نأمل منكم المتابعة والاطمئنان على الطالب/ة
-
-_نظام الحضور الذكي_`;
-
-        let phoneNumber = phone.replace(/\D/g, '');
-        if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
-
-        setTimeout(() => {
-            window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
-        }, index * 3000);
-    });
-
-    this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-},
-
-    sendNote() {
-        const selected = Array.from(this.selected.note); if (selected.length === 0) { this.showToast('⚠️ لم يتم اختيار أي طالب'); return; }
-        let noteText = document.getElementById('noteTextarea').value.trim();
-        if (!noteText && selected.length > 0) { const firstStudent = this.students[selected[0]]; const civil = firstStudent.civil; if (this.notes[civil] && this.notes[civil].length > 0) { noteText = this.notes[civil][this.notes[civil].length - 1].text; } }
-        if (!noteText) { this.showToast('⚠️ لا توجد ملاحظة للإرسال'); return; }
-        selected.forEach((i, index) => {
-            const student = this.students[i]; const phone = student.parentPhone || student.phone; if (!phone) { this.showToast(`⚠️ ${student.name}: لا يوجد رقم جوال مسجل`); return; }
-            const message = `السلام عليكم ورحمة الله\n\nعزيزي ولي أمر الطالب/ة: *${student.name}*\n\n📝 *ملاحظة مهمة:*\n${noteText}\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\nنشكر لكم تعاونكم\n\n_نظام الحضور الذكي_`;
-            let phoneNumber = phone.replace(/\D/g, ''); if (phoneNumber.startsWith('05')) { phoneNumber = '966' + phoneNumber.substring(1); }
-            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank'); }, index * 3000);
-        });
-        this.showToast(`✅ سيتم فتح ${selected.length} محادثة واتساب بعد قليل`);
-    },
-
-    clearSelection(type) {
-        if (type === 'delay') { const key = this.currentTab.delay; this.selected[key].clear(); this.renderList(key); }
-        else if (type === 'absence') { this.selected.absence.clear(); this.renderList('absence'); }
-        else if (type === 'note') { this.selected.note.clear(); this.renderList('note'); }
-        this.updateActions();
-    },
-
-deleteRecord(type, civil, idx) {
-    if (!confirm('هل تريد حذف هذا السجل؟')) return;
-
-    if (type === 'delay') {
-        this.delays[civil].splice(idx, 1);
-        if (this.delays[civil].length === 0) delete this.delays[civil];
-        this.renderDelayView();
-    } else if (type === 'absence') {
-        this.absences[civil].splice(idx, 1);
-        if (this.absences[civil].length === 0) delete this.absences[civil];
-        this.renderAbsenceView();
-    } else if (type === 'note') {
-        this.notes[civil].splice(idx, 1);
-        if (this.notes[civil].length === 0) delete this.notes[civil];
-        this.renderNoteView();
-    }
-
-    this.saveData();
-
-    // مزامنة فورية بين الأجهزة
-    this.savePendingData({ reason: 'deleteRecord', type, civil, idx });
-    this.syncPendingData();
-
-    this.showToast('✅ تم الحذف');
-},
-
-deleteFromModal(type, civil, idx) {
-    if (!confirm('هل تريد حذف هذا السجل؟')) return;
-
-    if (type === 'delay') {
-        this.delays[civil].splice(idx, 1);
-        if (this.delays[civil].length === 0) delete this.delays[civil];
-    } else if (type === 'absence') {
-        this.absences[civil].splice(idx, 1);
-        if (this.absences[civil].length === 0) delete this.absences[civil];
-    } else if (type === 'note') {
-        this.notes[civil].splice(idx, 1);
-        if (this.notes[civil].length === 0) delete this.notes[civil];
-    }
-
-    this.saveData();
-
-    // مزامنة فورية بين الأجهزة
-    this.savePendingData({ reason: 'deleteFromModal', type, civil, idx });
-    this.syncPendingData();
-
-    this.closeModal();
-    this.renderStudents();
-    this.showToast('✅ تم الحذف');
-},
-
-    // =================== Statistics ===================
-    updateAllStats() { try { this.calculateDailyStats(); this.calculateWeeklyStats(); this.calculateMonthlyStats(); this.renderAbsenceLevels(); } catch (error) { console.error('Error updating stats:', error); } },
-
-    calculateDailyStats() {
-        const today = new Date().toLocaleDateString('ar-SA'); let absentToday = 0; let lateToday = 0;
-        for (const civil in this.absences) { if (this.absences[civil].some(a => a.date === today)) absentToday++; }
-        for (const civil in this.delays) { if (this.delays[civil].some(d => d.date === today)) lateToday++; }
-        const total = this.students.length; const present = total - absentToday; const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-        document.getElementById('dailyDate').textContent = today; document.getElementById('dailyTotal').textContent = total; document.getElementById('dailyPresent').textContent = present; document.getElementById('dailyAbsent').textContent = absentToday; document.getElementById('dailyLate').textContent = lateToday; document.getElementById('dailyPercentage').textContent = percentage + '%';
-    },
-
-    calculateWeeklyStats() {
-        const now = new Date(); const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)); let totalAbsent = 0; let totalLate = 0;
-        for (const civil in this.absences) { totalAbsent += this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
-        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= weekAgo && date <= now; }).length; }
-        const avgPresent = this.students.length > 0 ? Math.round((this.students.length * 7 - totalAbsent) / 7) : 0;
-        document.getElementById('weeklyDays').textContent = '7'; document.getElementById('weeklyAvgPresent').textContent = avgPresent; document.getElementById('weeklyTotalAbsent').textContent = totalAbsent; document.getElementById('weeklyTotalLate').textContent = totalLate;
-    },
-
-    calculateMonthlyStats() {
-        const now = new Date(); const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1); let totalAbsent = 0; let totalLate = 0; const absentCounts = {};
-        for (const civil in this.absences) {
-            const count = this.absences[civil].filter(a => { const date = new Date(a.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length;
-            totalAbsent += count; if (count > 0) absentCounts[civil] = count;
-        }
-        for (const civil in this.delays) { totalLate += this.delays[civil].filter(d => { const date = new Date(d.date.split('/').reverse().join('-')); return date >= monthAgo && date <= now; }).length; }
-        const days = now.getDate(); const avgPresent = this.students.length > 0 ? Math.round((this.students.length * days - totalAbsent) / days) : 0;
-        document.getElementById('monthlyDays').textContent = days; document.getElementById('monthlyAvgPresent').textContent = avgPresent; document.getElementById('monthlyTotalAbsent').textContent = totalAbsent; document.getElementById('monthlyTotalLate').textContent = totalLate;
-        const sorted = Object.entries(absentCounts).sort((a, b) => b[1] - a[1]).slice(0, 5); const listDiv = document.getElementById('topAbsentList');
-        if (sorted.length === 0) { listDiv.innerHTML = '<div class="level-empty">✅ لا يوجد غياب هذا الشهر</div>'; }
-        else { listDiv.innerHTML = sorted.map(([civil, count]) => { const s = this.students.find(st => st.civil === civil); return s ? `<div class="level-student"><span class="student-name-stat">${s.name}</span><span class="student-days">${count} يوم</span></div>` : ''; }).join(''); }
-    },
-
-    loadLevelSettings() {
-        const stored = localStorage.getItem('levelSettings'); if (stored) { try { this.levelSettings = JSON.parse(stored); this.applyLevelSettings(); } catch (e) { console.error('Error loading level settings:', e); } }
-    },
-
-    applyLevelSettings() {
-        document.getElementById('level1Min').value = this.levelSettings.level1.min; document.getElementById('level1Max').value = this.levelSettings.level1.max;
-        document.getElementById('level2Min').value = this.levelSettings.level2.min; document.getElementById('level2Max').value = this.levelSettings.level2.max;
-        document.getElementById('level3Min').value = this.levelSettings.level3.min; document.getElementById('level3Max').value = this.levelSettings.level3.max;
-        document.getElementById('level4Min').value = this.levelSettings.level4.min; document.getElementById('level4Max').value = this.levelSettings.level4.max;
-    },
-
-    saveLevelSettings() {
-        this.levelSettings = {
-            level1: { min: parseInt(document.getElementById('level1Min').value), max: parseInt(document.getElementById('level1Max').value) },
-            level2: { min: parseInt(document.getElementById('level2Min').value), max: parseInt(document.getElementById('level2Max').value) },
-            level3: { min: parseInt(document.getElementById('level3Min').value), max: parseInt(document.getElementById('level3Max').value) },
-            level4: { min: parseInt(document.getElementById('level4Min').value), max: parseInt(document.getElementById('level4Max').value) }
-        };
-        localStorage.setItem('levelSettings', JSON.stringify(this.levelSettings)); this.renderAbsenceLevels(); this.showToast('✅ تم حفظ الإعدادات');
-    },
-
-    renderAbsenceLevels() {
-        const levels = { 1: [], 2: [], 3: [], 4: [] };
-        for (const civil in this.absences) {
-            const count = this.absences[civil].length; const s = this.students.find(st => st.civil === civil); if (!s) continue;
-            if (count >= this.levelSettings.level1.min && count <= this.levelSettings.level1.max) { levels[1].push({ student: s, days: count }); }
-            else if (count >= this.levelSettings.level2.min && count <= this.levelSettings.level2.max) { levels[2].push({ student: s, days: count }); }
-            else if (count >= this.levelSettings.level3.min && count <= this.levelSettings.level3.max) { levels[3].push({ student: s, days: count }); }
-            else if (count >= this.levelSettings.level4.min && count <= this.levelSettings.level4.max) { levels[4].push({ student: s, days: count }); }
-        }
-        for (let i = 1; i <= 4; i++) {
-            const div = document.getElementById(`level${i}Students`);
-            if (levels[i].length === 0) { div.innerHTML = '<div class="level-empty">✅ لا يوجد طلاب في هذا المستوى</div>'; }
-            else { div.innerHTML = levels[i].map(item => `<div class="level-student"><span class="student-name-stat">${item.student.name}</span><span class="student-days">${item.days} يوم</span></div>`).join(''); }
-        }
-    },
-
-    // =================== Utilities ===================
-
-importExcel(e) {
-    const file = e.target.files[0]; if (!file) return;
-
-    const reader = new FileReader();
-    const self = this;
-
-    reader.onload = function (ev) {
-        try {
-            const data = new Uint8Array(ev.target.result);
-            const wb = XLSX.read(data, { type: 'array' });
-            const sheet = wb.Sheets[wb.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
-
-            self.students = json.map(r => ({
-                name: r['الاسم'] || r['Name'] || '',
-                civil: String(r['السجل المدني'] || r['Civil'] || ''),
-                phone: String(r['الجوال'] || r['Phone'] || ''),
-                class: r['الصف'] || r['Class'] || '',
-                classroom: r['الفصل'] || r['Classroom'] || ''
-            }));
-
-            self.saveData();
-
-            // مزامنة فورية بين الأجهزة
-            self.savePendingData({ reason: 'importExcel', count: self.students.length });
-            self.syncPendingData();
-
-            self.populateFilters();
-            self.showToast(`✅ تم استيراد ${self.students.length} طالب بنجاح`);
-            e.target.value = '';
-        } catch (err) {
-            self.showToast('❌ خطأ في قراءة الملف');
-        }
-    };
-
-    reader.readAsArrayBuffer(file);
-},
-
-    resetApp() {
-        localStorage.clear(); this.students = []; this.delays = {}; this.absences = {}; this.notes = {}; this.selected = { morning: new Set(), break: new Set(), departure: new Set(), absence: new Set(), note: new Set() };
-        document.getElementById('studentsList').innerHTML = ''; document.getElementById('noteTextarea').value = ''; document.getElementById('noteCharCount').textContent = '0'; this.showToast('✅ تم مسح جميع البيانات'); this.showPage('main');
-    },
-
-    copyText(text) {
-        if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.showToast('✅ تم النسخ بنجاح')).catch(() => this.showToast('❌ فشل النسخ')); }
-        else {
-            const textarea = document.createElement('textarea'); textarea.value = text; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select();
-            try { document.execCommand('copy'); this.showToast('✅ تم النسخ بنجاح'); } catch (err) { this.showToast('❌ فشل النسخ'); }
-            document.body.removeChild(textarea);
-        }
-    },
-    
-    // =================== PDF Export Functions ===================
-    // إظهار نافذة اختيار التاريخ
-    showDateSelector(type) {
-        this.exportType = type;
-        document.getElementById('dateModal').classList.add('active');
-    },
-    
-    // تصدير حسب التاريخ
-    exportByDate() {
-        const date = document.getElementById('exportDate').value;
-        if (!date) {
-            this.showToast('⚠️ الرجاء اختيار التاريخ');
-            return;
-        }
-        
-        this.closeDateModal();
-        
-        if (this.exportType === 'absence') {
-            this.exportAbsencesByDate(date);
-        } else if (this.exportType === 'delay') {
-            this.exportDelaysByDate(date);
-        } else if (this.exportType === 'note') {
-            this.exportNotesByDate(date);
-        }
-    },
-    
-    // تصدير جميع الغيابات
-    exportAllAbsences() {
-        const all = [];
-        for (const civil in this.absences) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.absences[civil].forEach(a => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        date: a.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateAbsencePDF(all, 'جميع الغيابات');
-    },
-    
-    // تصدير غيابات يوم محدد
-    exportAbsencesByDate(date) {
-        const selectedDate = new Date(date).toLocaleDateString('ar-SA');         // يبقى للتصفية الداخلية
-        const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض الميلادي في PDF
-
-        const filtered = [];
-        
-        for (const civil in this.absences) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.absences[civil].forEach(a => {
-                    if (a.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            date: a.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد غيابات في هذا اليوم');
-            return;
-        }
-        
-        this.generateAbsencePDF(filtered, `غيابات يوم ${selectedDate}`);
-    },
-    
-    // تصدير غيابات طالب محدد
-    exportSelectedStudentAbsences() {
-        const search = document.getElementById('searchAbsenceView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const absences = this.absences[student.civil] || [];
-        if (absences.length === 0) {
-            this.showToast('⚠️ لا توجد غيابات لهذا الطالب');
-            return;
-        }
-        
-        const data = absences.map(a => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            date: a.date
-        }));
-        
-        this.generateAbsencePDF(data, `غيابات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للغيابات
-generateAbsencePDF(data, title) {
-    const docDefinition = {
-        content: [
-            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-            {
-                table: {
-                    headerRows: 1,
-                    // تم تعديل عرض الأعمدة
-                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
-                    body: [
-                        [
-                            // تم إضافة رأس العمود التسلسلي
-                            { text: 'م', style: 'tableHeader' },
-                            { text: 'الاسم', style: 'tableHeader' },
-                            { text: 'السجل المدني', style: 'tableHeader' },
-                            { text: 'الصف', style: 'tableHeader' },
-                            { text: 'الفصل', style: 'tableHeader' },
-                            { text: 'التاريخ', style: 'tableHeader' }
-                        ],
-                        // تم تعديل البيانات لإضافة الرقم التسلسلي
-                        ...data.map((item, index) => [
-                            index + 1,
-                            item.name,
-                            item.civil,
-                            item.class,
-                            item.classroom,
-                            item.date
-                        ])
-                    ]
-                },
-                layout: 'headerLineOnly'
-            },
-            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-            { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
-        ],
-        styles: {
-            header: {
-                fontSize: 22,
-                bold: true,
-                margin: [0, 0, 0, 10],
-                color: '#1976d2'
-            },
-            subheader: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            tableHeader: {
-                bold: true,
-                fontSize: 13,
-                color: 'white',
-                fillColor: '#1976d2',
-                alignment: 'center'
-            },
-            footer: {
-                fontSize: 11,
-                italics: true,
-                color: '#666'
-            }
-        },
-        defaultStyle: {
-            font: 'Nillima',
-            fontSize: 12
-        },
-        pageSize: 'A4',
-        pageMargins: [40, 60, 40, 60]
-    };
-    
-    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-    this.showToast('✅ تم تصدير الملف بنجاح');
-},
-
-    
-    // تصدير جميع التأخرات
-    exportAllDelays() {
-        const all = [];
-        for (const civil in this.delays) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.delays[civil].forEach(d => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        type: d.type,
-                        date: d.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateDelayPDF(all, 'جميع التأخرات');
-    },
-    
-    // تصدير تأخرات يوم محدد
-    exportDelaysByDate(date) {
-const selectedDate = new Date(date).toLocaleDateString('ar-SA');          // للتطابق مع التخزين
-const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض في PDF
-        const filtered = [];
-        
-        for (const civil in this.delays) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.delays[civil].forEach(d => {
-                    if (d.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            type: d.type,
-                            date: d.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد تأخرات في هذا اليوم');
-            return;
-        }
-        
-        this.generateDelayPDF(filtered, `تأخرات يوم ${selectedDate}`);
-    },
-    
-    // تصدير تأخرات طالب محدد
-    exportSelectedStudentDelays() {
-        const search = document.getElementById('searchDelayView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const delays = this.delays[student.civil] || [];
-        if (delays.length === 0) {
-            this.showToast('⚠️ لا توجد تأخرات لهذا الطالب');
-            return;
-        }
-        
-        const data = delays.map(d => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            type: d.type,
-            date: d.date
-        }));
-        
-        this.generateDelayPDF(data, `تأخرات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للتأخرات
-generateDelayPDF(data, title) {
-    const docDefinition = {
-        content: [
-            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-            {
-                table: {
-                    headerRows: 1,
-                    // تم تعديل عرض الأعمدة لإضافة العمود الجديد
-                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                    body: [
-                        [
-                            // تم إضافة رأس العمود التسلسلي
-                            { text: 'م', style: 'tableHeader' },
-                            { text: 'الاسم', style: 'tableHeader' },
-                            { text: 'السجل المدني', style: 'tableHeader' },
-                            { text: 'الصف', style: 'tableHeader' },
-                            { text: 'الفصل', style: 'tableHeader' },
-                            { text: 'نوع التأخر', style: 'tableHeader' },
-                            { text: 'التاريخ', style: 'tableHeader' }
-                        ],
-                        // تم تعديل البيانات لإضافة الرقم التسلسلي في بداية كل صف
-                        ...data.map((item, index) => [
-                            index + 1,
-                            item.name,
-                            item.civil,
-                            item.class,
-                            item.classroom,
-                            item.type,
-                            item.date
-                        ])
-                    ]
-                },
-                layout: 'headerLineOnly'
-            },
-            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-{ text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
-        ],
-        styles: {
-            header: {
-                fontSize: 22,
-                bold: true,
-                margin: [0, 0, 0, 10],
-                color: '#ff9800'
-            },
-            subheader: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            tableHeader: {
-                bold: true,
-                fontSize: 13,
-                color: 'white',
-                fillColor: '#ff9800',
-                alignment: 'center'
-            },
-            footer: {
-                fontSize: 11,
-                italics: true,
-                color: '#666'
-            }
-        },
-        defaultStyle: {
-            font: 'Nillima',
-            fontSize: 12
-        },
-        pageSize: 'A4',
-        pageMargins: [40, 60, 40, 60]
-    };
-    
-    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-    this.showToast('✅ تم تصدير الملف بنجاح');
-},
-
-    
-    // تصدير جميع الملاحظات
-    exportAllNotes() {
-        const all = [];
-        for (const civil in this.notes) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.notes[civil].forEach(n => {
-                    all.push({
-                        name: s.name,
-                        civil: s.civil,
-                        class: s.class,
-                        classroom: s.classroom,
-                        note: n.text,
-                        date: n.date
-                    });
-                });
-            }
-        }
-        
-        if (all.length === 0) {
-            this.showToast('⚠️ لا توجد بيانات للتصدير');
-            return;
-        }
-        
-        // ترتيب حسب التاريخ
-        all.sort((a, b) => {
-            const dateA = new Date(a.date.split('/').reverse().join('-'));
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
-            return dateB - dateA;
-        });
-        
-        this.generateNotePDF(all, 'جميع الملاحظات');
-    },
-    
-    // تصدير ملاحظات يوم محدد
-    exportNotesByDate(date) {
-const selectedDate = new Date(date).toLocaleDateString('ar-SA');           // يبقى للتصفية
-const selectedDateG = new Date(date).toLocaleDateString('ar-SA-u-ca-gregory'); // للعرض الميلادي
-        const filtered = [];
-        
-        for (const civil in this.notes) {
-            const s = this.students.find(st => st.civil === civil);
-            if (s) {
-                this.notes[civil].forEach(n => {
-                    if (n.date === selectedDate) {
-                        filtered.push({
-                            name: s.name,
-                            civil: s.civil,
-                            class: s.class,
-                            classroom: s.classroom,
-                            note: n.text,
-                            date: n.date
-                        });
-                    }
-                });
-            }
-        }
-        
-        if (filtered.length === 0) {
-            this.showToast('⚠️ لا توجد ملاحظات في هذا اليوم');
-            return;
-        }
-        
-        this.generateNotePDF(filtered, `ملاحظات يوم ${selectedDate}`);
-    },
-    
-    // تصدير ملاحظات طالب محدد
-    exportSelectedStudentNotes() {
-        const search = document.getElementById('searchNoteView').value.toLowerCase();
-        if (!search) {
-            this.showToast('⚠️ الرجاء البحث عن طالب أولاً');
-            return;
-        }
-        
-        const student = this.students.find(s => 
-            s.name.toLowerCase().includes(search) || 
-            s.civil.includes(search)
-        );
-        
-        if (!student) {
-            this.showToast('⚠️ الطالب غير موجود');
-            return;
-        }
-        
-        const notes = this.notes[student.civil] || [];
-        if (notes.length === 0) {
-            this.showToast('⚠️ لا توجد ملاحظات لهذا الطالب');
-            return;
-        }
-        
-        const data = notes.map(n => ({
-            name: student.name,
-            civil: student.civil,
-            class: student.class,
-            classroom: student.classroom,
-            note: n.text,
-            date: n.date
-        }));
-        
-        this.generateNotePDF(data, `ملاحظات الطالب ${student.name}`);
-    },
-    
-    // إنشاء PDF للملاحظات
-generateNotePDF(data, title) {
-    const docDefinition = {
-        content: [
-            { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-            { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-            {
-                table: {
-                    headerRows: 1,
-                    // تم تعديل عرض الأعمدة
-                    widths: ['auto', '*', 'auto', 'auto', '*', 'auto'],
-                    body: [
-                        [
-                            // تم إضافة رأس العمود التسلسلي
-                            { text: 'م', style: 'tableHeader' },
-                            { text: 'الاسم', style: 'tableHeader' },
-                            { text: 'السجل المدني', style: 'tableHeader' },
-                            { text: 'الصف', style: 'tableHeader' },
-                            { text: 'الملاحظة', style: 'tableHeader' },
-                            { text: 'التاريخ', style: 'tableHeader' }
-                        ],
-                        // تم تعديل البيانات لإضافة الرقم التسلسلي
-                        ...data.map((item, index) => [
-                            index + 1,
-                            item.name,
-                            item.civil,
-                            `${item.class} - ${item.classroom}`,
-                            { text: item.note, alignment: 'right' },
-                            item.date
-                        ])
-                    ]
-                },
-                layout: 'headerLineOnly'
-            },
-            { text: `إجمالي السجلات: ${data.length}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] },
-{ text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA-u-ca-gregory')}`, style: 'footer', alignment: 'center' }
-        ],
-        styles: {
-            header: {
-                fontSize: 22,
-                bold: true,
-                margin: [0, 0, 0, 10],
-                color: '#00897b'
-            },
-            subheader: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            tableHeader: {
-                bold: true,
-                fontSize: 13,
-                color: 'white',
-                fillColor: '#00897b',
-                alignment: 'center'
-            },
-            footer: {
-                fontSize: 11,
-                italics: true,
-                color: '#666'
-            }
-        },
-        defaultStyle: {
-            font: 'Nillima',
-            fontSize: 12
-        },
-        pageSize: 'A4',
-        pageMargins: [40, 60, 40, 60]
-    };
-    
-    pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-    this.showToast('✅ تم تصدير الملف بنجاح');
-},
-
-    
-    // تصدير الإحصائيات الحالية
-    exportCurrentStats() {
-        const currentTab = this.currentTab.stats;
-        let title = '';
-        let content = [];
-        
-        if (currentTab === 'daily') {
-            title = 'الإحصائيات اليومية';
-            const today = new Date().toLocaleDateString('ar-SA');
-            content = [
-                { text: `تاريخ: ${today}`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['إجمالي الطلاب', document.getElementById('dailyTotal').textContent],
-                            ['الحاضرون', document.getElementById('dailyPresent').textContent],
-                            ['الغائبون', document.getElementById('dailyAbsent').textContent],
-                            ['المتأخرون', document.getElementById('dailyLate').textContent],
-                            ['نسبة الحضور', document.getElementById('dailyPercentage').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-        } else if (currentTab === 'weekly') {
-            title = 'الإحصائيات الأسبوعية';
-            content = [
-                { text: 'آخر 7 أيام', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['أيام', document.getElementById('weeklyDays').textContent],
-                            ['متوسط الحضور', document.getElementById('weeklyAvgPresent').textContent],
-                            ['إجمالي الغياب', document.getElementById('weeklyTotalAbsent').textContent],
-                            ['إجمالي التأخرات', document.getElementById('weeklyTotalLate').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-        } else if (currentTab === 'monthly') {
-            title = 'الإحصائيات الشهرية';
-            const days = document.getElementById('monthlyDays').textContent;
-            content = [
-                { text: `آخر ${days} يوم`, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*'],
-                        body: [
-                            [
-                                { text: 'المؤشر', style: 'tableHeader' },
-                                { text: 'القيمة', style: 'tableHeader' }
-                            ],
-                            ['أيام الدراسة', document.getElementById('monthlyDays').textContent],
-                            ['متوسط الحضور', document.getElementById('monthlyAvgPresent').textContent],
-                            ['إجمالي الغياب', document.getElementById('monthlyTotalAbsent').textContent],
-                            ['إجمالي التأخرات', document.getElementById('monthlyTotalLate').textContent]
-                        ]
-                    },
-                    layout: 'headerLineOnly'
-                }
-            ];
-            
-            // إضافة قائمة الطلاب الأكثر غياباً
-            const topAbsentList = document.getElementById('topAbsentList');
-            if (topAbsentList && topAbsentList.innerHTML) {
-                const studentElements = topAbsentList.querySelectorAll('.level-student');
-                if (studentElements.length > 0) {
-                    const topAbsentData = Array.from(studentElements).map(el => {
-                        const name = el.querySelector('.student-name-stat').textContent;
-                        const days = el.querySelector('.student-days').textContent;
-                        return [name, days];
-                    });
-                    
-                    content.push({
-                        text: 'الطلاب الأكثر غياباً',
-                        style: 'subheader',
-                        alignment: 'center',
-                        margin: [0, 20, 0, 10]
-                    });
-                    
-                    content.push({
-                        table: {
-                            headerRows: 1,
-                            widths: ['*', '*'],
-                            body: [
-                                [
-                                    { text: 'اسم الطالب', style: 'tableHeader' },
-                                    { text: 'أيام الغياب', style: 'tableHeader' }
-                                ],
-                                ...topAbsentData
-                            ]
-                        },
-                        layout: 'headerLineOnly'
-                    });
-                }
-            }
-        } else if (currentTab === 'levels') {
-            title = 'مستويات الغياب';
-            content = [
-                { text: 'توزيع الطلاب حسب مستويات الغياب', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] }
-            ];
-            
-            // إضافة بيانات كل مستوى
-            for (let i = 1; i <= 4; i++) {
-                const levelCard = document.getElementById(`level${i}Card`);
-                const levelTitle = levelCard.querySelector('.level-title').textContent;
-                const students = levelCard.querySelectorAll('.level-student');
+        } else if (type === 'absences') {
+          database.ref(`absences/${date}/${studentId}`).remove()
+            .then(() => {
+              this.showToast('تم حذف السجل بنجاح');
+              this.loadRecords(type, 'daily');
+            })
+            .catch(error => {
+              this.showToast('حدث خطأ أثناء حذف السجل');
+              console.error(error);
+            });
+        } else if (type === 'notes') {
+          database.ref(`notes/${date}/${studentId}`).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+              const notes = snapshot.val();
+              const notesArray = Array.isArray(notes) ? notes : [notes];
+              
+              // Find and remove the specific note
+              const index = notesArray.findIndex(note => note === subType);
+              if (index > -1) {
+                notesArray.splice(index, 1);
                 
-                if (students.length > 0) {
-                    const studentData = Array.from(students).map(el => {
-                        const name = el.querySelector('.student-name-stat').textContent;
-                        const days = el.querySelector('.student-days').textContent;
-                        return [name, days];
-                    });
-                    
-                    content.push({
-                        text: levelTitle,
-                        style: 'levelTitle',
-                        margin: [0, 15, 0, 5]
-                    });
-                    
-                    content.push({
-                        table: {
-                            headerRows: 1,
-                            widths: ['*', '*'],
-                            body: [
-                                [
-                                    { text: 'اسم الطالب', style: 'tableHeader' },
-                                    { text: 'أيام الغياب', style: 'tableHeader' }
-                                ],
-                                ...studentData
-                            ]
-                        },
-                        layout: 'headerLineOnly'
-                    });
-                }
+                // Update the notes array
+                database.ref(`notes/${date}/${studentId}`).set(notesArray.length > 0 ? notesArray : null)
+                  .then(() => {
+                    this.showToast('تم حذف السجل بنجاح');
+                    this.loadRecords(type, 'add');
+                  })
+                  .catch(error => {
+                    this.showToast('حدث خطأ أثناء حذف السجل');
+                    console.error(error);
+                  });
+              }
             }
+          });
+        }
+      }
+    );
+  },
+  
+  // Confirm action
+  confirmAction: function(action) {
+    let title, message, callback;
+    
+    switch(action) {
+      case 'saveDelay':
+        title = 'حفظ التأخرات';
+        message = 'هل أنت متأكد من حفظ التأخرات المحددة؟';
+        callback = () => this.saveDelays(false);
+        break;
+      case 'saveAndSendDelay':
+        title = 'حفظ وإرسال التأخرات';
+        message = 'هل أنت متأكد من حفظ وإرسال التأخرات المحددة؟';
+        callback = () => this.saveDelays(true);
+        break;
+      case 'sendDelay':
+        title = 'إرسال التأخرات';
+        message = 'هل أنت متأكد من إرسال التأخرات المحددة؟';
+        callback = () => this.sendDelays();
+        break;
+      case 'saveAbsence':
+        title = 'حفظ الغياب';
+        message = 'هل أنت متأكد من حفظ الغياب المحدد؟';
+        callback = () => this.saveAbsences(false);
+        break;
+      case 'saveAndSendAbsence':
+        title = 'حفظ وإرسال الغياب';
+        message = 'هل أنت متأكد من حفظ وإرسال الغياب المحدد؟';
+        callback = () => this.saveAbsences(true);
+        break;
+      case 'sendAbsence':
+        title = 'إرسال الغياب';
+        message = 'هل أنت متأكد من إرسال الغياب المحدد؟';
+        callback = () => this.sendAbsences();
+        break;
+      case 'saveNote':
+        title = 'حفظ الملاحظات';
+        message = 'هل أنت متأكد من حفظ الملاحظات المحددة؟';
+        callback = () => this.saveNotes(false);
+        break;
+      case 'saveAndSendNote':
+        title = 'حفظ وإرسال الملاحظات';
+        message = 'هل أنت متأكد من حفظ وإرسال الملاحظات المحددة؟';
+        callback = () => this.saveNotes(true);
+        break;
+      case 'sendNote':
+        title = 'إرسال الملاحظات';
+        message = 'هل أنت متأكد من إرسال الملاحظات المحددة؟';
+        callback = () => this.sendNotes();
+        break;
+      case 'reset':
+        title = 'إعادة تعيين التطبيق';
+        message = 'هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.';
+        callback = () => this.resetApp();
+        break;
+    }
+    
+    this.showConfirm(title, message, callback);
+  },
+  
+  // Save delays
+  saveDelays: function(send = false) {
+    // Get active tab
+    const activeTab = document.querySelector('#delaysPage .tab.active');
+    const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+    
+    // Get date
+    const dateId = `date${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    const date = document.getElementById(dateId).value;
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents[type];
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Save delays to Firebase
+    const updates = {};
+    selectedStudents.forEach(studentId => {
+      updates[`delays/${date}/${studentId}/${type}`] = true;
+    });
+    
+    database.ref().update(updates)
+      .then(() => {
+        this.showToast('تم حفظ التأخرات بنجاح');
+        
+        // Clear selection
+        this.selectedStudents[type] = [];
+        this.displayStudents('delays', type);
+        
+        // Load records
+        this.loadRecords('delays', type);
+        
+        // Send if requested
+        if (send) {
+          this.sendDelays();
+        }
+      })
+      .catch(error => {
+        this.showToast('حدث خطأ أثناء حفظ التأخرات');
+        console.error(error);
+      });
+  },
+  
+  // Send delays
+  sendDelays: function() {
+    // Get active tab
+    const activeTab = document.querySelector('#delaysPage .tab.active');
+    const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+    
+    // Get date
+    const dateId = `date${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    const date = document.getElementById(dateId).value;
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents[type];
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Create Excel file
+    const data = [];
+    const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'نوع التأخر', 'التاريخ'];
+    data.push(headers);
+    
+    selectedStudents.forEach(studentId => {
+      const student = this.students.find(s => s.id === studentId);
+      if (!student) return;
+      
+      let typeText = '';
+      if (type === 'morning') typeText = 'صباحي';
+      else if (type === 'break') typeText = 'فسحة';
+      else if (type === 'departure') typeText = 'انصراف';
+      
+      data.push([
+        student.name,
+        student.id,
+        student.phone || '',
+        student.class,
+        student.classroom,
+        typeText,
+        date
+      ]);
+    });
+    
+    // Generate and download Excel file
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'التأخرات');
+    
+    const fileName = `التأخرات_${type}_${date}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    this.showToast('تم إرسال التأخرات بنجاح');
+  },
+  
+  // Save absences
+  saveAbsences: function(send = false) {
+    // Get date
+    const date = document.getElementById('dateAbsence').value;
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents.absence;
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Save absences to Firebase
+    const updates = {};
+    selectedStudents.forEach(studentId => {
+      updates[`absences/${date}/${studentId}`] = true;
+    });
+    
+    database.ref().update(updates)
+      .then(() => {
+        this.showToast('تم حفظ الغياب بنجاح');
+        
+        // Clear selection
+        this.selectedStudents.absence = [];
+        this.displayStudents('absence', 'daily');
+        
+        // Load records
+        this.loadRecords('absence', 'daily');
+        
+        // Send if requested
+        if (send) {
+          this.sendAbsences();
+        }
+      })
+      .catch(error => {
+        this.showToast('حدث خطأ أثناء حفظ الغياب');
+        console.error(error);
+      });
+  },
+  
+  // Send absences
+  sendAbsences: function() {
+    // Get date
+    const date = document.getElementById('dateAbsence').value;
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents.absence;
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Create Excel file
+    const data = [];
+    const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'التاريخ'];
+    data.push(headers);
+    
+    selectedStudents.forEach(studentId => {
+      const student = this.students.find(s => s.id === studentId);
+      if (!student) return;
+      
+      data.push([
+        student.name,
+        student.id,
+        student.phone || '',
+        student.class,
+        student.classroom,
+        date
+      ]);
+    });
+    
+    // Generate and download Excel file
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الغياب');
+    
+    const fileName = `الغياب_${date}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    this.showToast('تم إرسال الغياب بنجاح');
+  },
+  
+  // Save notes
+  saveNotes: function(send = false) {
+    // Get date and note text
+    const date = document.getElementById('dateNote').value;
+    const noteText = document.getElementById('noteTextarea').value.trim();
+    
+    if (!noteText) {
+      this.showToast('الرجاء كتابة ملاحظة');
+      return;
+    }
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents.note;
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Save notes to Firebase
+    const updates = {};
+    selectedStudents.forEach(studentId => {
+      // Get existing notes
+      database.ref(`notes/${date}/${studentId}`).once('value', (snapshot) => {
+        let notes = [];
+        
+        if (snapshot.exists()) {
+          const existingNotes = snapshot.val();
+          notes = Array.isArray(existingNotes) ? existingNotes : [existingNotes];
         }
         
-        const docDefinition = {
-            content: [
-                { text: 'نظام الحضور الذكي', style: 'header', alignment: 'center' },
-                { text: title, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
-                ...content,
-                { text: `تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, style: 'footer', alignment: 'center', margin: [0, 20, 0, 0] }
-            ],
-            styles: {
-                header: {
-                    fontSize: 22,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
-                    color: '#667eea'
-                },
-                subheader: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10]
-                },
-                levelTitle: {
-                    fontSize: 16,
-                    bold: true,
-                    margin: [0, 10, 0, 5]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'white',
-                    fillColor: '#667eea',
-                    alignment: 'center'
-                },
-                footer: {
-                    fontSize: 11,
-                    italics: true,
-                    color: '#666'
-                }
-            },
-            defaultStyle: {
-                font: 'Nillima',
-                fontSize: 12
-            },
-            pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60]
-        };
+        // Add new note
+        notes.push(noteText);
         
-        pdfMake.createPdf(docDefinition).download(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.showToast('✅ تم تصدير الملف بنجاح');
+        // Update notes
+        database.ref(`notes/${date}/${studentId}`).set(notes);
+      });
+    });
+    
+    this.showToast('تم حفظ الملاحظات بنجاح');
+    
+    // Clear selection and note text
+    this.selectedStudents.note = [];
+    document.getElementById('noteTextarea').value = '';
+    this.updateNoteCharCount();
+    this.displayStudents('notes', 'add');
+    
+    // Load records
+    this.loadRecords('notes', 'add');
+    
+    // Send if requested
+    if (send) {
+      this.sendNotes();
     }
-};
-	
-	  window.app = app; // يتيح استخدام onclick="app...." في عناصر HTML
-  document.addEventListener('DOMContentLoaded', () => app.init()); // تشغيل التهيئة بعد تحميل الصفحة
-
-
-	
-app.updateSubscriptionBadge = function(days) {
-  const badge = document.getElementById('subscriptionBadge');
-  if (!badge) return;
-  const daysEl = badge.querySelector('.badge-days');
-  const labelEl = badge.querySelector('.badge-label');
-  let codeEl = badge.querySelector('.badge-code');
-
-  if (!codeEl) {
-    const textWrap = badge.querySelector('.badge-text') || badge;
-    codeEl = document.createElement('span');
-    codeEl.className = 'badge-code';
-    codeEl.dir = 'ltr';
-    textWrap.appendChild(codeEl);
-  }
-
-  if (daysEl) daysEl.textContent = days;
-  if (labelEl) labelEl.textContent = (days === 1 ? 'يوم متبقي' : 'أيام متبقية');
-
-  const code = localStorage.getItem('activationCode') || '';
-  if (code.includes('TRIAL'))      codeEl.textContent = 'كود: تجريبي';
-  else if (code.startsWith('SK-')) codeEl.textContent = `كود: ${code}`;
-  else                             codeEl.textContent = '';
-
-  badge.classList.remove('trial', 'warning', 'active');
-  if (days <= 3)      badge.classList.add('warning');
-  else if (days <= 7) badge.classList.add('trial');
-  else                badge.classList.add('active');
-};
-
-document.addEventListener('DOMContentLoaded', function () { app.init(); });
-
-	if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    reg.addEventListener('updatefound', () => {
-      const nw = reg.installing;
-      if (!nw) return;
-      nw.addEventListener('statechange', () => {
-        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-          nw.postMessage({ type: 'SKIP_WAITING' }); // فعّل النسخة فورًا
+  },
+  
+  // Send notes
+  sendNotes: function() {
+    // Get date and note text
+    const date = document.getElementById('dateNote').value;
+    const noteText = document.getElementById('noteTextarea').value.trim();
+    
+    if (!noteText) {
+      this.showToast('الرجاء كتابة ملاحظة');
+      return;
+    }
+    
+    // Get selected students
+    const selectedStudents = this.selectedStudents.note;
+    
+    if (selectedStudents.length === 0) {
+      this.showToast('لم يتم تحديد أي طلاب');
+      return;
+    }
+    
+    // Create Excel file
+    const data = [];
+    const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'الملاحظة', 'التاريخ'];
+    data.push(headers);
+    
+    selectedStudents.forEach(studentId => {
+      const student = this.students.find(s => s.id === studentId);
+      if (!student) return;
+      
+      data.push([
+        student.name,
+        student.id,
+        student.phone || '',
+        student.class,
+        student.classroom,
+        noteText,
+        date
+      ]);
+    });
+    
+    // Generate and download Excel file
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الملاحظات');
+    
+    const fileName = `الملاحظات_${date}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    this.showToast('تم إرسال الملاحظات بنجاح');
+  },
+  
+  // Update note character count
+  updateNoteCharCount: function() {
+    const textarea = document.getElementById('noteTextarea');
+    const countElement = document.getElementById('noteCharCount');
+    countElement.textContent = textarea.value.length;
+  },
+  
+  // Show date selector for export
+  showDateSelector: function(type) {
+    document.getElementById('dateModal').classList.add('active');
+    
+    // Set export button action
+    document.getElementById('exportDateBtn').onclick = () => {
+      const date = document.getElementById('exportDate').value;
+      
+      if (!date) {
+        this.showToast('الرجاء اختيار تاريخ');
+        return;
+      }
+      
+      if (type === 'delay') {
+        this.exportDelaysByDate(date);
+      } else if (type === 'absence') {
+        this.exportAbsencesByDate(date);
+      } else if (type === 'note') {
+        this.exportNotesByDate(date);
+      }
+      
+      this.closeDateModal();
+    };
+  },
+  
+  // Export delays by date
+  exportDelaysByDate: function(date) {
+    database.ref(`delays/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات تأخر في هذا اليوم');
+        return;
+      }
+      
+      const delays = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'نوع التأخر', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each student's delays
+      Object.keys(delays).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const studentDelays = delays[studentId];
+        
+        if (studentDelays.morning) {
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            'صباحي',
+            date
+          ]);
+        }
+        
+        if (studentDelays.break) {
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            'فسحة',
+            date
+          ]);
+        }
+        
+        if (studentDelays.departure) {
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            'انصراف',
+            date
+          ]);
+        }
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'التأخرات');
+      
+      const fileName = `التأخرات_${date}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير التأخرات بنجاح');
+    });
+  },
+  
+  // Export absences by date
+  exportAbsencesByDate: function(date) {
+    database.ref(`absences/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات غياب في هذا اليوم');
+        return;
+      }
+      
+      const absences = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each student's absence
+      Object.keys(absences).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        data.push([
+          student.name,
+          student.id,
+          student.phone || '',
+          student.class,
+          student.classroom,
+          date
+        ]);
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الغياب');
+      
+      const fileName = `الغياب_${date}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الغياب بنجاح');
+    });
+  },
+  
+  // Export notes by date
+  exportNotesByDate: function(date) {
+    database.ref(`notes/${date}`).once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد ملاحظات في هذا اليوم');
+        return;
+      }
+      
+      const notes = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'الملاحظة', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each student's notes
+      Object.keys(notes).forEach(studentId => {
+        const student = this.students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const studentNotes = notes[studentId];
+        const notesArray = Array.isArray(studentNotes) ? studentNotes : [studentNotes];
+        
+        notesArray.forEach(note => {
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            note,
+            date
+          ]);
+        });
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الملاحظات');
+      
+      const fileName = `الملاحظات_${date}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الملاحظات بنجاح');
+    });
+  },
+  
+  // Export all delays
+  exportAllDelays: function() {
+    database.ref('delays').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات تأخر');
+        return;
+      }
+      
+      const allDelays = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'نوع التأخر', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's delays
+      Object.keys(allDelays).forEach(date => {
+        const delays = allDelays[date];
+        
+        // Process each student's delays
+        Object.keys(delays).forEach(studentId => {
+          const student = this.students.find(s => s.id === studentId);
+          if (!student) return;
+          
+          const studentDelays = delays[studentId];
+          
+          if (studentDelays.morning) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'صباحي',
+              date
+            ]);
+          }
+          
+          if (studentDelays.break) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'فسحة',
+              date
+            ]);
+          }
+          
+          if (studentDelays.departure) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'انصراف',
+              date
+            ]);
+          }
+        });
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'التأخرات');
+      
+      const fileName = `التأخرات_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير التأخرات بنجاح');
+    });
+  },
+  
+  // Export all absences
+  exportAllAbsences: function() {
+    database.ref('absences').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات غياب');
+        return;
+      }
+      
+      const allAbsences = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's absences
+      Object.keys(allAbsences).forEach(date => {
+        const absences = allAbsences[date];
+        
+        // Process each student's absence
+        Object.keys(absences).forEach(studentId => {
+          const student = this.students.find(s => s.id === studentId);
+          if (!student) return;
+          
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            date
+          ]);
+        });
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الغياب');
+      
+      const fileName = `الغياب_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الغياب بنجاح');
+    });
+  },
+  
+  // Export all notes
+  exportAllNotes: function() {
+    database.ref('notes').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد ملاحظات');
+        return;
+      }
+      
+      const allNotes = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'الملاحظة', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's notes
+      Object.keys(allNotes).forEach(date => {
+        const notes = allNotes[date];
+        
+        // Process each student's notes
+        Object.keys(notes).forEach(studentId => {
+          const student = this.students.find(s => s.id === studentId);
+          if (!student) return;
+          
+          const studentNotes = notes[studentId];
+          const notesArray = Array.isArray(studentNotes) ? studentNotes : [studentNotes];
+          
+          notesArray.forEach(note => {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              note,
+              date
+            ]);
+          });
+        });
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الملاحظات');
+      
+      const fileName = `الملاحظات_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الملاحظات بنجاح');
+    });
+  },
+  
+  // Export selected student delays
+  exportSelectedStudentDelays: function() {
+    // Show student selector modal
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+      <div style="margin-bottom:20px">
+        <input type="text" id="studentSearch" class="search-input" placeholder="ابحث عن طالب...">
+      </div>
+      <div id="studentSelector" style="max-height:300px;overflow-y:auto"></div>
+    `;
+    
+    // Display students
+    const studentSelector = document.getElementById('studentSelector');
+    this.students.forEach(student => {
+      const item = document.createElement('div');
+      item.className = 'student-item';
+      item.style.cursor = 'pointer';
+      item.innerHTML = `
+        <div class="student-name">${student.name}</div>
+        <div style="font-size:14px;color:#666;margin-top:4px">
+          ${student.class} - ${student.classroom} | ${student.id}
+        </div>
+      `;
+      
+      item.addEventListener('click', () => {
+        this.exportStudentDelays(student.id);
+        this.closeModal();
+      });
+      
+      studentSelector.appendChild(item);
+    });
+    
+    // Setup search
+    document.getElementById('studentSearch').addEventListener('input', (e) => {
+      const searchValue = e.target.value.toLowerCase();
+      
+      Array.from(studentSelector.children).forEach(item => {
+        const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+        if (studentName.includes(searchValue)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
         }
       });
     });
-  });
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    location.reload(); // أعد التحميل عند تبدّل المتحكم
-  });
-}
-	
+    
+    // Show modal
+    document.getElementById('studentModal').classList.add('active');
+  },
+  
+  // Export student delays
+  exportStudentDelays: function(studentId) {
+    const student = this.students.find(s => s.id === studentId);
+    if (!student) return;
+    
+    database.ref('delays').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات تأخر');
+        return;
+      }
+      
+      const allDelays = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'نوع التأخر', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's delays
+      Object.keys(allDelays).forEach(date => {
+        const delays = allDelays[date];
+        
+        // Check if student has delays on this date
+        if (delays[studentId]) {
+          const studentDelays = delays[studentId];
+          
+          if (studentDelays.morning) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'صباحي',
+              date
+            ]);
+          }
+          
+          if (studentDelays.break) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'فسحة',
+              date
+            ]);
+          }
+          
+          if (studentDelays.departure) {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              'انصراف',
+              date
+            ]);
+          }
+        }
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'التأخرات');
+      
+      const fileName = `التأخرات_${student.name}_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير التأخرات بنجاح');
+    });
+  },
+  
+  // Export selected student absences
+  exportSelectedStudentAbsences: function() {
+    // Show student selector modal
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+      <div style="margin-bottom:20px">
+        <input type="text" id="studentSearch" class="search-input" placeholder="ابحث عن طالب...">
+      </div>
+      <div id="studentSelector" style="max-height:300px;overflow-y:auto"></div>
+    `;
+    
+    // Display students
+    const studentSelector = document.getElementById('studentSelector');
+    this.students.forEach(student => {
+      const item = document.createElement('div');
+      item.className = 'student-item';
+      item.style.cursor = 'pointer';
+      item.innerHTML = `
+        <div class="student-name">${student.name}</div>
+        <div style="font-size:14px;color:#666;margin-top:4px">
+          ${student.class} - ${student.classroom} | ${student.id}
+        </div>
+      `;
+      
+      item.addEventListener('click', () => {
+        this.exportStudentAbsences(student.id);
+        this.closeModal();
+      });
+      
+      studentSelector.appendChild(item);
+    });
+    
+    // Setup search
+    document.getElementById('studentSearch').addEventListener('input', (e) => {
+      const searchValue = e.target.value.toLowerCase();
+      
+      Array.from(studentSelector.children).forEach(item => {
+        const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+        if (studentName.includes(searchValue)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Show modal
+    document.getElementById('studentModal').classList.add('active');
+  },
+  
+  // Export student absences
+  exportStudentAbsences: function(studentId) {
+    const student = this.students.find(s => s.id === studentId);
+    if (!student) return;
+    
+    database.ref('absences').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد سجلات غياب');
+        return;
+      }
+      
+      const allAbsences = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's absences
+      Object.keys(allAbsences).forEach(date => {
+        const absences = allAbsences[date];
+        
+        // Check if student has absence on this date
+        if (absences[studentId]) {
+          data.push([
+            student.name,
+            student.id,
+            student.phone || '',
+            student.class,
+            student.classroom,
+            date
+          ]);
+        }
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الغياب');
+      
+      const fileName = `الغياب_${student.name}_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الغياب بنجاح');
+    });
+  },
+  
+  // Export selected student notes
+  exportSelectedStudentNotes: function() {
+    // Show student selector modal
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+      <div style="margin-bottom:20px">
+        <input type="text" id="studentSearch" class="search-input" placeholder="ابحث عن طالب...">
+      </div>
+      <div id="studentSelector" style="max-height:300px;overflow-y:auto"></div>
+    `;
+    
+    // Display students
+    const studentSelector = document.getElementById('studentSelector');
+    this.students.forEach(student => {
+      const item = document.createElement('div');
+      item.className = 'student-item';
+      item.style.cursor = 'pointer';
+      item.innerHTML = `
+        <div class="student-name">${student.name}</div>
+        <div style="font-size:14px;color:#666;margin-top:4px">
+          ${student.class} - ${student.classroom} | ${student.id}
+        </div>
+      `;
+      
+      item.addEventListener('click', () => {
+        this.exportStudentNotes(student.id);
+        this.closeModal();
+      });
+      
+      studentSelector.appendChild(item);
+    });
+    
+    // Setup search
+    document.getElementById('studentSearch').addEventListener('input', (e) => {
+      const searchValue = e.target.value.toLowerCase();
+      
+      Array.from(studentSelector.children).forEach(item => {
+        const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+        if (studentName.includes(searchValue)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Show modal
+    document.getElementById('studentModal').classList.add('active');
+  },
+  
+  // Export student notes
+  exportStudentNotes: function(studentId) {
+    const student = this.students.find(s => s.id === studentId);
+    if (!student) return;
+    
+    database.ref('notes').once('value', (snapshot) => {
+      if (!snapshot.exists()) {
+        this.showToast('لا توجد ملاحظات');
+        return;
+      }
+      
+      const allNotes = snapshot.val();
+      const data = [];
+      const headers = ['الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'الملاحظة', 'التاريخ'];
+      data.push(headers);
+      
+      // Process each date's notes
+      Object.keys(allNotes).forEach(date => {
+        const notes = allNotes[date];
+        
+        // Check if student has notes on this date
+        if (notes[studentId]) {
+          const studentNotes = notes[studentId];
+          const notesArray = Array.isArray(studentNotes) ? studentNotes : [studentNotes];
+          
+          notesArray.forEach(note => {
+            data.push([
+              student.name,
+              student.id,
+              student.phone || '',
+              student.class,
+              student.classroom,
+              note,
+              date
+            ]);
+          });
+        }
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'الملاحظات');
+      
+      const fileName = `الملاحظات_${student.name}_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الملاحظات بنجاح');
+    });
+  },
+  
+  // Load statistics
+  loadStats: function(type) {
+    if (type === 'daily') {
+      this.loadDailyStats();
+    } else if (type === 'weekly') {
+      this.loadWeeklyStats();
+    } else if (type === 'monthly') {
+      this.loadMonthlyStats();
+    } else if (type === 'levels') {
+      this.loadLevelsStats();
+    }
+  },
+  
+  // Load daily statistics
+  loadDailyStats: function() {
+    const today = this.formatDate(new Date());
+    document.getElementById('dailyDate').textContent = today;
+    
+    // Get total students
+    const totalStudents = this.students.length;
+    document.getElementById('dailyTotal').textContent = totalStudents;
+    
+    // Get today's records
+    Promise.all([
+      database.ref(`delays/${today}`).once('value'),
+      database.ref(`absences/${today}`).once('value')
+    ]).then(([delaysSnapshot, absencesSnapshot]) => {
+      let presentCount = totalStudents;
+      let delayCount = 0;
+      let absenceCount = 0;
+      
+      // Process delays
+      if (delaysSnapshot.exists()) {
+        const delays = delaysSnapshot.val();
+        const delayedStudents = new Set();
+        
+        Object.keys(delays).forEach(studentId => {
+          const studentDelays = delays[studentId];
+          
+          if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+            delayedStudents.add(studentId);
+          }
+        });
+        
+        delayCount = delayedStudents.size;
+      }
+      
+      // Process absences
+      if (absencesSnapshot.exists()) {
+        const absences = absencesSnapshot.val();
+        absenceCount = Object.keys(absences).length;
+      }
+      
+      // Calculate present count
+      presentCount = totalStudents - absenceCount;
+      
+      // Update UI
+      document.getElementById('dailyPresent').textContent = presentCount;
+      document.getElementById('dailyAbsent').textContent = absenceCount;
+      document.getElementById('dailyLate').textContent = delayCount;
+      
+      // Calculate percentage
+      const percentage = totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0;
+      document.getElementById('dailyPercentage').textContent = `${percentage}%`;
+    });
+  },
+  
+  // Load weekly statistics
+  loadWeeklyStats: function() {
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
+    
+    const dates = [];
+    for (let d = new Date(weekAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalLate = 0;
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      Promise.all([
+        database.ref(`delays/${date}`).once('value'),
+        database.ref(`absences/${date}`).once('value')
+      ])
+    )).then(results => {
+      results.forEach(([delaysSnapshot, absencesSnapshot], index) => {
+        const date = dates[index];
+        
+        // Process delays
+        if (delaysSnapshot.exists()) {
+          const delays = delaysSnapshot.val();
+          const delayedStudents = new Set();
+          
+          Object.keys(delays).forEach(studentId => {
+            const studentDelays = delays[studentId];
+            
+            if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+              delayedStudents.add(studentId);
+            }
+          });
+          
+          totalLate += delayedStudents.size;
+        }
+        
+        // Process absences
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          totalAbsent += Object.keys(absences).length;
+        }
+      });
+      
+      // Calculate present count
+      totalPresent = (this.students.length * dates.length) - totalAbsent;
+      
+      // Calculate averages
+      const avgPresent = Math.round(totalPresent / dates.length);
+      
+      // Update UI
+      document.getElementById('weeklyAvgPresent').textContent = avgPresent;
+      document.getElementById('weeklyTotalAbsent').textContent = totalAbsent;
+      document.getElementById('weeklyTotalLate').textContent = totalLate;
+    });
+  },
+  
+  // Load monthly statistics
+  loadMonthlyStats: function() {
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setDate(today.getDate() - 30);
+    
+    const dates = [];
+    for (let d = new Date(monthAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalLate = 0;
+    const studentAbsences = {};
+    
+    // Initialize student absences
+    this.students.forEach(student => {
+      studentAbsences[student.id] = 0;
+    });
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      Promise.all([
+        database.ref(`delays/${date}`).once('value'),
+        database.ref(`absences/${date}`).once('value')
+      ])
+    )).then(results => {
+      results.forEach(([delaysSnapshot, absencesSnapshot], index) => {
+        const date = dates[index];
+        
+        // Process delays
+        if (delaysSnapshot.exists()) {
+          const delays = delaysSnapshot.val();
+          const delayedStudents = new Set();
+          
+          Object.keys(delays).forEach(studentId => {
+            const studentDelays = delays[studentId];
+            
+            if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+              delayedStudents.add(studentId);
+            }
+          });
+          
+          totalLate += delayedStudents.size;
+        }
+        
+        // Process absences
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          
+          Object.keys(absences).forEach(studentId => {
+            totalAbsent++;
+            if (studentAbsences[studentId] !== undefined) {
+              studentAbsences[studentId]++;
+            }
+          });
+        }
+      });
+      
+      // Calculate present count
+      totalPresent = (this.students.length * dates.length) - totalAbsent;
+      
+      // Calculate averages
+      const avgPresent = Math.round(totalPresent / dates.length);
+      
+      // Update UI
+      document.getElementById('monthlyAvgPresent').textContent = avgPresent;
+      document.getElementById('monthlyTotalAbsent').textContent = totalAbsent;
+      document.getElementById('monthlyTotalLate').textContent = totalLate;
+      
+      // Get top absent students
+      const topAbsent = Object.entries(studentAbsences)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([studentId, count]) => {
+          const student = this.students.find(s => s.id === studentId);
+          return {
+            name: student ? student.name : 'Unknown',
+            count
+          };
+        });
+      
+      // Update top absent list
+      const topAbsentList = document.getElementById('topAbsentList');
+      topAbsentList.innerHTML = '';
+      
+      if (topAbsent.length === 0) {
+        topAbsentList.innerHTML = '<div class="level-empty">لا يوجد طلاب غائبين خلال الشهر</div>';
+      } else {
+        topAbsent.forEach((student, index) => {
+          const item = document.createElement('div');
+          item.className = 'level-student';
+          item.innerHTML = `
+            <div class="student-name-stat">${index + 1}. ${student.name}</div>
+            <div class="student-days">${student.count} يوم</div>
+          `;
+          topAbsentList.appendChild(item);
+        });
+      }
+    });
+  },
+  
+  // Load levels statistics
+  loadLevelsStats: function() {
+    // Get level settings from localStorage or use defaults
+    const levelSettings = {
+      level1Min: parseInt(localStorage.getItem('level1Min') || '1'),
+      level1Max: parseInt(localStorage.getItem('level1Max') || '5'),
+      level2Min: parseInt(localStorage.getItem('level2Min') || '6'),
+      level2Max: parseInt(localStorage.getItem('level2Max') || '10'),
+      level3Min: parseInt(localStorage.getItem('level3Min') || '11'),
+      level3Max: parseInt(localStorage.getItem('level3Max') || '15'),
+      level4Min: parseInt(localStorage.getItem('level4Min') || '16'),
+      level4Max: parseInt(localStorage.getItem('level4Max') || '20')
+    };
+    
+    // Update UI
+    document.getElementById('level1Min').value = levelSettings.level1Min;
+    document.getElementById('level1Max').value = levelSettings.level1Max;
+    document.getElementById('level2Min').value = levelSettings.level2Min;
+    document.getElementById('level2Max').value = levelSettings.level2Max;
+    document.getElementById('level3Min').value = levelSettings.level3Min;
+    document.getElementById('level3Max').value = levelSettings.level3Max;
+    document.getElementById('level4Min').value = levelSettings.level4Min;
+    document.getElementById('level4Max').value = levelSettings.level4Max;
+    
+    // Get current month's absences
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setDate(today.getDate() - 30);
+    
+    const dates = [];
+    for (let d = new Date(monthAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    const studentAbsences = {};
+    
+    // Initialize student absences
+    this.students.forEach(student => {
+      studentAbsences[student.id] = {
+        name: student.name,
+        class: student.class,
+        classroom: student.classroom,
+        count: 0
+      };
+    });
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      database.ref(`absences/${date}`).once('value')
+    )).then(results => {
+      results.forEach((absencesSnapshot, index) => {
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          
+          Object.keys(absences).forEach(studentId => {
+            if (studentAbsences[studentId]) {
+              studentAbsences[studentId].count++;
+            }
+          });
+        }
+      });
+      
+      // Categorize students by level
+      const level1Students = [];
+      const level2Students = [];
+      const level3Students = [];
+      const level4Students = [];
+      
+      Object.values(studentAbsences).forEach(student => {
+        if (student.count >= levelSettings.level1Min && student.count <= levelSettings.level1Max) {
+          level1Students.push(student);
+        } else if (student.count >= levelSettings.level2Min && student.count <= levelSettings.level2Max) {
+          level2Students.push(student);
+        } else if (student.count >= levelSettings.level3Min && student.count <= levelSettings.level3Max) {
+          level3Students.push(student);
+        } else if (student.count >= levelSettings.level4Min && student.count <= levelSettings.level4Max) {
+          level4Students.push(student);
+        }
+      });
+      
+      // Update UI
+      this.updateLevelStudents('level1Students', level1Students);
+      this.updateLevelStudents('level2Students', level2Students);
+      this.updateLevelStudents('level3Students', level3Students);
+      this.updateLevelStudents('level4Students', level4Students);
+    });
+  },
+  
+  // Update level students list
+  updateLevelStudents: function(elementId, students) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = '';
+    
+    if (students.length === 0) {
+      element.innerHTML = '<div class="level-empty">لا يوجد طلاب في هذا المستوى</div>';
+    } else {
+      students.forEach(student => {
+        const item = document.createElement('div');
+        item.className = 'level-student';
+        item.innerHTML = `
+          <div class="student-name-stat">${student.name}</div>
+          <div class="student-days">${student.count} يوم</div>
+        `;
+        element.appendChild(item);
+      });
+    }
+  },
+  
+  // Save level settings
+  saveLevelSettings: function() {
+    const levelSettings = {
+      level1Min: document.getElementById('level1Min').value,
+      level1Max: document.getElementById('level1Max').value,
+      level2Min: document.getElementById('level2Min').value,
+      level2Max: document.getElementById('level2Max').value,
+      level3Min: document.getElementById('level3Min').value,
+      level3Max: document.getElementById('level3Max').value,
+      level4Min: document.getElementById('level4Min').value,
+      level4Max: document.getElementById('level4Max').value
+    };
+    
+    // Save to localStorage
+    Object.keys(levelSettings).forEach(key => {
+      localStorage.setItem(key, levelSettings[key]);
+    });
+    
+    this.showToast('تم حفظ الإعدادات بنجاح');
+    
+    // Reload levels statistics
+    this.loadLevelsStats();
+  },
+  
+  // Export current statistics
+  exportCurrentStats: function() {
+    // Get active tab
+    const activeTab = document.querySelector('#statsPage .tab.active');
+    const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+    
+    if (type === 'daily') {
+      this.exportDailyStats();
+    } else if (type === 'weekly') {
+      this.exportWeeklyStats();
+    } else if (type === 'monthly') {
+      this.exportMonthlyStats();
+    } else if (type === 'levels') {
+      this.exportLevelsStats();
+    }
+  },
+  
+  // Export daily statistics
+  exportDailyStats: function() {
+    const today = this.formatDate(new Date());
+    const totalStudents = this.students.length;
+    
+    // Get today's records
+    Promise.all([
+      database.ref(`delays/${today}`).once('value'),
+      database.ref(`absences/${today}`).once('value')
+    ]).then(([delaysSnapshot, absencesSnapshot]) => {
+      let presentCount = totalStudents;
+      let delayCount = 0;
+      let absenceCount = 0;
+      
+      // Process delays
+      if (delaysSnapshot.exists()) {
+        const delays = delaysSnapshot.val();
+        const delayedStudents = new Set();
+        
+        Object.keys(delays).forEach(studentId => {
+          const studentDelays = delays[studentId];
+          
+          if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+            delayedStudents.add(studentId);
+          }
+        });
+        
+        delayCount = delayedStudents.size;
+      }
+      
+      // Process absences
+      if (absencesSnapshot.exists()) {
+        const absences = absencesSnapshot.val();
+        absenceCount = Object.keys(absences).length;
+      }
+      
+      // Calculate present count
+      presentCount = totalStudents - absenceCount;
+      
+      // Calculate percentage
+      const percentage = totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0;
+      
+      // Create data for Excel
+      const data = [
+        ['إحصائيات اليوم', today],
+        [],
+        ['إجمالي الطلاب', totalStudents],
+        ['الحاضرون', presentCount],
+        ['الغائبون', absenceCount],
+        ['المتأخرون', delayCount],
+        ['نسبة الحضور', `${percentage}%`]
+      ];
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'إحصائيات اليوم');
+      
+      const fileName = `إحصائيات_اليوم_${today}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الإحصائيات بنجاح');
+    });
+  },
+  
+  // Export weekly statistics
+  exportWeeklyStats: function() {
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
+    
+    const dates = [];
+    for (let d = new Date(weekAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalLate = 0;
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      Promise.all([
+        database.ref(`delays/${date}`).once('value'),
+        database.ref(`absences/${date}`).once('value')
+      ])
+    )).then(results => {
+      results.forEach(([delaysSnapshot, absencesSnapshot], index) => {
+        const date = dates[index];
+        
+        // Process delays
+        if (delaysSnapshot.exists()) {
+          const delays = delaysSnapshot.val();
+          const delayedStudents = new Set();
+          
+          Object.keys(delays).forEach(studentId => {
+            const studentDelays = delays[studentId];
+            
+            if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+              delayedStudents.add(studentId);
+            }
+          });
+          
+          totalLate += delayedStudents.size;
+        }
+        
+        // Process absences
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          totalAbsent += Object.keys(absences).length;
+        }
+      });
+      
+      // Calculate present count
+      totalPresent = (this.students.length * dates.length) - totalAbsent;
+      
+      // Calculate averages
+      const avgPresent = Math.round(totalPresent / dates.length);
+      
+      // Create data for Excel
+      const data = [
+        ['إحصائيات الأسبوع', `${this.formatDate(weekAgo)} - ${this.formatDate(today)}`],
+        [],
+        ['عدد الأيام', dates.length],
+        ['متوسط الحضور', avgPresent],
+        ['إجمالي الغياب', totalAbsent],
+        ['إجمالي التأخرات', totalLate]
+      ];
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'إحصائيات الأسبوع');
+      
+      const fileName = `إحصائيات_الأسبوع_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الإحصائيات بنجاح');
+    });
+  },
+  
+  // Export monthly statistics
+  exportMonthlyStats: function() {
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setDate(today.getDate() - 30);
+    
+    const dates = [];
+    for (let d = new Date(monthAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalLate = 0;
+    const studentAbsences = {};
+    
+    // Initialize student absences
+    this.students.forEach(student => {
+      studentAbsences[student.id] = 0;
+    });
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      Promise.all([
+        database.ref(`delays/${date}`).once('value'),
+        database.ref(`absences/${date}`).once('value')
+      ])
+    )).then(results => {
+      results.forEach(([delaysSnapshot, absencesSnapshot], index) => {
+        const date = dates[index];
+        
+        // Process delays
+        if (delaysSnapshot.exists()) {
+          const delays = delaysSnapshot.val();
+          const delayedStudents = new Set();
+          
+          Object.keys(delays).forEach(studentId => {
+            const studentDelays = delays[studentId];
+            
+            if (studentDelays.morning || studentDelays.break || studentDelays.departure) {
+              delayedStudents.add(studentId);
+            }
+          });
+          
+          totalLate += delayedStudents.size;
+        }
+        
+        // Process absences
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          
+          Object.keys(absences).forEach(studentId => {
+            totalAbsent++;
+            if (studentAbsences[studentId] !== undefined) {
+              studentAbsences[studentId]++;
+            }
+          });
+        }
+      });
+      
+      // Calculate present count
+      totalPresent = (this.students.length * dates.length) - totalAbsent;
+      
+      // Calculate averages
+      const avgPresent = Math.round(totalPresent / dates.length);
+      
+      // Get top absent students
+      const topAbsent = Object.entries(studentAbsences)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([studentId, count]) => {
+          const student = this.students.find(s => s.id === studentId);
+          return {
+            name: student ? student.name : 'Unknown',
+            count
+          };
+        });
+      
+      // Create data for Excel
+      const data = [
+        ['إحصائيات الشهر', `${this.formatDate(monthAgo)} - ${this.formatDate(today)}`],
+        [],
+        ['أيام الدراسة', dates.length],
+        ['متوسط الحضور', avgPresent],
+        ['إجمالي الغياب', totalAbsent],
+        ['إجمالي التأخرات', totalLate],
+        [],
+        ['الطلاب الأكثر غياباً'],
+        ['الترتيب', 'الاسم', 'عدد أيام الغياب']
+      ];
+      
+      // Add top absent students
+      topAbsent.forEach((student, index) => {
+        data.push([index + 1, student.name, student.count]);
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'إحصائيات الشهر');
+      
+      const fileName = `إحصائيات_الشهر_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الإحصائيات بنجاح');
+    });
+  },
+  
+  // Export levels statistics
+  exportLevelsStats: function() {
+    // Get level settings from localStorage or use defaults
+    const levelSettings = {
+      level1Min: parseInt(localStorage.getItem('level1Min') || '1'),
+      level1Max: parseInt(localStorage.getItem('level1Max') || '5'),
+      level2Min: parseInt(localStorage.getItem('level2Min') || '6'),
+      level2Max: parseInt(localStorage.getItem('level2Max') || '10'),
+      level3Min: parseInt(localStorage.getItem('level3Min') || '11'),
+      level3Max: parseInt(localStorage.getItem('level3Max') || '15'),
+      level4Min: parseInt(localStorage.getItem('level4Min') || '16'),
+      level4Max: parseInt(localStorage.getItem('level4Max') || '20')
+    };
+    
+    // Get current month's absences
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setDate(today.getDate() - 30);
+    
+    const dates = [];
+    for (let d = new Date(monthAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      dates.push(this.formatDate(new Date(d)));
+    }
+    
+    const studentAbsences = {};
+    
+    // Initialize student absences
+    this.students.forEach(student => {
+      studentAbsences[student.id] = {
+        name: student.name,
+        class: student.class,
+        classroom: student.classroom,
+        count: 0
+      };
+    });
+    
+    // Get records for each day
+    Promise.all(dates.map(date => 
+      database.ref(`absences/${date}`).once('value')
+    )).then(results => {
+      results.forEach((absencesSnapshot, index) => {
+        if (absencesSnapshot.exists()) {
+          const absences = absencesSnapshot.val();
+          
+          Object.keys(absences).forEach(studentId => {
+            if (studentAbsences[studentId]) {
+              studentAbsences[studentId].count++;
+            }
+          });
+        }
+      });
+      
+      // Categorize students by level
+      const level1Students = [];
+      const level2Students = [];
+      const level3Students = [];
+      const level4Students = [];
+      
+      Object.values(studentAbsences).forEach(student => {
+        if (student.count >= levelSettings.level1Min && student.count <= levelSettings.level1Max) {
+          level1Students.push(student);
+        } else if (student.count >= levelSettings.level2Min && student.count <= levelSettings.level2Max) {
+          level2Students.push(student);
+        } else if (student.count >= levelSettings.level3Min && student.count <= levelSettings.level3Max) {
+          level3Students.push(student);
+        } else if (student.count >= levelSettings.level4Min && student.count <= levelSettings.level4Max) {
+          level4Students.push(student);
+        }
+      });
+      
+      // Create data for Excel
+      const data = [
+        ['إحصائيات مستويات الغياب', `${this.formatDate(monthAgo)} - ${this.formatDate(today)}`],
+        [],
+        ['إعدادات المستويات'],
+        ['المستوى', 'الحد الأدنى', 'الحد الأعلى'],
+        ['المستوى الأول (آمن)', levelSettings.level1Min, levelSettings.level1Max],
+        ['المستوى الثاني (انتباه)', levelSettings.level2Min, levelSettings.level2Max],
+        ['المستوى الثالث (تحذير)', levelSettings.level3Min, levelSettings.level3Max],
+        ['المستوى الرابع (خطر)', levelSettings.level4Min, levelSettings.level4Max],
+        [],
+        ['المستوى الأول (آمن)'],
+        ['الاسم', 'الصف', 'الفصل', 'عدد أيام الغياب']
+      ];
+      
+      // Add level 1 students
+      level1Students.forEach(student => {
+        data.push([student.name, student.class, student.classroom, student.count]);
+      });
+      
+      // Add level 2 students
+      data.push([], ['المستوى الثاني (انتباه)'], ['الاسم', 'الصف', 'الفصل', 'عدد أيام الغياب']);
+      level2Students.forEach(student => {
+        data.push([student.name, student.class, student.classroom, student.count]);
+      });
+      
+      // Add level 3 students
+      data.push([], ['المستوى الثالث (تحذير)'], ['الاسم', 'الصف', 'الفصل', 'عدد أيام الغياب']);
+      level3Students.forEach(student => {
+        data.push([student.name, student.class, student.classroom, student.count]);
+      });
+      
+      // Add level 4 students
+      data.push([], ['المستوى الرابع (خطر)'], ['الاسم', 'الصف', 'الفصل', 'عدد أيام الغياب']);
+      level4Students.forEach(student => {
+        data.push([student.name, student.class, student.classroom, student.count]);
+      });
+      
+      // Generate and download Excel file
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'مستويات الغياب');
+      
+      const fileName = `مستويات_الغياب_${this.formatDate(new Date())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      this.showToast('تم تصدير الإحصائيات بنجاح');
+    });
+  },
+  
+  // Import Excel file
+  importExcel: function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        
+        // Skip header row
+        const rows = jsonData.slice(1);
+        
+        // Process rows
+        const students = [];
+        rows.forEach(row => {
+          if (row.length >= 5 && row[0]) {
+            students.push({
+              name: row[0],
+              id: row[1] || '',
+              phone: row[2] || '',
+              class: row[3] || '',
+              classroom: row[4] || ''
+            });
+          }
+        });
+        
+        if (students.length === 0) {
+          this.showToast('لم يتم العثور على بيانات طلاب صالحة في الملف');
+          return;
+        }
+        
+        // Save students to Firebase
+        const updates = {};
+        students.forEach(student => {
+          updates[`students/${student.id}`] = student;
+        });
+        
+        database.ref().update(updates)
+          .then(() => {
+            this.showToast(`تم استيراد ${students.length} طالب بنجاح`);
+            this.loadStudents();
+            this.loadClassFilters();
+          })
+          .catch(error => {
+            this.showToast('حدث خطأ أثناء استيراد البيانات');
+            console.error(error);
+          });
+      } catch (error) {
+        this.showToast('حدث خطأ أثناء قراءة الملف');
+        console.error(error);
+      }
+    };
+    
+    reader.readAsArrayBuffer(file);
+    
+    // Reset file input
+    event.target.value = '';
+  },
+  
+  // Reset app
+  resetApp: function() {
+    if (!confirm('هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+      return;
+    }
+    
+    // Clear all data from Firebase
+    database.ref().set(null)
+      .then(() => {
+        this.showToast('تم حذف جميع البيانات بنجاح');
+        
+        // Reset local data
+        this.students = [];
+        this.selectedStudents = {
+          morning: [],
+          break: [],
+          departure: [],
+          absence: [],
+          note: []
+        };
+        
+        // Reload app
+        this.init();
+      })
+      .catch(error => {
+        this.showToast('حدث خطأ أثناء حذف البيانات');
+        console.error(error);
+      });
+  },
+  
+  // Check subscription
+  checkSubscription: function() {
+    // Get subscription from localStorage
+    const subscriptionStatus = localStorage.getItem('subscriptionStatus') || 'trial';
+    const subscriptionDaysLeft = parseInt(localStorage.getItem('subscriptionDaysLeft') || '7');
+    const subscriptionCode = localStorage.getItem('subscriptionCode') || null;
+    
+    this.subscription = {
+      status: subscriptionStatus,
+      daysLeft: subscriptionDaysLeft,
+      code: subscriptionCode
+    };
+    
+    // Update UI
+    this.updateSubscriptionUI();
+    
+    // Check if subscription is expired
+    if (this.subscription.status === 'trial' && this.subscription.daysLeft <= 0) {
+      this.showLockScreen();
+    } else if (this.subscription.status === 'expired') {
+      this.showLockScreen();
+    }
+  },
+  
+  // Update subscription UI
+  updateSubscriptionUI: function() {
+    const badge = document.getElementById('subscriptionBadge');
+    const badgeIcon = badge.querySelector('.badge-icon');
+    const badgeDays = badge.querySelector('.badge-days');
+    const badgeCode = badge.querySelector('.badge-code');
+    
+    // Update badge content
+    if (this.subscription.status === 'trial') {
+      badge.className = 'subscription-badge trial';
+      badgeIcon.textContent = '⏳';
+      badgeDays.textContent = this.subscription.daysLeft;
+      badgeCode.textContent = this.subscription.code || '';
+    } else if (this.subscription.status === 'active') {
+      badge.className = 'subscription-badge active';
+      badgeIcon.textContent = '✅';
+      badgeDays.textContent = this.subscription.daysLeft;
+      badgeCode.textContent = this.subscription.code || '';
+    } else if (this.subscription.status === 'expired') {
+      badge.className = 'subscription-badge warning';
+      badgeIcon.textContent = '❌';
+      badgeDays.textContent = '0';
+      badgeCode.textContent = this.subscription.code || '';
+    }
+  },
+  
+  // Show lock screen
+  showLockScreen: function() {
+    document.getElementById('lockScreen').style.display = 'block';
+  },
+  
+  // Hide lock screen
+  hideLockScreen: function() {
+    document.getElementById('lockScreen').style.display = 'none';
+  },
+  
+  // Show payment page
+  showPaymentPage: function() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('paymentPage').style.display = 'block';
+  },
+  
+  // Hide payment page
+  hidePaymentPage: function() {
+    document.getElementById('paymentPage').style.display = 'none';
+    document.getElementById('lockScreen').style.display = 'block';
+  },
+  
+  // Select payment method
+  selectPaymentMethod: function(method) {
+    if (method === 'bank') {
+      const details = document.getElementById('bankDetails');
+      details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    }
+  },
+  
+  // Contact WhatsApp
+  contactWhatsApp: function() {
+    window.open('https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي', '_blank');
+  },
+  
+  // Activate subscription
+  activateSubscription: function() {
+    const code = document.getElementById('activationCodeInput').value.trim();
+    
+    if (!code) {
+      this.showToast('الرجاء إدخال كود التفعيل');
+      return;
+    }
+    
+    // Validate code (in a real app, this would be done on the server)
+    if (code.startsWith('SK-') && code.length === 15) {
+      // Update subscription
+      this.subscription = {
+        status: 'active',
+        daysLeft: 365,
+        code: code
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('subscriptionStatus', 'active');
+      localStorage.setItem('subscriptionDaysLeft', '365');
+      localStorage.setItem('subscriptionCode', code);
+      
+      // Update UI
+      this.updateSubscriptionUI();
+      
+      // Hide payment page
+      document.getElementById('paymentPage').style.display = 'none';
+      
+      this.showToast('تم تفعيل الاشتراك بنجاح');
+    } else {
+      this.showToast('كود التفعيل غير صحيح');
+    }
+  },
+  
+  // Activate subscription from settings
+  activateSubscriptionFromSettings: function() {
+    const code = document.getElementById('activationCodeSettings').value.trim();
+    
+    if (!code) {
+      this.showToast('الرجاء إدخال كود التفعيل');
+      return;
+    }
+    
+    // Validate code (in a real app, this would be done on the server)
+    if (code.startsWith('SK-') && code.length === 15) {
+      // Update subscription
+      this.subscription = {
+        status: 'active',
+        daysLeft: 365,
+        code: code
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('subscriptionStatus', 'active');
+      localStorage.setItem('subscriptionDaysLeft', '365');
+      localStorage.setItem('subscriptionCode', code);
+      
+      // Update UI
+      this.updateSubscriptionUI();
+      
+      this.showToast('تم تفعيل الاشتراك بنجاح');
+    } else {
+      this.showToast('كود التفعيل غير صحيح');
+    }
+  },
+  
+  // Copy text to clipboard
+  copyText: function(text) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        this.showToast('تم نسخ النص بنجاح');
+      })
+      .catch(err => {
+        this.showToast('فشل نسخ النص');
+        console.error(err);
+      });
+  },
+  
+  // Show page
+  showPage: function(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+      page.classList.remove('active');
+    });
+    
+    // Show selected page
+    document.getElementById(`${pageId}Page`).classList.add('active');
+    
+    // Update navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    event.target.closest('.nav-item').classList.add('active');
+    
+    // Update current page
+    this.currentPage = pageId;
+    
+    // Load page-specific data
+    if (pageId === 'stats') {
+      // Get active tab
+      const activeTab = document.querySelector('#statsPage .tab.active');
+      if (activeTab) {
+        const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+        this.loadStats(type);
+      }
+    } else if (pageId === 'delays') {
+      // Get active tab
+      const activeTab = document.querySelector('#delaysPage .tab.active');
+      if (activeTab) {
+        const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+        if (type !== 'view') {
+          this.displayStudents('delays', type);
+        } else {
+          const dateId = `date${type.charAt(0).toUpperCase() + type.slice(1)}`;
+          const date = document.getElementById(dateId).value;
+          this.loadRecords('delays', type);
+        }
+      }
+    } else if (pageId === 'absence') {
+      // Get active tab
+      const activeTab = document.querySelector('#absencesPage .tab.active');
+      if (activeTab) {
+        const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+        if (type !== 'view') {
+          this.displayStudents('absence', type);
+        } else {
+          this.loadRecords('absence', type);
+        }
+      }
+    } else if (pageId === 'notes') {
+      // Get active tab
+      const activeTab = document.querySelector('#notesPage .tab.active');
+      if (activeTab) {
+        const type = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+        if (type !== 'view') {
+          this.displayStudents('notes', type);
+        } else {
+          this.loadRecords('notes', type);
+        }
+      }
+    }
+  },
+  
+  // Switch tab
+  switchTab: function(page, type, element) {
+    // Update active tab
+    document.querySelectorAll(`#${page}Page .tab`).forEach(tab => {
+      tab.classList.remove('active');
+    });
+    element.classList.add('active');
+    
+    // Update active content
+    document.querySelectorAll(`#${page}Page .tab-content`).forEach(content => {
+      content.classList.remove('active');
+    });
+    
+    const tabId = `${page}${type.charAt(0).toUpperCase() + type.slice(1)}Tab`;
+    document.getElementById(tabId).classList.add('active');
+    
+    // Load data
+    if (page === 'stats') {
+      this.loadStats(type);
+    } else if (page === 'delays') {
+      if (type !== 'view') {
+        this.displayStudents('delays', type);
+      } else {
+        const dateId = `date${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        const date = document.getElementById(dateId).value;
+        this.loadRecords('delays', type);
+      }
+    } else if (page === 'absence') {
+      if (type !== 'view') {
+        this.displayStudents('absence', type);
+      } else {
+        this.loadRecords('absence', type);
+      }
+    } else if (page === 'notes') {
+      if (type !== 'view') {
+        this.displayStudents('notes', type);
+      } else {
+        this.loadRecords('notes', type);
+      }
+    }
+  },
+  
+  // Show modal
+  showModal: function(modalId) {
+    document.getElementById(modalId).classList.add('active');
+  },
+  
+  // Close modal
+  closeModal: function() {
+    document.getElementById('studentModal').classList.remove('active');
+  },
+  
+  // Show confirm modal
+  showConfirm: function(title, message, onConfirm) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = message;
+    document.getElementById('confirmYes').onclick = onConfirm;
+    document.getElementById('confirmModal').classList.add('active');
+  },
+  
+  // Close confirm modal
+  closeConfirm: function() {
+    document.getElementById('confirmModal').classList.remove('active');
+  },
+  
+  // Show date modal
+  showDateModal: function() {
+    document.getElementById('dateModal').classList.add('active');
+  },
+  
+  // Close date modal
+  closeDateModal: function() {
+    document.getElementById('dateModal').classList.remove('active');
+  },
+  
+  // Show toast
+  showToast: function(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+};
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+});
+
+// Check subscription status daily
+setInterval(() => {
+  if (app.subscription.status === 'trial' && app.subscription.daysLeft > 0) {
+    app.subscription.daysLeft--;
+    localStorage.setItem('subscriptionDaysLeft', app.subscription.daysLeft.toString());
+    app.updateSubscriptionUI();
+    
+    if (app.subscription.daysLeft <= 0) {
+      app.showLockScreen();
+    }
+  } else if (app.subscription.status === 'active' && app.subscription.daysLeft > 0) {
+    app.subscription.daysLeft--;
+    localStorage.setItem('subscriptionDaysLeft', app.subscription.daysLeft.toString());
+    app.updateSubscriptionUI();
+    
+    if (app.subscription.daysLeft <= 0) {
+      app.subscription.status = 'expired';
+      localStorage.setItem('subscriptionStatus', 'expired');
+      app.updateSubscriptionUI();
+      app.showLockScreen();
+    }
+  }
+}, 24 * 60 * 60 * 1000); // Check daily
 </script>
 </body>
 </html>
