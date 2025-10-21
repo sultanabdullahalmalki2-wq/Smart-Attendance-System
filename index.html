@@ -4,130 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a237e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>نظام الحضور الذكي</title>
+<title>نظام الحضور الذكي - متقدم v6.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    
-    
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;overflow-x:hidden}
-.container{max-width:1200px;margin:0 auto;padding:20px}
-
-/* =================== Navigation =================== */
-.nav{background:white;border-radius:15px;padding:15px;margin-bottom:20px;display:flex;justify-content:space-around;box-shadow:0 5px 20px rgba(0,0,0,0.1);position:sticky;top:20px;z-index:100}
-.nav-item{flex:1;text-align:center;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.3s;color:#666;font-weight:500}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+.nav{background:white;border-radius:15px;padding:15px;margin-bottom:20px;display:flex;justify-content:space-around;box-shadow:0 5px 20px rgba(0,0,0,0.1);position:sticky;top:20px;z-index:100;overflow-x:auto}
+.nav-item{flex:1;text-align:center;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.3s;color:#666;font-weight:500;min-width:90px}
 .nav-item:hover{background:#f5f5f5;transform:translateY(-2px)}
 .nav-item.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;box-shadow:0 4px 15px rgba(102,126,234,0.4)}
-.nav-item i{display:block;font-size:24px;margin-bottom:5px}
-
-/* =================== Page Styles =================== */
-.page{display:none;animation:fadeIn 0.5s ease-in-out}
+.nav-item i{display:block;font-size:22px;margin-bottom:5px}
+.nav-item span{font-size:13px}
+.sub-tabs{background:white;border-radius:12px;padding:10px;margin-bottom:20px;display:flex;gap:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08)}
+.sub-tab{flex:1;padding:12px 20px;border-radius:8px;text-align:center;cursor:pointer;transition:all 0.3s;color:#666;font-weight:600;background:#f8f9fa}
+.sub-tab:hover{background:#e9ecef}
+.sub-tab.active{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white;box-shadow:0 3px 12px rgba(17,153,142,0.3)}
+.page{display:none;animation:fadeIn 0.5s}
 .page.active{display:block}
+.sub-page{display:none}
+.sub-page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-/* =================== Cards =================== */
-.card{background:white;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 5px 20px rgba(0,0,0,0.1);animation:slideUp 0.5s ease-out}
-@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #f0f0f0}
+.card{background:white;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #f0f0f0;flex-wrap:wrap;gap:10px}
 .card-title{font-size:1.5rem;font-weight:700;color:#1a237e;display:flex;align-items:center;gap:10px}
 .card-title i{font-size:1.8rem;color:#667eea}
-
-/* =================== Buttons =================== */
 .btn{padding:12px 24px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:'Tajawal',sans-serif;display:inline-flex;align-items:center;gap:8px;justify-content:center}
 .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;box-shadow:0 4px 15px rgba(102,126,234,0.4)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,0.6)}
-.btn-primary:active{transform:translateY(0)}
-
-.btn-success{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white;box-shadow:0 4px 15px rgba(17,153,142,0.4)}
-.btn-danger{background:linear-gradient(135deg,#eb3349 0%,#f45c43 100%);color:white;box-shadow:0 4px 15px rgba(235,51,73,0.4)}
-.btn-warning{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;box-shadow:0 4px 15px rgba(240,147,251,0.4)}
-.btn-secondary{background:#f5f5f5;color:#666;border:2px solid #e0e0e0}
-
-/* =================== Forms =================== */
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-success{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white}
+.btn-danger{background:linear-gradient(135deg,#eb3349 0%,#f45c43 100%);color:white}
+.btn-warning{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white}
+.btn-info{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);color:white}
+.btn-secondary{background:#f5f5f5;color:#666}
+.btn-whatsapp{background:#25d366;color:white}
 .form-group{margin-bottom:20px}
 .form-label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:15px}
-.form-input,.form-select{width:100%;padding:12px 15px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;font-family:'Tajawal',sans-serif;transition:all 0.3s}
-.form-input:focus,.form-select:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
-
-/* =================== Student List =================== */
+.form-input,.form-select,.form-textarea{width:100%;padding:12px 15px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;font-family:'Tajawal',sans-serif;transition:all 0.3s}
+.form-textarea{min-height:120px;resize:vertical}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.filters-section{background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:20px}
+.filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px}
+.filter-actions{display:flex;gap:10px;flex-wrap:wrap}
 .student-list{display:grid;gap:15px}
 .student-item{background:#f8f9fa;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s;border-right:4px solid transparent}
 .student-item:hover{background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:translateX(-5px);border-right-color:#667eea}
-
+.student-item.selected{background:#e3f2fd;border-right-color:#2196f3}
+.student-checkbox{width:20px;height:20px;cursor:pointer;margin-left:10px}
 .student-info{flex:1}
 .student-name{font-size:1.1rem;font-weight:700;color:#1a237e;margin-bottom:5px}
 .student-details{display:flex;gap:15px;flex-wrap:wrap;font-size:14px;color:#666}
 .student-detail{display:flex;align-items:center;gap:5px}
 .student-detail i{color:#667eea}
-
+.student-record{margin-top:10px;padding:10px;background:rgba(102,126,234,0.05);border-radius:8px;display:flex;gap:15px;flex-wrap:wrap;font-size:13px}
+.record-badge{padding:4px 10px;border-radius:15px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.record-badge.delays{background:#fff3cd;color:#856404}
+.record-badge.absences{background:#f8d7da;color:#721c24}
+.record-badge.notes{background:#d1ecf1;color:#0c5460}
 .student-actions{display:flex;gap:10px}
 .btn-icon{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;font-size:16px}
-.btn-icon.present{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white}
-.btn-icon.absent{background:linear-gradient(135deg,#eb3349 0%,#f45c43 100%);color:white}
 .btn-icon.edit{background:#667eea;color:white}
 .btn-icon.delete{background:#f45c43;color:white}
 .btn-icon:hover{transform:scale(1.1)}
-
-/* =================== Stats Cards =================== */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
 .stat-card{background:white;padding:20px;border-radius:12px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.1);transition:all 0.3s}
-.stat-card:hover{transform:translateY(-5px);box-shadow:0 5px 20px rgba(0,0,0,0.15)}
+.stat-card:hover{transform:translateY(-5px)}
 .stat-icon{font-size:2.5rem;margin-bottom:10px}
 .stat-value{font-size:2rem;font-weight:900;margin-bottom:5px}
 .stat-label{color:#666;font-size:14px;font-weight:500}
-
-/* =================== Search Box =================== */
+.levels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.level-card{padding:20px;border-radius:12px;border-right:5px solid;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+.level-card.safe{background:#d4edda;border-right-color:#28a745}
+.level-card.attention{background:#fff3cd;border-right-color:#ffc107}
+.level-card.warning{background:#ffe0b2;border-right-color:#fd7e14}
+.level-card.danger{background:#f8d7da;border-right-color:#dc3545}
+.level-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.level-title{font-size:1.2rem;font-weight:700}
+.level-count{font-size:2rem;font-weight:900}
+.level-threshold{font-size:13px;color:#666;margin-bottom:10px}
+.level-students{max-height:200px;overflow-y:auto}
+.level-student{padding:8px;background:white;margin-bottom:5px;border-radius:6px;font-size:14px;display:flex;justify-content:space-between}
 .search-box{position:relative;margin-bottom:20px}
-.search-input{width:100%;padding:15px 50px 15px 20px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;transition:all 0.3s}
-.search-input:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.search-input{width:100%;padding:15px 50px 15px 20px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px}
+.search-input:focus{border-color:#667eea}
 .search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#667eea;font-size:20px}
-
-/* =================== Attendance Table =================== */
-.attendance-table{width:100%;border-collapse:separate;border-spacing:0 10px}
-.attendance-table th{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:15px;text-align:right;font-weight:600;position:sticky;top:0;z-index:10}
-.attendance-table th:first-child{border-radius:12px 0 0 12px}
-.attendance-table th:last-child{border-radius:0 12px 12px 0}
-.attendance-table td{background:#f8f9fa;padding:15px;border:none}
-.attendance-table tr:hover td{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
-.attendance-table tbody tr td:first-child{border-radius:12px 0 0 12px}
-.attendance-table tbody tr td:last-child{border-radius:0 12px 12px 0}
-
-/* =================== Status Badges =================== */
-.status-badge{padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600;display:inline-block}
-.status-present{background:#d4edda;color:#155724}
-.status-absent{background:#f8d7da;color:#721c24}
-.status-late{background:#fff3cd;color:#856404}
-
-/* =================== Modal =================== */
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow-y:auto}
 .modal.active{display:flex}
-.modal-content{background:white;border-radius:20px;padding:30px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;animation:modalSlideIn 0.3s ease-out}
-@keyframes modalSlideIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+.modal-content{background:white;border-radius:20px;padding:30px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;margin:20px}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #f0f0f0}
 .modal-title{font-size:1.5rem;font-weight:700;color:#1a237e}
-.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:#666;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.3s}
-.modal-close:hover{background:#f0f0f0;color:#1a237e}
-
-/* =================== Empty State =================== */
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:#666;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.modal-close:hover{background:#f0f0f0}
 .empty-state{text-align:center;padding:60px 20px;color:#666}
 .empty-icon{font-size:4rem;margin-bottom:20px;opacity:0.5}
 .empty-text{font-size:1.2rem;margin-bottom:10px}
-.empty-subtext{font-size:14px;color:#999}
-
-/* =================== Loading Spinner =================== */
-.spinner{border:4px solid #f3f3f3;border-top:4px solid #667eea;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;margin:40px auto}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-
-/* =================== Toast Notification =================== */
-.toast{position:fixed;bottom:30px;right:30px;background:white;padding:15px 20px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:12px;min-width:300px;transform:translateX(400px);transition:transform 0.3s ease-out}
+.toast{position:fixed;bottom:30px;right:30px;background:white;padding:15px 20px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:12px;min-width:300px;transform:translateX(400px);transition:transform 0.3s}
 .toast.show{transform:translateX(0)}
 .toast-icon{font-size:24px}
 .toast.success{border-right:4px solid #38ef7d}
@@ -136,19 +111,6 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .toast.error .toast-icon{color:#f45c43}
 .toast.info{border-right:4px solid #667eea}
 .toast.info .toast-icon{color:#667eea}
-
-/* =================== File Upload =================== */
-.file-upload{border:3px dashed #e0e0e0;border-radius:15px;padding:40px;text-align:center;cursor:pointer;transition:all 0.3s;background:#f8f9fa}
-.file-upload:hover{border-color:#667eea;background:#fff}
-.file-upload.dragover{border-color:#667eea;background:#e8eaf6;transform:scale(1.02)}
-.file-icon{font-size:3rem;color:#667eea;margin-bottom:15px}
-.file-text{font-size:16px;color:#666;margin-bottom:10px}
-.file-subtext{font-size:13px;color:#999}
-
-/* =================== Export Buttons =================== */
-.export-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
-
-/* =================== Subscription Badge =================== */
 .subscription-badge{background:white;padding:15px 20px;border-radius:12px;display:flex;align-items:center;gap:15px;margin-bottom:20px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
 .subscription-icon{font-size:2rem}
 .subscription-info{flex:1}
@@ -156,298 +118,170 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .subscription-expiry{font-size:13px;color:#666}
 .subscription-badge.trial{border-right:4px solid #ff9800}
 .subscription-badge.active{border-right:4px solid #4caf50}
-.subscription-badge.warning{border-right:4px solid #f44336;animation:pulse 2s infinite}
-
-/* =================== Lock Screen & Payment Page =================== */
-#lockScreen, #paymentPage{position:fixed;top:0;left:0;width:100vw;min-height:100vh;height:auto;z-index:99999;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.lock-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg, rgba(26,35,126,0.95) 0%, rgba(13,71,161,0.95) 100%);backdrop-filter:blur(10px)}
-.lock-container, .payment-container{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
-.lock-header{text-align:center;margin-bottom:30px;animation:fadeInDown 0.6s ease-out}
-.lock-icon-main{font-size:70px;margin-bottom:15px;animation:bounce 2s infinite}
+#lockScreen,#paymentPage{position:fixed;top:0;left:0;width:100vw;min-height:100vh;z-index:99999;overflow-y:auto}
+.lock-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(26,35,126,0.95) 0%,rgba(13,71,161,0.95) 100%)}
+.lock-container,.payment-container{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.lock-header{text-align:center;margin-bottom:30px}
+.lock-icon-main{font-size:70px;margin-bottom:15px}
 .lock-main-title{color:white;font-size:2rem;margin-bottom:10px;font-weight:900}
 .lock-subtitle{color:rgba(255,255,255,0.9);font-size:1.1rem}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
-
 .features-grid{display:grid;gap:15px;margin-bottom:30px}
-.feature-item{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:20px;border-radius:15px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:start;gap:15px;transition:all 0.3s}
-.feature-item:hover{background:rgba(255,255,255,0.15);transform:translateX(-5px)}
+.feature-item{background:rgba(255,255,255,0.1);padding:20px;border-radius:15px;display:flex;gap:15px}
 .feature-icon{font-size:2rem;min-width:50px;height:50px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center}
 .feature-content{flex:1}
 .feature-title{color:white;font-size:1.1rem;font-weight:700;margin-bottom:5px}
-.feature-text{color:rgba(255,255,255,0.8);font-size:14px;line-height:1.6}
-
-.btn-subscribe-main{width:100%;padding:18px;background:linear-gradient(135deg,#ffd89b 0%,#19547b 100%);color:white;border:none;border-radius:15px;font-size:1.2rem;font-weight:900;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 25px rgba(255,216,155,0.4);margin-bottom:15px;display:flex;align-items:center;justify-content:center;gap:10px}
-.btn-subscribe-main:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(255,216,155,0.6)}
-.btn-subscribe-main:active{transform:translateY(0)}
-
-.guarantee{text-align:center;color:rgba(255,255,255,0.9);font-size:14px;margin-top:10px}
-
-.warning-box{background:rgba(244,67,54,0.15);border:2px solid rgba(244,67,54,0.5);border-radius:15px;padding:20px;margin-top:20px;display:flex;gap:15px;align-items:start}
+.feature-text{color:rgba(255,255,255,0.8);font-size:14px}
+.btn-subscribe-main{width:100%;padding:18px;background:linear-gradient(135deg,#ffd89b 0%,#19547b 100%);color:white;border:none;border-radius:15px;font-size:1.2rem;font-weight:900;cursor:pointer;margin-bottom:15px}
+.warning-box{background:rgba(244,67,54,0.15);border:2px solid rgba(244,67,54,0.5);border-radius:15px;padding:20px;margin-top:20px;display:flex;gap:15px}
 .warning-icon{font-size:2rem;color:#ff5252}
 .warning-content{flex:1;color:white}
-.warning-content strong{display:block;font-size:1.1rem;margin-bottom:5px}
-.countdown-timer{display:inline-block;background:rgba(244,67,54,0.3);padding:4px 12px;border-radius:20px;font-weight:900;color:#ffeb3b;margin:0 3px}
-
-/* =================== Payment Page =================== */
-.payment-container{padding:20px}
-.btn-back{background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.3);padding:10px 20px;border-radius:10px;font-size:14px;cursor:pointer;transition:all 0.3s;margin-bottom:20px;display:inline-flex;align-items:center;gap:8px}
-.btn-back:hover{background:rgba(255,255,255,0.3)}
-
-.payment-header{text-align:center;margin-bottom:30px}
-.payment-icon{font-size:60px;margin-bottom:15px}
-.payment-header h2{color:white;font-size:2rem;margin-bottom:10px;font-weight:900}
-.payment-subtitle{color:rgba(255,255,255,0.9);font-size:1rem}
-
+.countdown-timer{background:rgba(244,67,54,0.3);padding:4px 12px;border-radius:20px;font-weight:900;color:#ffeb3b}
 .payment-methods{display:grid;gap:15px;margin-bottom:30px}
-.payment-method{background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;cursor:pointer;transition:all 0.3s;border:3px solid transparent}
-.payment-method:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.15)}
-.payment-method.selected{border-color:#ffd89b;background:white;box-shadow:0 8px 25px rgba(255,216,155,0.4)}
-
+.payment-method{background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;cursor:pointer;border:3px solid transparent}
+.payment-method.selected{border-color:#ffd89b;background:white}
 .method-header{display:flex;align-items:center;gap:15px;margin-bottom:15px}
 .method-icon{font-size:2rem;min-width:50px;height:50px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-radius:12px;display:flex;align-items:center;justify-content:center}
-.method-title{flex:1}
-.method-title h3{font-size:1.2rem;color:#1a237e;margin-bottom:3px}
-.method-subtitle{font-size:13px;color:#666}
-.method-radio{width:24px;height:24px;accent-color:#667eea}
-
+.method-title h3{font-size:1.2rem;color:#1a237e}
 .method-content{display:none;margin-top:15px;padding-top:15px;border-top:2px solid #f0f0f0}
 .payment-method.selected .method-content{display:block}
-
-.payment-details{background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:20px}
-.detail-row{display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #e0e0e0}
-.detail-row:last-child{border-bottom:none;font-weight:700;font-size:1.1rem;color:#1a237e}
-.detail-label{color:#666}
-.detail-value{font-weight:600;color:#1a237e}
-
 .bank-info{background:#e3f2fd;padding:15px;border-radius:10px;margin-bottom:15px}
 .bank-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed rgba(0,0,0,0.1)}
-.bank-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.bank-label{color:#666;font-size:14px}
-.bank-value{font-weight:700;color:#1a237e;font-family:monospace;font-size:16px}
-.btn-copy{background:#667eea;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all 0.3s}
-.btn-copy:hover{background:#5568d3}
-
-.qr-code{text-align:center;padding:20px;background:white;border-radius:12px;margin-bottom:15px}
-.qr-placeholder{width:200px;height:200px;margin:0 auto 15px;background:#f0f0f0;border:3px dashed #ccc;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:3rem;color:#ccc}
-
-.payment-steps{background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;margin-bottom:20px}
-.payment-steps h3{color:#1a237e;margin-bottom:15px;font-size:1.2rem}
-.step-item{display:flex;gap:12px;margin-bottom:15px;align-items:start}
-.step-item:last-child{margin-bottom:0}
-.step-number{min-width:30px;height:30px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
-.step-text{flex:1;color:#333;line-height:30px;font-size:14px}
-.step-text strong{color:#1a237e}
-
-.whatsapp-link{display:inline-flex;align-items:center;gap:10px;background:#25d366;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;transition:all 0.3s;margin-top:10px}
-.whatsapp-link:hover{background:#1da851;transform:translateY(-2px)}
-
 .activation-section{background:rgba(255,255,255,0.95);padding:25px;border-radius:15px;text-align:center}
-.activation-section h3{color:#1a237e;margin-bottom:10px;font-size:1.3rem}
-.activation-hint{color:#666;font-size:14px;margin-bottom:20px}
 .activation-input-group{display:flex;gap:10px}
 .activation-input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;text-align:center;font-family:monospace;text-transform:uppercase}
-.btn-activate{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white;border:none;padding:12px 30px;border-radius:10px;font-weight:700;cursor:pointer;transition:all 0.3s;white-space:nowrap}
-.btn-activate:hover{transform:scale(1.05)}
-
-/* =================== Responsive =================== */
-@media (max-width: 768px){
+@media (max-width:768px){
 .nav{padding:10px 5px}
-.nav-item{padding:10px 5px;font-size:12px}
-.nav-item i{font-size:20px;margin-bottom:3px}
+.nav-item{padding:10px 5px;font-size:12px;min-width:70px}
 .stats-grid{grid-template-columns:repeat(2,1fr)}
-.card{padding:15px}
-.card-title{font-size:1.2rem}
+.filters-grid{grid-template-columns:1fr}
 .student-item{flex-direction:column;align-items:start;gap:15px}
-.student-actions{width:100%;justify-content:space-between}
-.export-buttons{flex-direction:column}
-.export-buttons .btn{width:100%}
-.attendance-table{font-size:14px}
-.attendance-table th,.attendance-table td{padding:10px 8px}
-.lock-main-title{font-size:1.5rem}
-.feature-item{flex-direction:column;text-align:center}
-.warning-box{flex-direction:column;text-align:center}
-.activation-input-group{flex-direction:column}
-.btn-activate{width:100%}
+.levels-grid{grid-template-columns:1fr}
 }
-
-/* =================== Print Styles =================== */
-@media print{
-.nav,.btn,.modal,.toast,#lockScreen,#paymentPage{display:none!important}
-.page{display:block!important}
-body{background:white}
-.card{box-shadow:none;page-break-inside:avoid}
-}
-
-/* =================== Animations =================== */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-.fade-in{animation:fadeIn 0.5s ease-in-out}
-.slide-up{animation:slideUp 0.5s ease-out}
-
-/* =================== Scrollbar =================== */
-::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-track{background:#f1f1f1;border-radius:10px}
-::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:10px}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(135deg,#5568d3 0%,#6a3f8f 100%)}
-
-/* =================== Additional Utility Classes =================== */
-.text-center{text-align:center}
-.mt-10{margin-top:10px}
-.mt-20{margin-top:20px}
-.mb-10{margin-bottom:10px}
-.mb-20{margin-bottom:20px}
 .w-100{width:100%}
 .d-flex{display:flex}
 .gap-10{gap:10px}
-.justify-between{justify-content:space-between}
-.align-center{align-items:center}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-thumb{background:#667eea;border-radius:10px}
+
+.btn:disabled, .btn-icon:disabled, input:disabled, select:disabled, textarea:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+.disabled-action {
+    pointer-events: none !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
 </style>
 </head>
 <body>
 
-<!-- Lock Screen -->
 <div id="lockScreen" style="display:none;">
-  <div class="lock-overlay"></div>
-  <div class="lock-container">
-    <div class="lock-header">
-      <div class="lock-icon-main">🔒</div>
-      <h1 class="lock-main-title">نظام الحضور الذكي</h1>
-      <p class="lock-subtitle">إدارة احترافية للحضور والغياب</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-item"><div class="feature-icon">📊</div><div class="feature-content"><div class="feature-title">تقارير تفصيلية</div><div class="feature-text">احصل على تقارير شاملة بصيغ متعددة (Excel, PDF)</div></div></div>
-      <div class="feature-item"><div class="feature-icon">📱</div><div class="feature-content"><div class="feature-title">تطبيق متوافق</div><div class="feature-text">يعمل على جميع الأجهزة بسلاسة تامة</div></div></div>
-      <div class="feature-item"><div class="feature-icon">☁️</div><div class="feature-content"><div class="feature-title">سحابة آمنة</div><div class="feature-text">بياناتك محفوظة بأمان في السحابة</div></div></div>
-      <div class="feature-item"><div class="feature-icon">🔄</div><div class="feature-content"><div class="feature-title">تحديثات مستمرة</div><div class="feature-text">احصل على آخر التحديثات والميزات الجديدة</div></div></div>
-      <div class="feature-item"><div class="feature-icon">💬</div><div class="feature-content"><div class="feature-title">دعم فني</div><div class="feature-text">دعم فني مجاني على مدار الساعة</div></div></div>
-      </div>
-      <button class="btn-subscribe-main" onclick="app.showPaymentPage()">🚀 اشترك الآن واسترجع بياناتك</button>
-      <p class="guarantee">💯 ضمان استرجاع الأموال خلال 14 يوم</p>
-    </div>
-    <div class="warning-box">
-      <span class="warning-icon">⚠️</span>
-      <div class="warning-content"><strong>تنبيه مهم:</strong> سيتم حذف بياناتك نهائياً بعد <span class="countdown-timer" id="trialDaysLeft">0</span> أيام من انتهاء الفترة التجريبية. اشترك الآن للحفاظ على بياناتك!</div>
-    </div>
-  </div>
+<div class="lock-overlay"></div>
+<div class="lock-container">
+<div class="lock-header">
+<div class="lock-icon-main">🔒</div>
+<h1 class="lock-main-title">نظام الحضور الذكي</h1>
+<p class="lock-subtitle">إدارة احترافية شاملة</p>
+</div>
+<div class="features-grid">
+<div class="feature-item"><div class="feature-icon">📊</div><div class="feature-content"><div class="feature-title">تقارير تفصيلية</div><div class="feature-text">تقارير شاملة</div></div></div>
+<div class="feature-item"><div class="feature-icon">📱</div><div class="feature-content"><div class="feature-title">واتساب</div><div class="feature-text">إرسال تلقائي</div></div></div>
+</div>
+<button class="btn-subscribe-main" onclick="app.showPaymentPage()">🚀 اشترك الآن - 35 ريال</button>
+<div class="warning-box">
+<span class="warning-icon">⚠️</span>
+<div class="warning-content"><strong>تنبيه:</strong> متبقي <span class="countdown-timer" id="trialDaysLeft">7</span> أيام</div>
+</div>
+</div>
 </div>
 
-<!-- Payment Page -->
 <div id="paymentPage" style="display:none;">
-  <div class="lock-overlay"></div>
-  <div class="payment-container">
-    <button class="btn-back" onclick="app.hidePaymentPage()">← رجوع</button>
-    <div class="payment-header">
-      <div class="payment-icon">💳</div>
-      <h2>معلومات الدفع</h2>
-      <p class="payment-subtitle">اختر طريقة الدفع المناسبة</p>
-    </div>
-    <div class="payment-methods">
-      <div class="payment-method" id="bankTransfer" onclick="app.selectPaymentMethod('bank')">
-        <div class="method-header">
-          <div class="method-icon">🏦</div>
-          <div class="method-title"><h3>التحويل البنكي</h3><p class="method-subtitle">استخدم تطبيق الراجحي المباشر</p></div>
-          <input type="radio" name="paymentMethod" value="bank" class="method-radio">
-        </div>
-        <div class="method-content">
-          <div class="bank-info">
-            <div class="bank-row"><span class="bank-label">رقم الآيبان:</span><span class="bank-value">SA1234567891234567891234</span><button class="btn-copy" onclick="app.copyToClipboard('SA1234567891234567891234')">نسخ</button></div>
-            <div class="bank-row"><span class="bank-label">اسم المستفيد:</span><span class="bank-value">أحمد محمد العلي</span></div>
-            <div class="bank-row"><span class="bank-label">البنك:</span><span class="bank-value">مصرف الراجحي</span></div>
-            <div class="bank-row"><span class="bank-label">المبلغ:</span><span class="bank-value">35 ريال</span></div>
-          </div>
-          <div class="qr-code">
-            <div class="qr-placeholder">📱</div>
-            <p style="color:#666;font-size:14px;">امسح الباركود باستخدام كاميرا الجوال</p>
-          </div>
-        </div>
-      </div>
-      <div class="payment-method" id="whatsappPay" onclick="app.selectPaymentMethod('whatsapp')">
-        <div class="method-header">
-          <div class="method-icon">💬</div>
-          <div class="method-title"><h3>الدفع عبر واتساب</h3><p class="method-subtitle">تواصل مباشر للحصول على كود التفعيل</p></div>
-          <input type="radio" name="paymentMethod" value="whatsapp" class="method-radio">
-        </div>
-        <div class="method-content">
-          <p style="color:#666;margin-bottom:15px;font-size:14px;">تواصل معنا عبر واتساب وسنرسل لك كود التفعيل فوراً</p>
-          <a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" class="whatsapp-link" target="_blank" style="width:100%;justify-content:center;">
-            <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="payment-details">
-      <div class="detail-row"><span class="detail-label">سعر الاشتراك السنوي:</span><span class="detail-value">35 ريال</span></div>
-      <div class="detail-row"><span class="detail-label">الخصم:</span><span class="detail-value">0 ريال</span></div>
-      <div class="detail-row"><span class="detail-label">الإجمالي:</span><span class="detail-value">35 ريال</span></div>
-    </div>
-    <div class="payment-steps">
-      <h3>خطوات الحصول على كود التفعيل:</h3>
-      <div class="step-item"><div class="step-number">1</div><div class="step-text">اختر <strong>طريقة الدفع</strong> المناسبة لك</div></div>
-      <div class="step-item"><div class="step-number">2</div><div class="step-text">قم بتحويل <strong>35 ريال</strong> للحساب البنكي</div></div>
-      <div class="step-item"><div class="step-number">3</div><div class="step-text">أرسل <strong>إيصال التحويل</strong> عبر واتساب</div></div>
-      <div class="step-item"><div class="step-number">4</div><div class="step-text">ستحصل على <strong>كود التفعيل</strong> خلال دقائق</div></div>
-<a href="https://wa.me/966533371147?text=مرحباً، أريد تفعيل نظام الحضور الذكي" class="whatsapp-link" target="_blank" style="width:100%;margin-top:15px;justify-content:center;"><i class="fab fa-whatsapp"></i> أرسل إيصال التحويل</a>
-    </div>
-    <div class="activation-section">
-      <h3>هل لديك كود تفعيل؟</h3>
-      <p class="activation-hint">بعد إتمام الدفع، ستحصل على كود التفعيل</p>
-      <div class="activation-input-group">
-        <input type="text" id="activationCodeInput" placeholder="SK-XXXXX-XXXXX" class="activation-input">
-        <button onclick="app.activateSubscription()" class="btn-activate">تفعيل</button>
-      </div>
-    </div>
-  </div>
+<div class="lock-overlay"></div>
+<div class="payment-container">
+<button class="btn btn-secondary" onclick="app.hidePaymentPage()" style="margin-bottom:20px;">← رجوع</button>
+<div class="payment-header" style="text-align:center;margin-bottom:30px;">
+<div style="font-size:60px;margin-bottom:15px;">💳</div>
+<h2 style="color:white;font-size:2rem;margin-bottom:10px;">معلومات الدفع</h2>
+</div>
+<div class="payment-methods">
+<div class="payment-method" id="bankTransfer" onclick="app.selectPaymentMethod('bank')">
+<div class="method-header">
+<div class="method-icon">🏦</div>
+<div class="method-title"><h3>التحويل البنكي</h3></div>
+<input type="radio" name="paymentMethod" value="bank">
+</div>
+<div class="method-content">
+<div class="bank-info">
+<div class="bank-row"><span>الآيبان:</span><span style="font-family:monospace;">SA1234567891234567891234</span></div>
+<div class="bank-row" style="border:none;"><span>المبلغ:</span><span style="color:#11998e;font-weight:bold;">35 ريال</span></div>
+</div>
+</div>
+</div>
+<div class="payment-method" id="whatsappPay" onclick="app.selectPaymentMethod('whatsapp')">
+<div class="method-header">
+<div class="method-icon">💬</div>
+<div class="method-title"><h3>واتساب</h3></div>
+<input type="radio" name="paymentMethod" value="whatsapp">
+</div>
+<div class="method-content">
+<a href="https://wa.me/966533371147?text=أريد تفعيل النظام" class="btn btn-whatsapp w-100" target="_blank" style="text-decoration:none;justify-content:center;"><i class="fab fa-whatsapp"></i> تواصل الآن</a>
+</div>
+</div>
+</div>
+<div class="activation-section">
+<h3 style="color:#1a237e;margin-bottom:10px;">هل لديك كود تفعيل؟</h3>
+<div class="activation-input-group">
+<input type="text" id="activationCodeInput" data-allow="true" placeholder="SK-XXXXX-XXXXX" class="activation-input">
+<button onclick="app.activateSubscription()" class="btn btn-success" data-allow="true">تفعيل</button>
+</div>
+</div>
+</div>
 </div>
 
 <div class="container">
-<!-- Navigation -->
+
 <nav class="nav">
-<div class="nav-item active" onclick="app.showPage('main')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+<div class="nav-item active" onclick="app.showPage('home')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
 <div class="nav-item" onclick="app.showPage('students')"><i class="fas fa-users"></i><span>الطلاب</span></div>
-<div class="nav-item" onclick="app.showPage('attendance')"><i class="fas fa-clipboard-list"></i><span>الحضور</span></div>
-<div class="nav-item" onclick="app.showPage('reports')"><i class="fas fa-chart-bar"></i><span>التقارير</span></div>
+<div class="nav-item" onclick="app.showPage('attendance')"><i class="fas fa-clipboard-check"></i><span>الحضور والغياب</span></div>
+<div class="nav-item" onclick="app.showPage('notes')"><i class="fas fa-sticky-note"></i><span>الملاحظات</span></div>
+<div class="nav-item" onclick="app.showPage('statistics')"><i class="fas fa-chart-bar"></i><span>الإحصائيات</span></div>
+<div class="nav-item" onclick="app.showPage('reports')"><i class="fas fa-file-alt"></i><span>التقارير</span></div>
 <div class="nav-item" onclick="app.showPage('settings')"><i class="fas fa-cog"></i><span>الإعدادات</span></div>
 </nav>
 
-<!-- Main Page -->
-<div id="mainPage" class="page active">
-<!-- Subscription Badge -->
+<div id="homePage" class="page active">
 <div class="subscription-badge trial" id="subscriptionBadge">
 <div class="subscription-icon">⏰</div>
 <div class="subscription-info">
 <div class="subscription-status" id="subscriptionStatus">فترة تجريبية</div>
 <div class="subscription-expiry" id="subscriptionExpiry">متبقي 7 أيام</div>
-<div class="subscription-expiry" id="activationCodeDisplay" style="font-family: monospace; font-weight: bold; color: #667eea; margin-top: 5px;"></div>
+<div id="activationCodeDisplay" style="font-family:monospace;font-weight:bold;color:#667eea;margin-top:5px;"></div>
 </div>
-<button class="btn btn-warning" onclick="app.showPaymentPage()" style="white-space:nowrap;">اشترك الآن</button>
+<button class="btn btn-warning" onclick="app.showPaymentPage()" data-allow="true">اشترك الآن</button>
 </div>
 
-<!-- Stats Cards -->
 <div class="stats-grid">
 <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="totalStudents">0</div><div class="stat-label">إجمالي الطلاب</div></div>
 <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="presentToday">0</div><div class="stat-label">الحضور اليوم</div></div>
+<div class="stat-card"><div class="stat-icon">⏰</div><div class="stat-value" id="delaysToday">0</div><div class="stat-label">التأخير اليوم</div></div>
 <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-value" id="absentToday">0</div><div class="stat-label">الغياب اليوم</div></div>
-<div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="attendanceRate">0%</div><div class="stat-label">نسبة الحضور</div></div>
+<div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value" id="notesToday">0</div><div class="stat-label">الملاحظات اليوم</div></div>
 </div>
 
-<!-- Quick Actions -->
 <div class="card">
 <div class="card-header"><h2 class="card-title"><i class="fas fa-bolt"></i>إجراءات سريعة</h2></div>
 <div class="d-flex gap-10" style="flex-wrap:wrap;">
 <button class="btn btn-primary" onclick="app.showPage('students')"><i class="fas fa-user-plus"></i>إضافة طالب</button>
-<button class="btn btn-success" onclick="app.markAllPresent()"><i class="fas fa-check-double"></i>تسجيل حضور الجميع</button>
-<button class="btn btn-warning" onclick="app.showPage('reports')"><i class="fas fa-file-export"></i>تصدير التقارير</button>
+<button class="btn btn-success" onclick="app.showPage('attendance')"><i class="fas fa-clipboard-check"></i>تسجيل الحضور</button>
+<button class="btn btn-warning" onclick="app.showPage('notes')"><i class="fas fa-sticky-note"></i>إضافة ملاحظة</button>
+<button class="btn btn-info" onclick="app.showPage('reports')"><i class="fas fa-file-export"></i>طباعة تقرير</button>
 </div>
-</div>
-
-<!-- Recent Activity -->
-<div class="card">
-<div class="card-header"><h2 class="card-title"><i class="fas fa-history"></i>النشاط الأخير</h2></div>
-<div id="recentActivity"></div>
 </div>
 </div>
 
-<!-- Students Page -->
 <div id="studentsPage" class="page">
 <div class="card">
 <div class="card-header">
@@ -455,269 +289,421 @@ body{background:white}
 <button class="btn btn-primary" onclick="app.showAddStudentModal()"><i class="fas fa-user-plus"></i>إضافة طالب</button>
 </div>
 
-<!-- Search Box -->
 <div class="search-box">
-<input type="text" class="search-input" id="studentSearch" placeholder="ابحث عن طالب بالاسم أو رقم السجل المدني..." oninput="app.searchStudents()">
+<input type="text" class="search-input" id="studentSearch" placeholder="ابحث عن طالب..." oninput="app.searchStudents()">
 <i class="fas fa-search search-icon"></i>
 </div>
 
-<!-- Import/Export Buttons -->
-<div class="export-buttons">
-<label for="excelFile" class="btn btn-success" style="margin:0;cursor:pointer;"><i class="fas fa-file-excel"></i>استيراد من Excel</label>
+<div class="d-flex gap-10" style="margin-bottom:20px;flex-wrap:wrap;">
+<label for="excelFile" class="btn btn-success" style="margin:0;cursor:pointer;"><i class="fas fa-file-excel"></i>استيراد Excel</label>
 <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
 <button class="btn btn-primary" onclick="app.exportStudentsExcel()"><i class="fas fa-download"></i>تصدير Excel</button>
 <button class="btn btn-danger" onclick="app.deleteAllStudents()"><i class="fas fa-trash"></i>حذف الكل</button>
 </div>
 
-<!-- File Upload Hint -->
-<div class="file-upload" style="margin-top:20px;padding:20px;">
-<div class="file-icon">📄</div>
-<div class="file-text">قم برفع ملف Excel يحتوي على: الاسم - السجل المدني - الجوال - الصف - الفصل</div>
-<div class="file-subtext">الحد الأقصى: 5MB | الصيغ المدعومة: XLSX, XLS</div>
-</div>
-
-<!-- Students List -->
-<div class="student-list" id="studentsList"></div>
+<div id="studentsList"></div>
 </div>
 </div>
 
-<!-- Attendance Page -->
 <div id="attendancePage" class="page">
+<div class="sub-tabs">
+<div class="sub-tab active" onclick="app.showSubPage('delays')">⏰ التأخير</div>
+<div class="sub-tab" onclick="app.showSubPage('absences')">❌ الغياب</div>
+</div>
+
+<div id="delaysSubPage" class="sub-page active">
 <div class="card">
 <div class="card-header">
-<h2 class="card-title"><i class="fas fa-clipboard-check"></i>تسجيل الحضور والغياب</h2>
-<div class="d-flex gap-10">
-<input type="date" class="form-input" id="attendanceDate" style="width:auto;" onchange="app.loadAttendance()">
-<button class="btn btn-success" onclick="app.markAllPresent()"><i class="fas fa-check-double"></i>حضور الكل</button>
+<h2 class="card-title"><i class="fas fa-clock"></i>تسجيل التأخير</h2>
+<input type="date" class="form-input" id="delaysDate" style="width:auto;" onchange="app.loadDelays()">
+</div>
+
+<div class="filters-section">
+<div class="filters-grid">
+<div><label class="form-label">الصف</label><select class="form-select" id="delaysGradeFilter" onchange="app.loadDelays()"><option value="">جميع الصفوف</option></select></div>
+<div><label class="form-label">الفصل</label><select class="form-select" id="delaysClassFilter" onchange="app.loadDelays()"><option value="">جميع الفصول</option></select></div>
+</div>
+<div class="filter-actions">
+<button class="btn btn-primary" onclick="app.selectAllDelays()"><i class="fas fa-check-square"></i>تحديد الكل</button>
+<button class="btn btn-secondary" onclick="app.deselectAllDelays()">إلغاء التحديد</button>
+<button class="btn btn-success" onclick="app.saveDelaysToRecord()"><i class="fas fa-save"></i>حفظ</button>
+<button class="btn btn-whatsapp" onclick="app.sendDelaysWhatsApp()"><i class="fab fa-whatsapp"></i>واتساب</button>
 </div>
 </div>
 
-<!-- Search Box -->
 <div class="search-box">
-<input type="text" class="search-input" id="attendanceSearch" placeholder="ابحث عن طالب..." oninput="app.searchAttendance()">
+<input type="text" class="search-input" id="delaysSearch" placeholder="بحث..." oninput="app.searchDelays()">
 <i class="fas fa-search search-icon"></i>
 </div>
 
-<!-- Attendance Stats -->
-<div class="stats-grid">
-<div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="presentCount">0</div><div class="stat-label">حاضر</div></div>
-<div class="stat-card"><div class="stat-icon">❌</div><div class="stat-value" id="absentCount">0</div><div class="stat-label">غائب</div></div>
-<div class="stat-card"><div class="stat-icon">⏰</div><div class="stat-value" id="lateCount">0</div><div class="stat-label">متأخر</div></div>
-</div>
-
-<!-- Attendance List -->
-<div id="attendanceList"></div>
+<div id="delaysList"></div>
 </div>
 </div>
 
-<!-- Reports Page -->
+<div id="absencesSubPage" class="sub-page">
+<div class="card">
+<div class="card-header">
+<h2 class="card-title"><i class="fas fa-user-times"></i>تسجيل الغياب</h2>
+<input type="date" class="form-input" id="absencesDate" style="width:auto;" onchange="app.loadAbsences()">
+</div>
+
+<div class="filters-section">
+<div class="filters-grid">
+<div><label class="form-label">الصف</label><select class="form-select" id="absencesGradeFilter" onchange="app.loadAbsences()"><option value="">جميع الصفوف</option></select></div>
+<div><label class="form-label">الفصل</label><select class="form-select" id="absencesClassFilter" onchange="app.loadAbsences()"><option value="">جميع الفصول</option></select></div>
+</div>
+<div class="filter-actions">
+<button class="btn btn-primary" onclick="app.selectAllAbsences()"><i class="fas fa-check-square"></i>تحديد الكل</button>
+<button class="btn btn-secondary" onclick="app.deselectAllAbsences()">إلغاء التحديد</button>
+<button class="btn btn-success" onclick="app.saveAbsencesToRecord()"><i class="fas fa-save"></i>حفظ</button>
+<button class="btn btn-whatsapp" onclick="app.sendAbsencesWhatsApp()"><i class="fab fa-whatsapp"></i>واتساب</button>
+</div>
+</div>
+
+<div class="search-box">
+<input type="text" class="search-input" id="absencesSearch" placeholder="بحث..." oninput="app.searchAbsences()">
+<i class="fas fa-search search-icon"></i>
+</div>
+
+<div id="absencesList"></div>
+</div>
+</div>
+</div>
+
+<div id="notesPage" class="page">
+<div class="card">
+<div class="card-header">
+<h2 class="card-title"><i class="fas fa-sticky-note"></i>إدارة الملاحظات</h2>
+<input type="date" class="form-input" id="notesDate" style="width:auto;" onchange="app.loadNotes()">
+</div>
+
+<div class="filters-section">
+<div class="filters-grid">
+<div><label class="form-label">الصف</label><select class="form-select" id="notesGradeFilter" onchange="app.loadNotes()"><option value="">جميع الصفوف</option></select></div>
+<div><label class="form-label">الفصل</label><select class="form-select" id="notesClassFilter" onchange="app.loadNotes()"><option value="">جميع الفصول</option></select></div>
+</div>
+<div><label class="form-label">نص الملاحظة</label><textarea class="form-textarea" id="noteText" placeholder="اكتب الملاحظة..."></textarea></div>
+<div class="filter-actions">
+<button class="btn btn-primary" onclick="app.selectAllNotes()"><i class="fas fa-check-square"></i>تحديد الكل</button>
+<button class="btn btn-secondary" onclick="app.deselectAllNotes()">إلغاء التحديد</button>
+<button class="btn btn-success" onclick="app.saveNotesToRecord()"><i class="fas fa-save"></i>حفظ</button>
+<button class="btn btn-whatsapp" onclick="app.sendNotesWhatsApp()"><i class="fab fa-whatsapp"></i>واتساب</button>
+</div>
+</div>
+
+<div class="search-box">
+<input type="text" class="search-input" id="notesSearch" placeholder="بحث..." oninput="app.searchNotes()">
+<i class="fas fa-search search-icon"></i>
+</div>
+
+<div id="notesList"></div>
+</div>
+</div>
+
+<div id="statisticsPage" class="page">
+<div class="sub-tabs">
+<div class="sub-tab active" onclick="app.showSubPage('stats')">📊 الإحصائيات</div>
+<div class="sub-tab" onclick="app.showSubPage('levels')">🎯 مستويات الغياب</div>
+</div>
+
+<div id="statsSubPage" class="sub-page active">
+<div class="card">
+<div class="card-header"><h2 class="card-title"><i class="fas fa-chart-line"></i>إحصائيات الغياب</h2></div>
+
+<div class="sub-tabs">
+<div class="sub-tab active" onclick="app.showStatsView('daily')">📅 يومي</div>
+<div class="sub-tab" onclick="app.showStatsView('weekly')">📆 أسبوعي</div>
+<div class="sub-tab" onclick="app.showStatsView('monthly')">🗓️ شهري</div>
+</div>
+
+<div id="dailyStats" class="sub-page active">
+<div class="form-group"><label class="form-label">التاريخ</label><input type="date" class="form-input" id="dailyStatsDate" onchange="app.generateDailyStats()"></div>
+<div id="dailyStatsContent"></div>
+</div>
+
+<div id="weeklyStats" class="sub-page">
+<div class="form-group"><label class="form-label">الأسبوع</label><input type="week" class="form-input" id="weeklyStatsDate" onchange="app.generateWeeklyStats()"></div>
+<div id="weeklyStatsContent"></div>
+</div>
+
+<div id="monthlyStats" class="sub-page">
+<div class="form-group"><label class="form-label">الشهر</label><input type="month" class="form-input" id="monthlyStatsDate" onchange="app.generateMonthlyStats()"></div>
+<div id="monthlyStatsContent"></div>
+</div>
+</div>
+</div>
+
+<div id="levelsSubPage" class="sub-page">
+<div class="card">
+<div class="card-header">
+<h2 class="card-title"><i class="fas fa-layer-group"></i>مستويات الغياب</h2>
+<button class="btn btn-primary" onclick="app.showLevelsSettings()"><i class="fas fa-sliders-h"></i>الإعدادات</button>
+</div>
+<div class="levels-grid" id="levelsGrid"></div>
+</div>
+</div>
+</div>
+
 <div id="reportsPage" class="page">
 <div class="card">
-<div class="card-header"><h2 class="card-title"><i class="fas fa-chart-line"></i>التقارير والإحصائيات</h2></div>
+<div class="card-header"><h2 class="card-title"><i class="fas fa-print"></i>التقارير</h2></div>
 
-<!-- Date Range -->
-<div class="d-flex gap-10 mb-20" style="flex-wrap:wrap;">
-<div class="form-group" style="flex:1;margin:0;"><label class="form-label">من تاريخ</label><input type="date" class="form-input" id="reportStartDate"></div>
-<div class="form-group" style="flex:1;margin:0;"><label class="form-label">إلى تاريخ</label><input type="date" class="form-input" id="reportEndDate"></div>
-<button class="btn btn-primary" onclick="app.generateReport()" style="align-self:flex-end;"><i class="fas fa-sync"></i>تحديث</button>
+<div class="form-group"><label class="form-label">نوع التقرير</label>
+<select class="form-select" id="reportType">
+<option value="delays">تقرير التأخير</option>
+<option value="absences">تقرير الغياب</option>
+<option value="notes">تقرير الملاحظات</option>
+<option value="comprehensive">تقرير شامل</option>
+</select>
 </div>
 
-<!-- Export Buttons -->
-<div class="export-buttons">
-<button class="btn btn-success" onclick="app.exportReportExcel()"><i class="fas fa-file-excel"></i>تصدير Excel</button>
-<button class="btn btn-danger" onclick="app.exportReportPDF()"><i class="fas fa-file-pdf"></i>تصدير PDF</button>
-<button class="btn btn-primary" onclick="app.printReport()"><i class="fas fa-print"></i>طباعة</button>
+<div class="form-group"><label class="form-label">نطاق التقرير</label>
+<select class="form-select" id="reportScope" onchange="app.handleReportScope()">
+<option value="all">جميع الطلاب</option>
+<option value="dateRange">نطاق زمني</option>
+<option value="student">طالب محدد</option>
+</select>
 </div>
 
-<!-- Report Content -->
-<div id="reportContent"></div>
+<div id="dateRangeSection" style="display:none;">
+<div class="d-flex gap-10" style="flex-wrap:wrap;margin-bottom:20px;">
+<div style="flex:1;" class="form-group"><label class="form-label">من</label><input type="date" class="form-input" id="reportStartDate"></div>
+<div style="flex:1;" class="form-group"><label class="form-label">إلى</label><input type="date" class="form-input" id="reportEndDate"></div>
 </div>
 </div>
 
-<!-- Settings Page -->
+<div id="studentSection" style="display:none;">
+<div class="form-group"><label class="form-label">الطالب</label><select class="form-select" id="reportStudent"></select></div>
+</div>
+
+<div class="d-flex gap-10" style="flex-wrap:wrap;margin-top:20px;">
+<button class="btn btn-primary" onclick="app.generatePrintReport()"><i class="fas fa-eye"></i>معاينة</button>
+<button class="btn btn-success" onclick="app.printReport()"><i class="fas fa-print"></i>طباعة</button>
+<button class="btn btn-info" onclick="app.exportReportExcel()"><i class="fas fa-file-excel"></i>Excel</button>
+</div>
+
+<div id="reportPreview" style="margin-top:30px;"></div>
+</div>
+</div>
+
 <div id="settingsPage" class="page">
 <div class="card">
 <div class="card-header"><h2 class="card-title"><i class="fas fa-cog"></i>الإعدادات</h2></div>
 
-<!-- School Info -->
-<div class="form-group"><label class="form-label">اسم المدرسة</label><input type="text" class="form-input" id="schoolName" placeholder="مدرسة النموذجية" value="مدرسة النموذجية"></div>
-<div class="form-group"><label class="form-label">اسم المعلم</label><input type="text" class="form-input" id="teacherName" placeholder="أحمد محمد" value="أحمد محمد"></div>
+<div class="form-group"><label class="form-label">اسم المدرسة</label><input type="text" class="form-input" id="schoolName" value="مدرسة النموذجية"></div>
+<div class="form-group"><label class="form-label">اسم المعلم</label><input type="text" class="form-input" id="teacherName" value="أحمد محمد"></div>
 
-<!-- Subscription Info -->
-<div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:20px;">
-<h3 style="color:#1a237e;margin-bottom:15px;display:flex;align-items:center;gap:10px;"><i class="fas fa-crown" style="color:#ffd700;"></i>معلومات الاشتراك</h3>
+<div style="background:#f8f9fa;padding:20px;border-radius:12px;margin:20px 0;">
+<h3 style="color:#1a237e;margin-bottom:15px;"><i class="fas fa-crown" style="color:#ffd700;"></i> الاشتراك</h3>
 <div style="display:grid;gap:10px;">
-<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span style="color:#666;">الحالة:</span><span id="settingsStatus" style="font-weight:700;color:#ff9800;">فترة تجريبية</span></div>
-<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span style="color:#666;">تاريخ الانتهاء:</span><span id="settingsExpiry" style="font-weight:700;color:#1a237e;">--</span></div>
-<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span style="color:#666;">الأيام المتبقية:</span><span id="settingsDaysLeft" style="font-weight:700;color:#f44336;">7 أيام</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span>الحالة:</span><span id="settingsStatus">فترة تجريبية</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span>الانتهاء:</span><span id="settingsExpiry">--</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:white;border-radius:8px;"><span>المتبقي:</span><span id="settingsDaysLeft">7 أيام</span></div>
 </div>
 </div>
 
-<!-- Activation Section -->
 <div style="background:#e3f2fd;padding:20px;border-radius:12px;margin-bottom:20px;">
-<h3 style="color:#1a237e;margin-bottom:10px;"><i class="fas fa-key"></i> تفعيل الاشتراك</h3>
-<p style="color:#666;font-size:14px;margin-bottom:15px;">أدخل كود التفعيل لتفعيل التطبيق لمدة سنة كاملة</p>
-<input type="text" id="activationCodeSettings" placeholder="أدخل كود التفعيل الذي حصلت عليه" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:15px;">
-<button onclick="app.activateSubscription('settings')" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> تفعيل الآن</button>
-<button onclick="app.showPaymentPage()" class="btn btn-primary w-100 mt-10"><i class="fas fa-shopping-cart"></i> شراء كود التفعيل</button>
+<h3 style="color:#1a237e;margin-bottom:10px;"><i class="fas fa-key"></i> التفعيل</h3>
+<input type="text" id="activationCodeSettings" data-allow="true" placeholder="SK-XXXXX-XXXXX" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;margin-bottom:15px;font-family:monospace;text-align:center;text-transform:uppercase;">
+<button onclick="app.activateSubscription('settings')" class="btn btn-success w-100" data-allow="true"><i class="fas fa-check-circle"></i> تفعيل</button>
+<button onclick="app.showPaymentPage()" class="btn btn-primary w-100" data-allow="true" style="margin-top:10px;"><i class="fas fa-shopping-cart"></i> شراء كود</button>
 </div>
 
-<!-- Actions -->
 <div class="d-flex gap-10" style="flex-wrap:wrap;">
-<button class="btn btn-primary" onclick="app.saveSettings()"><i class="fas fa-save"></i>حفظ الإعدادات</button>
+<button class="btn btn-primary" onclick="app.saveSettings()"><i class="fas fa-save"></i>حفظ</button>
 <button class="btn btn-danger" onclick="app.resetApp()"><i class="fas fa-redo"></i>إعادة تعيين</button>
 </div>
 
-<!-- Developer Info -->
 <div style="margin-top:30px;padding:20px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;color:white;text-align:center;">
 <div style="font-size:2.5rem;margin-bottom:10px;">👨‍💻</div>
-<h3 style="margin-bottom:5px;">متخصص في تطوير أنظمة إدارة التعليم</h3>
-<p style="font-size:14px;opacity:0.9;margin-bottom:15px;">جودة عالية • دعم مستمر • تحديثات دورية</p>
-<a href="https://wa.me/966533371147" class="whatsapp-link" target="_blank" style="display:inline-flex;"><i class="fab fa-whatsapp"></i>تواصل معنا</a>
-</div>
-
-<!-- App Info -->
-<div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:8px;text-align:center;color:#666;font-size:13px;">
-<strong style="color:#1a237e;">الاسم:</strong> نظام الحضور الذكي | 
-<strong style="color:#1a237e;">الإصدار:</strong> 5.0.0 | 
-<strong style="color:#1a237e;">التحديث:</strong> أكتوبر 2025 | 
-<strong style="color:#1a237e;">الاشتراك:</strong> 35 ريال سنوياً
+<h3 style="margin-bottom:5px;">نظام الحضور الذكي</h3>
+<p style="font-size:14px;opacity:0.9;margin-bottom:15px;">v6.0 | أكتوبر 2025</p>
+<a href="https://wa.me/966533371147" class="btn btn-whatsapp" target="_blank" style="display:inline-flex;text-decoration:none;"><i class="fab fa-whatsapp"></i>تواصل</a>
 </div>
 </div>
 </div>
 
 </div>
 
-<!-- Add/Edit Student Modal -->
 <div id="studentModal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<h3 class="modal-title" id="modalTitle">إضافة طالب جديد</h3>
+<h3 class="modal-title" id="modalTitle">إضافة طالب</h3>
 <button class="modal-close" onclick="app.closeStudentModal()">×</button>
 </div>
 <form onsubmit="app.saveStudent(event)">
-<div class="form-group"><label class="form-label">الاسم الكامل</label><input type="text" class="form-input" id="studentName" required></div>
-<div class="form-group"><label class="form-label">رقم السجل المدني</label><input type="text" class="form-input" id="studentID" required></div>
-<div class="form-group"><label class="form-label">رقم الجوال</label><input type="tel" class="form-input" id="studentPhone"></div>
-<div class="form-group"><label class="form-label">الصف</label><select class="form-select" id="studentGrade" required><option value="">اختر الصف</option><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select></div>
-<div class="form-group"><label class="form-label">الفصل</label><input type="text" class="form-input" id="studentClass" placeholder="أ، ب، ج..." required></div>
-<div class="d-flex gap-10"><button type="submit" class="btn btn-primary" style="flex:1;"><i class="fas fa-save"></i>حفظ</button><button type="button" class="btn btn-secondary" style="flex:1;" onclick="app.closeStudentModal()">إلغاء</button></div>
+<div class="form-group"><label class="form-label">الاسم</label><input type="text" class="form-input" id="studentName" required></div>
+<div class="form-group"><label class="form-label">السجل المدني</label><input type="text" class="form-input" id="studentID" required></div>
+<div class="form-group"><label class="form-label">الجوال</label><input type="tel" class="form-input" id="studentPhone"></div>
+<div class="form-group"><label class="form-label">الصف</label><select class="form-select" id="studentGrade" required><option value="">اختر</option></select></div>
+<div class="form-group"><label class="form-label">الفصل</label><select class="form-select" id="studentClass" required><option value="">اختر</option></select></div>
+<div class="d-flex gap-10"><button type="submit" class="btn btn-primary" style="flex:1;">حفظ</button><button type="button" class="btn btn-secondary" style="flex:1;" onclick="app.closeStudentModal()">إلغاء</button></div>
 </form>
 </div>
 </div>
 
-<!-- Toast Notification -->
+<div id="levelsModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3 class="modal-title">إعدادات المستويات</h3>
+<button class="modal-close" onclick="app.closeLevelsModal()">×</button>
+</div>
+<form onsubmit="app.saveLevelsSettings(event)">
+<div class="form-group"><label class="form-label">🟢 آمن (من-إلى)</label><div class="d-flex gap-10"><input type="number" class="form-input" id="safeMin" value="0" min="0"><input type="number" class="form-input" id="safeMax" value="2" min="0"></div></div>
+<div class="form-group"><label class="form-label">🟡 انتبه (من-إلى)</label><div class="d-flex gap-10"><input type="number" class="form-input" id="attentionMin" value="3" min="0"><input type="number" class="form-input" id="attentionMax" value="5" min="0"></div></div>
+<div class="form-group"><label class="form-label">🟠 تحذير (من-إلى)</label><div class="d-flex gap-10"><input type="number" class="form-input" id="warningMin" value="6" min="0"><input type="number" class="form-input" id="warningMax" value="10" min="0"></div></div>
+<div class="form-group"><label class="form-label">🔴 خطر (من)</label><input type="number" class="form-input" id="dangerMin" value="11" min="0"></div>
+<div class="d-flex gap-10"><button type="submit" class="btn btn-primary" style="flex:1;">حفظ</button><button type="button" class="btn btn-secondary" style="flex:1;" onclick="app.closeLevelsModal()">إلغاء</button></div>
+</form>
+</div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
-// Firebase Configuration
-const firebaseConfig = {
-apiKey: "AIzaSyAWcfGHGtV0123456789abcdefghijklmn",
-authDomain: "attendance-app.firebaseapp.com",
-databaseURL: "https://attendance-app-default-rtdb.firebaseio.com",
-projectId: "attendance-app",
-storageBucket: "attendance-app.appspot.com",
-messagingSenderId: "123456789012",
-appId: "1:123456789012:web:abc123def456"
-};
-
-// Initialize Firebase
+const firebaseConfig={apiKey:"AIzaSyAWcfGHGtV0123456789",authDomain:"attendance.firebaseapp.com",databaseURL:"https://attendance.firebaseio.com",projectId:"attendance"};
 firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
 
-// App Class
-class AttendanceApp {
-constructor() {
-this.students = [];
-this.attendance = {};
-this.currentStudentId = null;
-this.subscription = {
-status: 'trial',
-startDate: new Date().toISOString(),
-expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-activationCode: '',
-isActive: false
-};
+class AttendanceApp{
+constructor(){
+this.students=[];this.delays={};this.absences={};this.notes={};
+this.grades=['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
+this.classes=['أ','ب','ج','د'];this.currentStudentId=null;
+this.subscription={status:'trial',startDate:new Date().toISOString(),
+expiryDate:new Date(Date.now()+7*24*60*60*1000).toISOString(),
+activationCode:'',isActive:false};
+this.levelsConfig={safe:{min:0,max:2},attention:{min:3,max:5},
+warning:{min:6,max:10},danger:{min:11,max:999}};
 this.init();
 }
 
-init() {
-this.loadFromLocalStorage();
-this.setupEventListeners();
-this.updateUI();
-this.checkSubscription();
-this.setTodayDate();
+init(){
+this.loadFromLocalStorage();this.setupEventListeners();
+this.populateGradeClassSelects();this.updateUI();
+this.checkSubscription();this.setTodayDate();
 }
 
-setupEventListeners() {
-const excelFile = document.getElementById('excelFile');
-if (excelFile) {
-const self = this;
-excelFile.addEventListener('change', function (e) { self.importExcel(e); });
+setupEventListeners(){
+const excelFile=document.getElementById('excelFile');
+if(excelFile)excelFile.addEventListener('change',(e)=>this.importExcel(e));
+}
+
+showPage(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const pageEl=document.getElementById(page+'Page');
+    if(pageEl) pageEl.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>{
+        const oncl = n.getAttribute('onclick') || '';
+        if(oncl.includes(`showPage('${page}')`) || oncl.includes(`showPage("${page}")`)) n.classList.add('active');
+    });
+    if(page==='students')this.updateStudentsList();
+    if(page==='attendance'){this.showSubPage('delays');this.loadDelays();}
+    if(page==='notes')this.loadNotes();
+    if(page==='statistics'){this.showSubPage('stats');this.showStatsView('daily');}
+    if(page==='reports')this.populateReportStudents();
+    if(page==='settings')this.loadSettings();
+}
+if(page==='notes')this.loadNotes();
+if(page==='statistics'){this.showSubPage('stats');this.showStatsView('daily');}
+if(page==='reports')this.populateReportStudents();
+if(page==='settings')this.loadSettings();
+}
+
+showSubPage(subPage){
+    if(subPage==='delays'||subPage==='absences'){
+        document.querySelectorAll('#attendancePage .sub-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('#attendancePage .sub-page').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('#attendancePage .sub-tab').forEach(t=>{
+            const oncl = t.getAttribute('onclick') || '';
+            if(oncl.includes(`showSubPage('${subPage}')`) || oncl.includes(`showSubPage("${subPage}")`)) t.classList.add('active');
+        });
+        const sp=document.getElementById(subPage+'SubPage');
+        if(sp) sp.classList.add('active');
+        if(subPage==='delays') this.loadDelays();
+        if(subPage==='absences') this.loadAbsences();
+    } else if(subPage==='stats'||subPage==='levels'){
+        document.querySelectorAll('#statisticsPage > .sub-tabs .sub-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('#statisticsPage > .sub-page').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('#statisticsPage > .sub-tabs .sub-tab').forEach(t=>{
+            const oncl = t.getAttribute('onclick') || '';
+            if(oncl.includes(`showSubPage('${subPage}')`) || oncl.includes(`showSubPage("${subPage}")`)) t.classList.add('active');
+        });
+        const sp=document.getElementById(subPage+'SubPage');
+        if(sp) sp.classList.add('active');
+        if(subPage==='stats') this.showStatsView('daily');
+        if(subPage==='levels') this.generateLevels();
+    }
+}else if(subPage==='stats'||subPage==='levels'){
+document.querySelectorAll('#statisticsPage > .sub-tabs .sub-tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('#statisticsPage > .sub-page').forEach(p=>p.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById(subPage+'SubPage').classList.add('active');
+if(subPage==='stats')this.showStatsView('daily');
+if(subPage==='levels')this.generateLevels();
 }
 }
 
-showPage(page) {
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-document.getElementById(page + 'Page').classList.add('active');
-event.target.closest('.nav-item').classList.add('active');
-
-if (page === 'attendance') this.loadAttendance();
-if (page === 'reports') this.generateReport();
-if (page === 'settings') this.loadSettings();
+showStatsView(view){
+    document.querySelectorAll('#statsSubPage .sub-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('#statsSubPage .sub-page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('#statsSubPage .sub-tab').forEach(t=>{
+        const oncl = t.getAttribute('onclick') || '';
+        if(oncl.includes(`showStatsView('${view}')`) || oncl.includes(`showStatsView("${view}")`)) t.classList.add('active');
+    });
+    const vp=document.getElementById(view+'Stats');
+    if(vp) vp.classList.add('active');
+    if(view==='daily') this.generateDailyStats();
+    if(view==='weekly') this.generateWeeklyStats();
+    if(view==='monthly') this.generateMonthlyStats();
 }
 
-// =================== Student Management ===================
-
-showAddStudentModal() {
-document.getElementById('modalTitle').textContent = 'إضافة طالب جديد';
+showAddStudentModal(){
+document.getElementById('modalTitle').textContent='إضافة طالب';
 document.getElementById('studentModal').classList.add('active');
-this.currentStudentId = null;
+this.currentStudentId=null;
 document.querySelector('#studentModal form').reset();
 }
 
-showEditStudentModal(id) {
-const student = this.students.find(s => s.id === id);
-if (!student) return;
-
-document.getElementById('modalTitle').textContent = 'تعديل بيانات الطالب';
-document.getElementById('studentName').value = student.name;
-document.getElementById('studentID').value = student.civilId;
-document.getElementById('studentPhone').value = student.phone || '';
-document.getElementById('studentGrade').value = student.grade;
-document.getElementById('studentClass').value = student.class;
+showEditStudentModal(id){
+const student=this.students.find(s=>s.id===id);
+if(!student)return;
+document.getElementById('modalTitle').textContent='تعديل الطالب';
+document.getElementById('studentName').value=student.name;
+document.getElementById('studentID').value=student.civilId;
+document.getElementById('studentPhone').value=student.phone||'';
+document.getElementById('studentGrade').value=student.grade;
+document.getElementById('studentClass').value=student.class;
 document.getElementById('studentModal').classList.add('active');
-this.currentStudentId = id;
+this.currentStudentId=id;
 }
 
-closeStudentModal() {
+closeStudentModal(){
 document.getElementById('studentModal').classList.remove('active');
-this.currentStudentId = null;
+this.currentStudentId=null;
 }
 
-saveStudent(event) {
+saveStudent(event){
 event.preventDefault();
-
-const student = {
-id: this.currentStudentId || Date.now().toString(),
-name: document.getElementById('studentName').value.trim(),
-civilId: document.getElementById('studentID').value.trim(),
-phone: document.getElementById('studentPhone').value.trim(),
-grade: document.getElementById('studentGrade').value,
-class: document.getElementById('studentClass').value.trim(),
-addedDate: this.currentStudentId ? 
-(this.students.find(s => s.id === this.currentStudentId)?.addedDate || new Date().toISOString()) : 
+const student={
+id:this.currentStudentId||Date.now().toString(),
+name:document.getElementById('studentName').value.trim(),
+civilId:document.getElementById('studentID').value.trim(),
+phone:document.getElementById('studentPhone').value.trim(),
+grade:document.getElementById('studentGrade').value,
+class:document.getElementById('studentClass').value,
+addedDate:this.currentStudentId?
+(this.students.find(s=>s.id===this.currentStudentId)?.addedDate||new Date().toISOString()):
 new Date().toISOString()
 };
 
-if (this.currentStudentId) {
-const index = this.students.findIndex(s => s.id === this.currentStudentId);
-this.students[index] = student;
-this.showToast('تم تحديث بيانات الطالب بنجاح', 'success');
-} else {
+if(this.currentStudentId){
+const index=this.students.findIndex(s=>s.id===this.currentStudentId);
+this.students[index]=student;
+this.showToast('تم التحديث','success');
+}else{
 this.students.push(student);
-this.showToast('تم إضافة الطالب بنجاح', 'success');
+this.showToast('تم الإضافة','success');
 }
 
 this.saveToLocalStorage();
@@ -726,541 +712,981 @@ this.closeStudentModal();
 this.updateStats();
 }
 
-deleteStudent(id) {
-if (!confirm('هل أنت متأكد من حذف هذا الطالب؟ سيتم حذف جميع سجلات الحضور الخاصة به!')) return;
-
-this.students = this.students.filter(s => s.id !== id);
-// Delete attendance records
-Object.keys(this.attendance).forEach(date => {
-if (this.attendance[date][id]) {
-delete this.attendance[date][id];
-}
-});
-
+deleteStudent(id){
+if(!confirm('حذف الطالب؟'))return;
+this.students=this.students.filter(s=>s.id!==id);
+Object.keys(this.delays).forEach(date=>delete this.delays[date][id]);
+Object.keys(this.absences).forEach(date=>delete this.absences[date][id]);
+Object.keys(this.notes).forEach(date=>delete this.notes[date][id]);
 this.saveToLocalStorage();
 this.updateStudentsList();
-this.showToast('تم حذف الطالب بنجاح', 'success');
+this.showToast('تم الحذف','success');
 this.updateStats();
 }
 
-deleteAllStudents() {
-const message = 'تحذير خطير!\n\nسيتم حذف جميع البيانات بشكل نهائي:\n✗ جميع الطلاب\n✗ جميع سجلات الحضور\n✗ جميع التقارير\n\nهل أنت متأكد تماماً؟';
-if (!confirm(message)) return;
-
-const confirmMessage = 'تأكيد نهائي!\n\nهذا الإجراء لا يمكن التراجع عنه.\nاكتب "نعم" للمتابعة';
-const userInput = prompt(confirmMessage);
-if (userInput !== 'نعم') return;
-
-this.students = [];
-this.attendance = {};
+deleteAllStudents(){
+if(!confirm('حذف الكل؟'))return;
+if(prompt('اكتب "نعم"')!=='نعم')return;
+this.students=[];this.delays={};this.absences={};this.notes={};
 this.saveToLocalStorage();
 this.updateStudentsList();
 this.updateStats();
-this.showToast('تم حذف جميع البيانات', 'info');
+this.showToast('تم الحذف','info');
 }
 
-searchStudents() {
-const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
-const filtered = this.students.filter(s => 
-s.name.toLowerCase().includes(searchTerm) || 
+searchStudents(){
+const searchTerm=document.getElementById('studentSearch').value.toLowerCase();
+const filtered=this.students.filter(s=>
+s.name.toLowerCase().includes(searchTerm)||
 s.civilId.includes(searchTerm)
 );
 this.updateStudentsList(filtered);
 }
 
-updateStudentsList(students = this.students) {
-const list = document.getElementById('studentsList');
-if (students.length === 0) {
-list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد طلاب</div><div class="empty-subtext">استخدم البحث للعثور على طالب</div></div>';
+updateStudentsList(students=this.students){
+const list=document.getElementById('studentsList');
+if(students.length===0){
+list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد طلاب</div></div>';
 return;
 }
 
-list.innerHTML = students.map(s => `
-<div class="student-item">
-<div class="student-info">
-<div class="student-name">${s.name}</div>
-<div class="student-details">
-<span class="student-detail"><i class="fas fa-id-card"></i>${s.civilId}</span>
-<span class="student-detail"><i class="fas fa-phone"></i>${s.phone || 'غير محدد'}</span>
-<span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
-</div>
-</div>
-<div class="student-actions">
-<button class="btn-icon edit" onclick="app.showEditStudentModal('${s.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-<button class="btn-icon delete" onclick="app.deleteStudent('${s.id}')" title="حذف"><i class="fas fa-trash"></i></button>
-</div>
-</div>
-`).join('');
-}
-
-// =================== Excel Import/Export ===================
-
-importExcel(e) {
-const file = e.target.files[0];
-if (!file) return;
-
-const reader = new FileReader();
-const self = this;
-
-reader.onload = function (ev) {
-try {
-const data = new Uint8Array(ev.target.result);
-const workbook = XLSX.read(data, { type: 'array' });
-const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-
-// Skip header row and process data
-let imported = 0;
-for (let i = 1; i < jsonData.length; i++) {
-const row = jsonData[i];
-if (!row[0]) continue; // Skip empty rows
-
-// Map columns: Name(0), CivilID(1), Phone(2), Grade(3), Class(4)
-const student = {
-id: Date.now().toString() + i,
-name: String(row[0] || '').trim(),
-civilId: String(row[1] || '').trim(),
-phone: String(row[2] || '').trim(),
-grade: String(row[3] || '').trim(),
-class: String(row[4] || '').trim(),
-addedDate: new Date().toISOString()
-};
-
-// Validate required fields
-if (student.name && student.civilId && student.grade && student.class) {
-self.students.push(student);
-imported++;
-}
-}
-
-self.saveToLocalStorage();
-self.updateStudentsList();
-self.updateStats();
-self.showToast(`تم استيراد ${imported} طالب بنجاح`, 'success');
-
-// Reset file input
-e.target.value = '';
-} catch (error) {
-console.error('Import error:', error);
-self.showToast('خطأ في قراءة الملف. تأكد من صحة التنسيق', 'error');
-}
-};
-
-reader.readAsArrayBuffer(file);
-}
-
-exportStudentsExcel() {
-if (this.students.length === 0) {
-this.showToast('لا يوجد طلاب للتصدير', 'error');
-return;
-}
-
-const data = [
-['#', 'الاسم', 'السجل المدني', 'الجوال', 'الصف', 'الفصل', 'تاريخ الإضافة'],
-...this.students.map((s, i) => [
-i + 1,
-s.name,
-s.civilId,
-s.phone || '',
-s.grade,
-s.class,
-new Date(s.addedDate).toLocaleDateString('ar-SA')
-])
-];
-
-const ws = XLSX.utils.aoa_to_sheet(data);
-const wb = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
-XLSX.writeFile(wb, `قائمة_الطلاب_${new Date().toLocaleDateString('ar-SA')}.xlsx`);
-this.showToast('تم تصدير قائمة الطلاب بنجاح', 'success');
-}
-
-// =================== Attendance Management ===================
-
-setTodayDate() {
-const today = new Date().toISOString().split('T')[0];
-const dateInput = document.getElementById('attendanceDate');
-if (dateInput) dateInput.value = today;
-}
-
-loadAttendance() {
-const date = document.getElementById('attendanceDate').value;
-if (!date) return;
-
-const list = document.getElementById('attendanceList');
-if (this.students.length === 0) {
-list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد طلاب</div></div>';
-return;
-}
-
-list.innerHTML = '<div class="student-list">' + this.students.map(s => {
-const status = this.attendance[date]?.[s.id] || 'absent';
+list.innerHTML='<div class="student-list">'+students.map(s=>{
+const record=this.getStudentRecord(s.id);
 return `
 <div class="student-item">
 <div class="student-info">
 <div class="student-name">${s.name}</div>
 <div class="student-details">
+<span class="student-detail"><i class="fas fa-id-card"></i>${s.civilId}</span>
+<span class="student-detail"><i class="fas fa-phone"></i>${s.phone||'--'}</span>
 <span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
+</div>
+<div class="student-record">
+<span class="record-badge delays"><i class="fas fa-clock"></i> ${record.delays}</span>
+<span class="record-badge absences"><i class="fas fa-times-circle"></i> ${record.absences}</span>
+<span class="record-badge notes"><i class="fas fa-sticky-note"></i> ${record.notes}</span>
 </div>
 </div>
 <div class="student-actions">
-<button class="btn-icon present ${status === 'present' ? 'active' : ''}" 
-onclick="app.markAttendance('${s.id}', 'present')" title="حاضر">
-<i class="fas fa-check"></i>
-</button>
-<button class="btn-icon absent ${status === 'absent' ? 'active' : ''}" 
-onclick="app.markAttendance('${s.id}', 'absent')" title="غائب">
-<i class="fas fa-times"></i>
-</button>
+<button class="btn-icon edit" onclick="app.showEditStudentModal('${s.id}')"><i class="fas fa-edit"></i></button>
+<button class="btn-icon delete" onclick="app.deleteStudent('${s.id}')"><i class="fas fa-trash"></i></button>
 </div>
 </div>
 `;
-}).join('') + '</div>';
-
-this.updateAttendanceStats();
+}).join('')+'</div>';
 }
 
-markAttendance(studentId, status) {
-const date = document.getElementById('attendanceDate').value;
-if (!date) return;
+getStudentRecord(studentId){
+let delays=0,absences=0,notes=0;
+Object.keys(this.delays).forEach(date=>{if(this.delays[date][studentId])delays++;});
+Object.keys(this.absences).forEach(date=>{if(this.absences[date][studentId])absences++;});
+Object.keys(this.notes).forEach(date=>{if(this.notes[date][studentId])notes++;});
+return{delays,absences,notes};
+}
 
-if (!this.attendance[date]) this.attendance[date] = {};
-this.attendance[date][studentId] = status;
+importExcel(e){
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=(ev)=>{
+try{
+const data=new Uint8Array(ev.target.result);
+const workbook=XLSX.read(data,{type:'array'});
+const firstSheet=workbook.Sheets[workbook.SheetNames[0]];
+const jsonData=XLSX.utils.sheet_to_json(firstSheet,{header:1});
 
+let imported=0;
+const newGrades=new Set(this.grades);
+const newClasses=new Set(this.classes);
+
+for(let i=1;i<jsonData.length;i++){
+const row=jsonData[i];
+if(!row[0])continue;
+
+const grade=String(row[3]||'').trim();
+const classVal=String(row[4]||'').trim();
+
+if(grade&&!newGrades.has(grade))newGrades.add(grade);
+if(classVal&&!newClasses.has(classVal))newClasses.add(classVal);
+
+const student={
+id:Date.now().toString()+i,
+name:String(row[0]||'').trim(),
+civilId:String(row[1]||'').trim(),
+phone:String(row[2]||'').trim(),
+grade:grade,
+class:classVal,
+addedDate:new Date().toISOString()
+};
+
+if(student.name&&student.civilId&&student.grade&&student.class){
+this.students.push(student);
+imported++;
+}
+}
+
+this.grades=Array.from(newGrades);
+this.classes=Array.from(newClasses);
+this.populateGradeClassSelects();
 this.saveToLocalStorage();
-this.loadAttendance();
+this.updateStudentsList();
 this.updateStats();
+this.showToast(`استيراد ${imported} طالب`,'success');
+e.target.value='';
+}catch(error){
+this.showToast('خطأ في الملف','error');
+}
+};
+reader.readAsArrayBuffer(file);
 }
 
-markAllPresent() {
-const date = document.getElementById('attendanceDate')?.value || new Date().toISOString().split('T')[0];
-if (!this.attendance[date]) this.attendance[date] = {};
-
-this.students.forEach(s => {
-this.attendance[date][s.id] = 'present';
-});
-
-this.saveToLocalStorage();
-this.loadAttendance();
-this.updateStats();
-this.showToast('تم تسجيل حضور جميع الطلاب', 'success');
-}
-
-searchAttendance() {
-const searchTerm = document.getElementById('attendanceSearch').value.toLowerCase();
-const filtered = this.students.filter(s => s.name.toLowerCase().includes(searchTerm));
-// For simplicity, reload with filtered list
-this.loadAttendance();
-}
-
-updateAttendanceStats() {
-const date = document.getElementById('attendanceDate').value;
-const dayAttendance = this.attendance[date] || {};
-
-let present = 0, absent = 0, late = 0;
-this.students.forEach(s => {
-const status = dayAttendance[s.id] || 'absent';
-if (status === 'present') present++;
-else if (status === 'absent') absent++;
-else if (status === 'late') late++;
-});
-
-document.getElementById('presentCount').textContent = present;
-document.getElementById('absentCount').textContent = absent;
-document.getElementById('lateCount').textContent = late;
-}
-
-// =================== Statistics & Reports ===================
-
-updateStats() {
-const total = this.students.length;
-document.getElementById('totalStudents').textContent = total;
-
-const today = new Date().toISOString().split('T')[0];
-const todayAttendance = this.attendance[today] || {};
-
-let present = 0;
-this.students.forEach(s => {
-if (todayAttendance[s.id] === 'present') present++;
-});
-
-const absent = total - present;
-const rate = total > 0 ? Math.round((present / total) * 100) : 0;
-
-document.getElementById('presentToday').textContent = present;
-document.getElementById('absentToday').textContent = absent;
-document.getElementById('attendanceRate').textContent = rate + '%';
-}
-
-generateReport() {
-const startDate = document.getElementById('reportStartDate').value;
-const endDate = document.getElementById('reportEndDate').value;
-
-if (!startDate || !endDate) {
-document.getElementById('reportContent').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">اختر نطاق التاريخ</div></div>';
+exportStudentsExcel(){
+if(this.students.length===0){
+this.showToast('لا يوجد طلاب','error');
 return;
 }
 
-const dates = this.getDateRange(startDate, endDate);
-const reportData = this.students.map(s => {
-let presentDays = 0;
-let absentDays = 0;
+const data=[
+['#','الاسم','السجل','الجوال','الصف','الفصل','التأخير','الغياب','الملاحظات'],
+...this.students.map((s,i)=>{
+const record=this.getStudentRecord(s.id);
+return[i+1,s.name,s.civilId,s.phone||'',s.grade,s.class,record.delays,record.absences,record.notes];
+})
+];
 
-dates.forEach(date => {
-const status = this.attendance[date]?.[s.id];
-if (status === 'present') presentDays++;
-else absentDays++;
+const ws=XLSX.utils.aoa_to_sheet(data);
+const wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,'الطلاب');
+XLSX.writeFile(wb,`الطلاب_${new Date().toISOString().split('T')[0]}.xlsx`);
+this.showToast('تم التصدير','success');
+}
+
+populateGradeClassSelects(){
+['studentGrade','delaysGradeFilter','absencesGradeFilter','notesGradeFilter'].forEach(id=>{
+const select=document.getElementById(id);
+if(select){
+const currentValue=select.value;
+const isFilter=id.includes('Filter');
+select.innerHTML=isFilter?'<option value="">جميع الصفوف</option>':'<option value="">اختر</option>';
+this.grades.forEach(grade=>{
+select.innerHTML+=`<option value="${grade}">${grade}</option>`;
+});
+if(currentValue)select.value=currentValue;
+}
 });
 
-const rate = dates.length > 0 ? Math.round((presentDays / dates.length) * 100) : 0;
-
-return { ...s, presentDays, absentDays, rate };
+['studentClass','delaysClassFilter','absencesClassFilter','notesClassFilter'].forEach(id=>{
+const select=document.getElementById(id);
+if(select){
+const currentValue=select.value;
+const isFilter=id.includes('Filter');
+select.innerHTML=isFilter?'<option value="">جميع الفصول</option>':'<option value="">اختر</option>';
+this.classes.forEach(cls=>{
+select.innerHTML+=`<option value="${cls}">${cls}</option>`;
 });
+if(currentValue)select.value=currentValue;
+}
+});
+}
 
-const content = document.getElementById('reportContent');
-content.innerHTML = `
-<div style="overflow-x:auto;">
-<table class="attendance-table">
-<thead>
-<tr>
-<th>الاسم</th>
-<th>الصف</th>
-<th>أيام الحضور</th>
-<th>أيام الغياب</th>
-<th>نسبة الحضور</th>
-</tr>
-</thead>
-<tbody>
-${reportData.map(s => `
-<tr>
-<td>${s.name}</td>
-<td>${s.grade} - ${s.class}</td>
-<td><span class="status-badge status-present">${s.presentDays}</span></td>
-<td><span class="status-badge status-absent">${s.absentDays}</span></td>
-<td><strong>${s.rate}%</strong></td>
-</tr>
-`).join('')}
-</tbody>
-</table>
+loadDelays(){
+const date=document.getElementById('delaysDate').value;
+if(!date)return;
+
+const gradeFilter=document.getElementById('delaysGradeFilter').value;
+const classFilter=document.getElementById('delaysClassFilter').value;
+
+let filtered=this.students;
+if(gradeFilter)filtered=filtered.filter(s=>s.grade===gradeFilter);
+if(classFilter)filtered=filtered.filter(s=>s.class===classFilter);
+
+const list=document.getElementById('delaysList');
+if(filtered.length===0){
+list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد</div></div>';
+return;
+}
+
+list.innerHTML='<div class="student-list">'+filtered.map(s=>{
+const isDelayed=this.delays[date]?.[s.id]||false;
+return`
+<div class="student-item ${isDelayed?'selected':''}" id="delay_${s.id}">
+<input type="checkbox" class="student-checkbox" ${isDelayed?'checked':''} onchange="app.toggleDelay('${s.id}')">
+<div class="student-info">
+<div class="student-name">${s.name}</div>
+<div class="student-details">
+<span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
+</div>
+</div>
 </div>
 `;
-
-this.currentReportData = reportData;
-this.currentReportDates = { startDate, endDate };
+}).join('')+'</div>';
 }
 
-getDateRange(start, end) {
-const dates = [];
-const startDate = new Date(start);
-const endDate = new Date(end);
-
-while (startDate <= endDate) {
-dates.push(startDate.toISOString().split('T')[0]);
-startDate.setDate(startDate.getDate() + 1);
+toggleDelay(studentId){
+const date=document.getElementById('delaysDate').value;
+if(!this.delays[date])this.delays[date]={};
+this.delays[date][studentId]=!this.delays[date][studentId];
+if(!this.delays[date][studentId])delete this.delays[date][studentId];
+document.getElementById(`delay_${studentId}`).classList.toggle('selected');
 }
 
+searchDelays(){
+const searchTerm=document.getElementById('delaysSearch').value.toLowerCase();
+document.querySelectorAll('#delaysList .student-item').forEach(item=>{
+const name=item.querySelector('.student-name').textContent.toLowerCase();
+item.style.display=name.includes(searchTerm)?'':'none';
+});
+}
+
+selectAllDelays(){
+const date=document.getElementById('delaysDate').value;
+if(!this.delays[date])this.delays[date]={};
+document.querySelectorAll('#delaysList .student-checkbox').forEach(cb=>{
+cb.checked=true;
+const studentId=cb.parentElement.id.replace('delay_','');
+this.delays[date][studentId]=true;
+cb.parentElement.classList.add('selected');
+});
+}
+
+deselectAllDelays(){
+const date=document.getElementById('delaysDate').value;
+if(this.delays[date])this.delays[date]={};
+document.querySelectorAll('#delaysList .student-checkbox').forEach(cb=>{
+cb.checked=false;
+cb.parentElement.classList.remove('selected');
+});
+}
+
+saveDelaysToRecord(){
+this.saveToLocalStorage();
+this.showToast('تم الحفظ','success');
+this.updateStats();
+}
+
+sendDelaysWhatsApp(){
+const date=document.getElementById('delaysDate').value;
+const delayed=this.delays[date]||{};
+const delayedStudents=this.students.filter(s=>delayed[s.id]);
+
+if(delayedStudents.length===0){
+this.showToast('لم يتم التحديد','error');
+return;
+}
+
+const schoolName=localStorage.getItem('schoolName')||'المدرسة';
+let message=`*تأخير - ${schoolName}*
+التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}
+
+`;
+delayedStudents.forEach((s,i)=>{
+message+=`${i+1}. ${s.name} - ${s.grade} ${s.class}
+`;
+});
+
+window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank');
+}
+
+loadAbsences(){
+const date=document.getElementById('absencesDate').value;
+if(!date)return;
+
+const gradeFilter=document.getElementById('absencesGradeFilter').value;
+const classFilter=document.getElementById('absencesClassFilter').value;
+
+let filtered=this.students;
+if(gradeFilter)filtered=filtered.filter(s=>s.grade===gradeFilter);
+if(classFilter)filtered=filtered.filter(s=>s.class===classFilter);
+
+const list=document.getElementById('absencesList');
+if(filtered.length===0){
+list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد</div></div>';
+return;
+}
+
+list.innerHTML='<div class="student-list">'+filtered.map(s=>{
+const isAbsent=this.absences[date]?.[s.id]||false;
+return`
+<div class="student-item ${isAbsent?'selected':''}" id="absence_${s.id}">
+<input type="checkbox" class="student-checkbox" ${isAbsent?'checked':''} onchange="app.toggleAbsence('${s.id}')">
+<div class="student-info">
+<div class="student-name">${s.name}</div>
+<div class="student-details">
+<span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
+</div>
+</div>
+</div>
+`;
+}).join('')+'</div>';
+}
+
+toggleAbsence(studentId){
+const date=document.getElementById('absencesDate').value;
+if(!this.absences[date])this.absences[date]={};
+this.absences[date][studentId]=!this.absences[date][studentId];
+if(!this.absences[date][studentId])delete this.absences[date][studentId];
+document.getElementById(`absence_${studentId}`).classList.toggle('selected');
+}
+
+searchAbsences(){
+const searchTerm=document.getElementById('absencesSearch').value.toLowerCase();
+document.querySelectorAll('#absencesList .student-item').forEach(item=>{
+const name=item.querySelector('.student-name').textContent.toLowerCase();
+item.style.display=name.includes(searchTerm)?'':'none';
+});
+}
+
+selectAllAbsences(){
+const date=document.getElementById('absencesDate').value;
+if(!this.absences[date])this.absences[date]={};
+document.querySelectorAll('#absencesList .student-checkbox').forEach(cb=>{
+cb.checked=true;
+const studentId=cb.parentElement.id.replace('absence_','');
+this.absences[date][studentId]=true;
+cb.parentElement.classList.add('selected');
+});
+}
+
+deselectAllAbsences(){
+const date=document.getElementById('absencesDate').value;
+if(this.absences[date])this.absences[date]={};
+document.querySelectorAll('#absencesList .student-checkbox').forEach(cb=>{
+cb.checked=false;
+cb.parentElement.classList.remove('selected');
+});
+}
+
+saveAbsencesToRecord(){
+this.saveToLocalStorage();
+this.showToast('تم الحفظ','success');
+this.updateStats();
+}
+
+sendAbsencesWhatsApp(){
+const date=document.getElementById('absencesDate').value;
+const absent=this.absences[date]||{};
+const absentStudents=this.students.filter(s=>absent[s.id]);
+
+if(absentStudents.length===0){
+this.showToast('لم يتم التحديد','error');
+return;
+}
+
+const schoolName=localStorage.getItem('schoolName')||'المدرسة';
+let message=`*غياب - ${schoolName}*
+التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}
+
+`;
+absentStudents.forEach((s,i)=>{
+message+=`${i+1}. ${s.name} - ${s.grade} ${s.class}
+`;
+});
+
+window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank');
+}
+
+loadNotes(){
+const date=document.getElementById('notesDate').value;
+if(!date)return;
+
+const gradeFilter=document.getElementById('notesGradeFilter').value;
+const classFilter=document.getElementById('notesClassFilter').value;
+
+let filtered=this.students;
+if(gradeFilter)filtered=filtered.filter(s=>s.grade===gradeFilter);
+if(classFilter)filtered=filtered.filter(s=>s.class===classFilter);
+
+const list=document.getElementById('notesList');
+if(filtered.length===0){
+list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد</div></div>';
+return;
+}
+
+list.innerHTML='<div class="student-list">'+filtered.map(s=>{
+const hasNote=this.notes[date]?.[s.id]||false;
+return`
+<div class="student-item ${hasNote?'selected':''}" id="note_${s.id}">
+<input type="checkbox" class="student-checkbox" ${hasNote?'checked':''} onchange="app.toggleNote('${s.id}')">
+<div class="student-info">
+<div class="student-name">${s.name}</div>
+<div class="student-details">
+<span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
+</div>
+${hasNote?`<div style="margin-top:8px;padding:8px;background:#fff3cd;border-radius:6px;font-size:13px;">${this.notes[date][s.id]}</div>`:''}
+</div>
+</div>
+`;
+}).join('')+'</div>';
+}
+
+toggleNote(studentId){
+const checkbox=document.querySelector(`#note_${studentId} .student-checkbox`);
+const item=document.getElementById(`note_${studentId}`);
+if(checkbox.checked){
+item.classList.add('selected');
+}else{
+item.classList.remove('selected');
+const date=document.getElementById('notesDate').value;
+if(this.notes[date]?.[studentId]){
+delete this.notes[date][studentId];
+this.loadNotes();
+}
+}
+}
+
+searchNotes(){
+const searchTerm=document.getElementById('notesSearch').value.toLowerCase();
+document.querySelectorAll('#notesList .student-item').forEach(item=>{
+const name=item.querySelector('.student-name').textContent.toLowerCase();
+item.style.display=name.includes(searchTerm)?'':'none';
+});
+}
+
+selectAllNotes(){
+document.querySelectorAll('#notesList .student-checkbox').forEach(cb=>{
+cb.checked=true;
+cb.parentElement.classList.add('selected');
+});
+}
+
+deselectAllNotes(){
+document.querySelectorAll('#notesList .student-checkbox').forEach(cb=>{
+cb.checked=false;
+cb.parentElement.classList.remove('selected');
+});
+}
+
+saveNotesToRecord(){
+const date=document.getElementById('notesDate').value;
+const noteText=document.getElementById('noteText').value.trim();
+
+if(!noteText){
+this.showToast('اكتب الملاحظة','error');
+return;
+}
+
+const selectedStudents=[];
+document.querySelectorAll('#notesList .student-checkbox:checked').forEach(cb=>{
+const studentId=cb.parentElement.id.replace('note_','');
+selectedStudents.push(studentId);
+});
+
+if(selectedStudents.length===0){
+this.showToast('حدد طالب واحد على الأقل','error');
+return;
+}
+
+if(!this.notes[date])this.notes[date]={};
+selectedStudents.forEach(id=>{
+this.notes[date][id]=noteText;
+});
+
+this.saveToLocalStorage();
+this.showToast(`تم حفظ الملاحظة لـ ${selectedStudents.length} طالب`,'success');
+document.getElementById('noteText').value='';
+this.loadNotes();
+this.updateStats();
+}
+
+sendNotesWhatsApp(){
+const date=document.getElementById('notesDate').value;
+const noteText=document.getElementById('noteText').value.trim();
+
+const selectedStudents=[];
+document.querySelectorAll('#notesList .student-checkbox:checked').forEach(cb=>{
+const studentId=cb.parentElement.id.replace('note_','');
+const student=this.students.find(s=>s.id===studentId);
+if(student)selectedStudents.push(student);
+});
+
+if(selectedStudents.length===0||!noteText){
+this.showToast('حدد طلاب واكتب الملاحظة','error');
+return;
+}
+
+const schoolName=localStorage.getItem('schoolName')||'المدرسة';
+let message=`*ملاحظة - ${schoolName}*
+التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}
+
+*الملاحظة:* ${noteText}
+
+`;
+selectedStudents.forEach((s,i)=>{
+message+=`${i+1}. ${s.name} - ${s.grade} ${s.class}
+`;
+});
+
+window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank');
+}
+
+generateDailyStats(){
+const date=document.getElementById('dailyStatsDate').value||new Date().toISOString().split('T')[0];
+document.getElementById('dailyStatsDate').value=date;
+
+const delayed=this.delays[date]||{};
+const absent=this.absences[date]||{};
+const noted=this.notes[date]||{};
+
+const delayedCount=Object.keys(delayed).length;
+const absentCount=Object.keys(absent).length;
+const notedCount=Object.keys(noted).length;
+const presentCount=this.students.length-absentCount;
+
+document.getElementById('dailyStatsContent').innerHTML=`
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">${presentCount}</div><div class="stat-label">حاضر</div></div>
+<div class="stat-card"><div class="stat-icon">⏰</div><div class="stat-value">${delayedCount}</div><div class="stat-label">متأخر</div></div>
+<div class="stat-card"><div class="stat-icon">❌</div><div class="stat-value">${absentCount}</div><div class="stat-label">غائب</div></div>
+<div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value">${notedCount}</div><div class="stat-label">ملاحظة</div></div>
+</div>
+`;
+}
+
+generateWeeklyStats(){
+const weekInput=document.getElementById('weeklyStatsDate').value;
+if(!weekInput)return;
+
+const[year,week]=weekInput.split('-W');
+const dates=this.getWeekDates(year,week);
+
+let totalDelays=0,totalAbsences=0,totalNotes=0;
+dates.forEach(date=>{
+totalDelays+=Object.keys(this.delays[date]||{}).length;
+totalAbsences+=Object.keys(this.absences[date]||{}).length;
+totalNotes+=Object.keys(this.notes[date]||{}).length;
+});
+
+document.getElementById('weeklyStatsContent').innerHTML=`
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">⏰</div><div class="stat-value">${totalDelays}</div><div class="stat-label">التأخير</div></div>
+<div class="stat-card"><div class="stat-icon">❌</div><div class="stat-value">${totalAbsences}</div><div class="stat-label">الغياب</div></div>
+<div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value">${totalNotes}</div><div class="stat-label">الملاحظات</div></div>
+</div>
+`;
+}
+
+generateMonthlyStats(){
+const monthInput=document.getElementById('monthlyStatsDate').value;
+if(!monthInput)return;
+
+const[year,month]=monthInput.split('-');
+const dates=this.getMonthDates(year,month);
+
+let totalDelays=0,totalAbsences=0,totalNotes=0;
+dates.forEach(date=>{
+totalDelays+=Object.keys(this.delays[date]||{}).length;
+totalAbsences+=Object.keys(this.absences[date]||{}).length;
+totalNotes+=Object.keys(this.notes[date]||{}).length;
+});
+
+document.getElementById('monthlyStatsContent').innerHTML=`
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">⏰</div><div class="stat-value">${totalDelays}</div><div class="stat-label">التأخير</div></div>
+<div class="stat-card"><div class="stat-icon">❌</div><div class="stat-value">${totalAbsences}</div><div class="stat-label">الغياب</div></div>
+<div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value">${totalNotes}</div><div class="stat-label">الملاحظات</div></div>
+</div>
+`;
+}
+
+getWeekDates(year,week){
+const dates=[];
+const firstDayOfYear=new Date(year,0,1);
+const daysOffset=(parseInt(week)-1)*7;
+const startDate=new Date(firstDayOfYear.setDate(firstDayOfYear.getDate()+daysOffset));
+for(let i=0;i<7;i++){
+const date=new Date(startDate);
+date.setDate(startDate.getDate()+i);
+dates.push(date.toISOString().split('T')[0]);
+}
 return dates;
 }
 
-exportReportExcel() {
-if (!this.currentReportData) {
-this.showToast('قم بإنشاء التقرير أولاً', 'error');
-return;
+getMonthDates(year,month){
+const dates=[];
+const daysInMonth=new Date(year,month,0).getDate();
+for(let day=1;day<=daysInMonth;day++){
+const date=new Date(year,month-1,day);
+dates.push(date.toISOString().split('T')[0]);
+}
+return dates;
 }
 
-const data = [
-['#', 'الاسم', 'السجل المدني', 'الصف', 'الفصل', 'أيام الحضور', 'أيام الغياب', 'نسبة الحضور'],
-...this.currentReportData.map((s, i) => [
-i + 1,
-s.name,
-s.civilId,
-s.grade,
-s.class,
-s.presentDays,
-s.absentDays,
-s.rate + '%'
-])
-];
+generateLevels(){
+const levels={safe:[],attention:[],warning:[],danger:[]};
 
-const ws = XLSX.utils.aoa_to_sheet(data);
-const wb = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb, ws, 'تقرير الحضور');
-XLSX.writeFile(wb, `تقرير_الحضور_${this.currentReportDates.startDate}_${this.currentReportDates.endDate}.xlsx`);
-this.showToast('تم تصدير التقرير بنجاح', 'success');
+this.students.forEach(s=>{
+const absenceCount=Object.keys(this.absences).filter(date=>this.absences[date][s.id]).length;
+if(absenceCount>=this.levelsConfig.danger.min)levels.danger.push({...s,absenceCount});
+else if(absenceCount>=this.levelsConfig.warning.min)levels.warning.push({...s,absenceCount});
+else if(absenceCount>=this.levelsConfig.attention.min)levels.attention.push({...s,absenceCount});
+else levels.safe.push({...s,absenceCount});
+});
+
+document.getElementById('levelsGrid').innerHTML=`
+<div class="level-card safe">
+<div class="level-header"><div class="level-title">🟢 آمن</div><div class="level-count">${levels.safe.length}</div></div>
+<div class="level-threshold">من ${this.levelsConfig.safe.min} إلى ${this.levelsConfig.safe.max} أيام</div>
+<div class="level-students">${levels.safe.map(s=>`<div class="level-student"><span>${s.name}</span><span>${s.absenceCount} يوم</span></div>`).join('')}</div>
+</div>
+<div class="level-card attention">
+<div class="level-header"><div class="level-title">🟡 انتبه</div><div class="level-count">${levels.attention.length}</div></div>
+<div class="level-threshold">من ${this.levelsConfig.attention.min} إلى ${this.levelsConfig.attention.max} أيام</div>
+<div class="level-students">${levels.attention.map(s=>`<div class="level-student"><span>${s.name}</span><span>${s.absenceCount} يوم</span></div>`).join('')}</div>
+</div>
+<div class="level-card warning">
+<div class="level-header"><div class="level-title">🟠 تحذير</div><div class="level-count">${levels.warning.length}</div></div>
+<div class="level-threshold">من ${this.levelsConfig.warning.min} إلى ${this.levelsConfig.warning.max} أيام</div>
+<div class="level-students">${levels.warning.map(s=>`<div class="level-student"><span>${s.name}</span><span>${s.absenceCount} يوم</span></div>`).join('')}</div>
+</div>
+<div class="level-card danger">
+<div class="level-header"><div class="level-title">🔴 خطر</div><div class="level-count">${levels.danger.length}</div></div>
+<div class="level-threshold">من ${this.levelsConfig.danger.min} يوم فأكثر</div>
+<div class="level-students">${levels.danger.map(s=>`<div class="level-student"><span>${s.name}</span><span>${s.absenceCount} يوم</span></div>`).join('')}</div>
+</div>
+`;
 }
 
-exportReportPDF() {
-this.showToast('ميزة تصدير PDF قيد التطوير', 'info');
+showLevelsSettings(){
+document.getElementById('levelsModal').classList.add('active');
+document.getElementById('safeMin').value=this.levelsConfig.safe.min;
+document.getElementById('safeMax').value=this.levelsConfig.safe.max;
+document.getElementById('attentionMin').value=this.levelsConfig.attention.min;
+document.getElementById('attentionMax').value=this.levelsConfig.attention.max;
+document.getElementById('warningMin').value=this.levelsConfig.warning.min;
+document.getElementById('warningMax').value=this.levelsConfig.warning.max;
+document.getElementById('dangerMin').value=this.levelsConfig.danger.min;
 }
 
-printReport() {
+closeLevelsModal(){
+document.getElementById('levelsModal').classList.remove('active');
+}
+
+saveLevelsSettings(event){
+event.preventDefault();
+this.levelsConfig={
+safe:{min:parseInt(document.getElementById('safeMin').value),max:parseInt(document.getElementById('safeMax').value)},
+attention:{min:parseInt(document.getElementById('attentionMin').value),max:parseInt(document.getElementById('attentionMax').value)},
+warning:{min:parseInt(document.getElementById('warningMin').value),max:parseInt(document.getElementById('warningMax').value)},
+danger:{min:parseInt(document.getElementById('dangerMin').value),max:999}
+};
+this.saveToLocalStorage();
+this.closeLevelsModal();
+this.generateLevels();
+this.showToast('تم الحفظ','success');
+}
+
+handleReportScope(){
+const scope=document.getElementById('reportScope').value;
+document.getElementById('dateRangeSection').style.display=scope==='dateRange'?'block':'none';
+document.getElementById('studentSection').style.display=scope==='student'?'block':'none';
+}
+
+populateReportStudents(){
+const select=document.getElementById('reportStudent');
+select.innerHTML='<option value="">اختر</option>'+
+this.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
+
+generatePrintReport(){
+const type=document.getElementById('reportType').value;
+const scope=document.getElementById('reportScope').value;
+
+let html=`<div style="padding:20px;background:white;border-radius:12px;">`;
+html+=`<h2 style="text-align:center;color:#1a237e;margin-bottom:20px;">تقرير ${this.getReportTypeName(type)}</h2>`;
+
+if(type==='comprehensive'){
+html+=this.generateComprehensiveReport(scope);
+}else{
+html+=this.generateSpecificReport(type,scope);
+}
+
+html+=`</div>`;
+document.getElementById('reportPreview').innerHTML=html;
+}
+
+getReportTypeName(type){
+const names={delays:'التأخير',absences:'الغياب',notes:'الملاحظات',comprehensive:'شامل'};
+return names[type]||type;
+}
+
+generateComprehensiveReport(scope){
+let html='<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#667eea;color:white;">';
+html+='<th style="padding:10px;border:1px solid #ddd;">الاسم</th>';
+html+='<th style="padding:10px;border:1px solid #ddd;">الصف</th>';
+html+='<th style="padding:10px;border:1px solid #ddd;">التأخير</th>';
+html+='<th style="padding:10px;border:1px solid #ddd;">الغياب</th>';
+html+='<th style="padding:10px;border:1px solid #ddd;">الملاحظات</th>';
+html+='</tr></thead><tbody>';
+
+let students=this.students;
+if(scope==='student'){
+const studentId=document.getElementById('reportStudent').value;
+students=this.students.filter(s=>s.id===studentId);
+}
+
+students.forEach(s=>{
+const record=this.getStudentRecord(s.id);
+html+='<tr>';
+html+=`<td style="padding:10px;border:1px solid #ddd;">${s.name}</td>`;
+html+=`<td style="padding:10px;border:1px solid #ddd;">${s.grade} - ${s.class}</td>`;
+html+=`<td style="padding:10px;border:1px solid #ddd;">${record.delays}</td>`;
+html+=`<td style="padding:10px;border:1px solid #ddd;">${record.absences}</td>`;
+html+=`<td style="padding:10px;border:1px solid #ddd;">${record.notes}</td>`;
+html+='</tr>';
+});
+
+html+='</tbody></table>';
+return html;
+}
+
+generateSpecificReport(type,scope){
+const dataMap={delays:this.delays,absences:this.absences,notes:this.notes};
+const data=dataMap[type];
+
+let html='<div>';
+Object.keys(data).forEach(date=>{
+const records=data[date];
+if(Object.keys(records).length>0){
+html+=`<h3 style="color:#667eea;margin:15px 0;">التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}</h3>`;
+html+='<ul>';
+Object.keys(records).forEach(studentId=>{
+const student=this.students.find(s=>s.id===studentId);
+if(student){
+const noteText=type==='notes'?` - ${records[studentId]}`:'';
+html+=`<li style="padding:8px;border-bottom:1px solid #eee;">${student.name} - ${student.grade} ${student.class}${noteText}</li>`;
+}
+});
+html+='</ul>';
+}
+});
+html+='</div>';
+return html;
+}
+
+printReport(){
 window.print();
 }
 
-// =================== Subscription Management ===================
+exportReportExcel(){
+const type=document.getElementById('reportType').value;
+const data=[
+['#','الاسم','السجل','الصف','الفصل','التأخير','الغياب','الملاحظات'],
+...this.students.map((s,i)=>{
+const record=this.getStudentRecord(s.id);
+return[i+1,s.name,s.civilId,s.grade,s.class,record.delays,record.absences,record.notes];
+})
+];
 
-checkSubscription() {
-const now = new Date();
-const expiry = new Date(this.subscription.expiryDate);
-const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-
-// Update displays
-document.getElementById('trialDaysLeft').textContent = Math.max(0, daysLeft);
-
-if (this.subscription.isActive) {
-document.getElementById('subscriptionStatus').textContent = 'مفعّل ✓';
-document.getElementById('subscriptionExpiry').textContent = `ينتهي في ${expiry.toLocaleDateString('ar-SA')}`;
-document.getElementById('subscriptionBadge').className = 'subscription-badge active';
-document.getElementById('lockScreen').style.display = 'none';
-this.displayActivationCode();
-} else if (daysLeft > 0) {
-document.getElementById('subscriptionStatus').textContent = 'فترة تجريبية';
-document.getElementById('subscriptionExpiry').textContent = `متبقي ${daysLeft} أيام`;
-document.getElementById('subscriptionBadge').className = 'subscription-badge trial';
-document.getElementById('lockScreen').style.display = 'none';
-} else {
-document.getElementById('subscriptionStatus').textContent = 'منتهي الصلاحية';
-document.getElementById('subscriptionExpiry').textContent = 'يرجى التجديد';
-document.getElementById('subscriptionBadge').className = 'subscription-badge warning';
-document.getElementById('lockScreen').style.display = 'flex';
-}
+const ws=XLSX.utils.aoa_to_sheet(data);
+const wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,'التقرير');
+XLSX.writeFile(wb,`تقرير_${type}_${new Date().toISOString().split('T')[0]}.xlsx`);
+this.showToast('تم التصدير','success');
 }
 
-displayActivationCode() {
-if (this.subscription.activationCode && this.subscription.isActive) {
-const displayElement = document.getElementById('activationCodeDisplay');
-if (displayElement) {
-displayElement.textContent = `كود التفعيل: ${this.subscription.activationCode}`;
-displayElement.style.display = 'block';
-}
-}
-}
+loadSettings(){
+document.getElementById('schoolName').value=localStorage.getItem('schoolName')||'مدرسة النموذجية';
+document.getElementById('teacherName').value=localStorage.getItem('teacherName')||'أحمد محمد';
 
-activateSubscription(source = 'payment') {
-const inputId = source === 'settings' ? 'activationCodeSettings' : 'activationCodeInput';
-const code = document.getElementById(inputId).value.trim().toUpperCase();
+const expiry=new Date(this.subscription.expiryDate);
+const daysLeft=Math.ceil((expiry-new Date())/(1000*60*60*24));
 
-if (!code) {
-this.showToast('الرجاء إدخال كود التفعيل', 'error');
-return;
+document.getElementById('settingsStatus').textContent=this.subscription.isActive?'مفعّل ✓':'فترة تجريبية';
+document.getElementById('settingsExpiry').textContent=expiry.toLocaleDateString('ar-SA');
+document.getElementById('settingsDaysLeft').textContent=`${Math.max(0,daysLeft)} أيام`;
 }
 
-// Validate format: SK-XXXXX-XXXXX
-if (!/^SK-[A-Z0-9]{5}-[A-Z0-9]{5}$/.test(code)) {
-this.showToast('كود التفعيل غير صحيح. الصيغة الصحيحة: SK-XXXXX-XXXXX', 'error');
-return;
+saveSettings(){
+localStorage.setItem('schoolName',document.getElementById('schoolName').value);
+localStorage.setItem('teacherName',document.getElementById('teacherName').value);
+this.showToast('تم الحفظ','success');
 }
 
-// Activate subscription
-this.subscription.status = 'active';
-this.subscription.isActive = true;
-this.subscription.activationCode = code;
-this.subscription.expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
-
-this.saveToLocalStorage();
-this.checkSubscription();
-this.hidePaymentPage();
-
-this.showToast('🎉 تم تفعيل الاشتراك بنجاح! مرحباً بك', 'success');
-
-setTimeout(() => location.reload(), 2000);
-}
-
-showPaymentPage() {
-document.getElementById('lockScreen').style.display = 'none';
-document.getElementById('paymentPage').style.display = 'block';
-}
-
-hidePaymentPage() {
-document.getElementById('paymentPage').style.display = 'none';
-document.getElementById('lockScreen').style.display = 'flex';
-}
-
-selectPaymentMethod(method) {
-document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-document.querySelectorAll('.method-radio').forEach(r => r.checked = false);
-
-if (method === 'bank') {
-document.getElementById('bankTransfer').classList.add('selected');
-document.querySelector('#bankTransfer .method-radio').checked = true;
-} else if (method === 'whatsapp') {
-document.getElementById('whatsappPay').classList.add('selected');
-document.querySelector('#whatsappPay .method-radio').checked = true;
-}
-}
-
-copyToClipboard(text) {
-navigator.clipboard.writeText(text).then(() => {
-this.showToast('تم النسخ بنجاح', 'success');
-});
-}
-
-// =================== Settings ===================
-
-loadSettings() {
-document.getElementById('schoolName').value = localStorage.getItem('schoolName') || 'مدرسة النموذجية';
-document.getElementById('teacherName').value = localStorage.getItem('teacherName') || 'أحمد محمد';
-
-const expiry = new Date(this.subscription.expiryDate);
-const daysLeft = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
-
-document.getElementById('settingsStatus').textContent = this.subscription.isActive ? 'مفعّل ✓' : 'فترة تجريبية';
-document.getElementById('settingsExpiry').textContent = expiry.toLocaleDateString('ar-SA');
-document.getElementById('settingsDaysLeft').textContent = `${Math.max(0, daysLeft)} أيام`;
-}
-
-saveSettings() {
-localStorage.setItem('schoolName', document.getElementById('schoolName').value);
-localStorage.setItem('teacherName', document.getElementById('teacherName').value);
-this.showToast('تم حفظ الإعدادات بنجاح', 'success');
-}
-
-resetApp() {
-if (!confirm('هل أنت متأكد من إعادة تعيين التطبيق؟ سيتم حذف جميع البيانات!')) return;
-
+resetApp(){
+if(!confirm('حذف كل شيء؟'))return;
 localStorage.clear();
 location.reload();
 }
 
-// =================== Utilities ===================
+checkSubscription(){
+    const now=new Date();
+    const expiry=new Date(this.subscription.expiryDate);
+    const daysLeft=Math.ceil((expiry-now)/(1000*60*60*24));
 
-saveToLocalStorage() {
-localStorage.setItem('students', JSON.stringify(this.students));
-localStorage.setItem('attendance', JSON.stringify(this.attendance));
-localStorage.setItem('subscription', JSON.stringify(this.subscription));
+    document.getElementById('trialDaysLeft').textContent=Math.max(0,daysLeft);
+
+    if(this.subscription.isActive){
+        document.getElementById('subscriptionStatus').textContent='مفعّل ✓';
+        document.getElementById('subscriptionExpiry').textContent=`ينتهي ${expiry.toLocaleDateString('ar-SA')}`;
+        document.getElementById('subscriptionBadge').className='subscription-badge active';
+        document.getElementById('lockScreen').style.display='none';
+        this.displayActivationCode();
+    } else if(daysLeft>0){
+        document.getElementById('subscriptionStatus').textContent='فترة تجريبية';
+        document.getElementById('subscriptionExpiry').textContent=`متبقي ${daysLeft} أيام`;
+        document.getElementById('subscriptionBadge').className='subscription-badge trial';
+        document.getElementById('lockScreen').style.display='none';
+    } else {
+        document.getElementById('lockScreen').style.display='flex';
+    }
+    setTimeout(() => this.applyActionLockState(), 100);
+}`;
+document.getElementById('subscriptionBadge').className='subscription-badge active';
+document.getElementById('lockScreen').style.display='none';
+this.displayActivationCode();
+}else if(daysLeft>0){
+document.getElementById('subscriptionStatus').textContent='فترة تجريبية';
+document.getElementById('subscriptionExpiry').textContent=`متبقي ${daysLeft} أيام`;
+document.getElementById('subscriptionBadge').className='subscription-badge trial';
+document.getElementById('lockScreen').style.display='none';
+}else{
+document.getElementById('lockScreen').style.display='flex';
+}
 }
 
-loadFromLocalStorage() {
-const students = localStorage.getItem('students');
-const attendance = localStorage.getItem('attendance');
-const subscription = localStorage.getItem('subscription');
+displayActivationCode(){
+if(this.subscription.activationCode&&this.subscription.isActive){
+const displayElement=document.getElementById('activationCodeDisplay');
+if(displayElement){
+displayElement.textContent=`كود: ${this.subscription.activationCode}`;
+}
+}
+}
 
-if (students) this.students = JSON.parse(students);
-if (attendance) this.attendance = JSON.parse(attendance);
-if (subscription) this.subscription = { ...this.subscription, ...JSON.parse(subscription) };
+activateSubscription(source='payment'){
+const inputId=source==='settings'?'activationCodeSettings':'activationCodeInput';
+const code=document.getElementById(inputId).value.trim().toUpperCase();
+
+if(!code){
+this.showToast('أدخل الكود','error');
+return;
+}
+
+if(!/^SK-[A-Z0-9]{5}-[A-Z0-9]{5}$/.test(code)){
+this.showToast('كود غير صحيح','error');
+return;
+}
+
+this.subscription.status='active';
+this.subscription.isActive=true;
+this.subscription.activationCode=code;
+this.subscription.expiryDate=new Date(Date.now()+365*24*60*60*1000).toISOString();
+
+this.saveToLocalStorage();
+this.checkSubscription();
+this.hidePaymentPage();
+this.showToast('تم التفعيل!','success');
+setTimeout(()=>location.reload(),2000);
+}
+
+showPaymentPage(){
+document.getElementById('lockScreen').style.display='none';
+document.getElementById('paymentPage').style.display='flex';
+}
+
+hidePaymentPage(){
+document.getElementById('paymentPage').style.display='none';
+document.getElementById('lockScreen').style.display='flex';
+}
+
+selectPaymentMethod(method){
+document.querySelectorAll('.payment-method').forEach(m=>m.classList.remove('selected'));
+document.querySelectorAll('[name="paymentMethod"]').forEach(r=>r.checked=false);
+
+if(method==='bank'){
+document.getElementById('bankTransfer').classList.add('selected');
+document.querySelector('#bankTransfer input').checked=true;
+}else if(method==='whatsapp'){
+document.getElementById('whatsappPay').classList.add('selected');
+document.querySelector('#whatsappPay input').checked=true;
+}
+}
+
+copyToClipboard(text){
+navigator.clipboard.writeText(text).then(()=>{
+this.showToast('تم النسخ','success');
+});
+}
+
+setTodayDate(){
+const today=new Date().toISOString().split('T')[0];
+['delaysDate','absencesDate','notesDate','dailyStatsDate'].forEach(id=>{
+const input=document.getElementById(id);
+if(input)input.value=today;
+});
+}
+
+updateStats(){
+const total=this.students.length;
+document.getElementById('totalStudents').textContent=total;
+
+const today=new Date().toISOString().split('T')[0];
+const todayDelays=this.delays[today]||{};
+const todayAbsences=this.absences[today]||{};
+const todayNotes=this.notes[today]||{};
+
+const delaysCount=Object.keys(todayDelays).length;
+const absentCount=Object.keys(todayAbsences).length;
+const notesCount=Object.keys(todayNotes).length;
+const presentCount=total-absentCount;
+
+document.getElementById('delaysToday').textContent=delaysCount;
+document.getElementById('absentToday').textContent=absentCount;
+document.getElementById('notesToday').textContent=notesCount;
+document.getElementById('presentToday').textContent=presentCount;
+}
+
+updateUI(){
+this.updateStudentsList();
+this.updateStats();
+}
+
+saveToLocalStorage(){
+localStorage.setItem('students',JSON.stringify(this.students));
+localStorage.setItem('delays',JSON.stringify(this.delays));
+localStorage.setItem('absences',JSON.stringify(this.absences));
+localStorage.setItem('notes',JSON.stringify(this.notes));
+localStorage.setItem('subscription',JSON.stringify(this.subscription));
+localStorage.setItem('levelsConfig',JSON.stringify(this.levelsConfig));
+localStorage.setItem('grades',JSON.stringify(this.grades));
+localStorage.setItem('classes',JSON.stringify(this.classes));
+}
+
+loadFromLocalStorage(){
+const students=localStorage.getItem('students');
+const delays=localStorage.getItem('delays');
+const absences=localStorage.getItem('absences');
+const notes=localStorage.getItem('notes');
+const subscription=localStorage.getItem('subscription');
+const levelsConfig=localStorage.getItem('levelsConfig');
+const grades=localStorage.getItem('grades');
+const classes=localStorage.getItem('classes');
+
+if(students)this.students=JSON.parse(students);
+if(delays)this.delays=JSON.parse(delays);
+if(absences)this.absences=JSON.parse(absences);
+if(notes)this.notes=JSON.parse(notes);
+if(subscription)this.subscription={...this.subscription,...JSON.parse(subscription)};
+if(levelsConfig)this.levelsConfig=JSON.parse(levelsConfig);
+if(grades)this.grades=JSON.parse(grades);
+if(classes)this.classes=JSON.parse(classes);
 
 this.updateStudentsList();
 this.updateStats();
 }
 
-showToast(message, type = 'info') {
-const toast = document.getElementById('toast');
-const icons = { success: '✓', error: '✗', info: 'ℹ' };
+showToast(message,type='info'){
+const toast=document.getElementById('toast');
+const icons={success:'✓',error:'✗',info:'ℹ'};
 
-toast.innerHTML = `<div class="toast-icon">${icons[type]}</div><div>${message}</div>`;
-toast.className = `toast ${type} show`;
+toast.innerHTML=`<div class="toast-icon">${icons[type]}</div><div>${message}</div>`;
+toast.className=`toast ${type} show`;
 
-setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-updateUI() {
-this.updateStudentsList();
-this.updateStats();
+setTimeout(()=>toast.classList.remove('show'),3000);
 }
 }
 
-// Initialize App
-const app = new AttendanceApp();
+var app=new AttendanceApp(); window.app=app;
 </script>
 </body>
 </html>
