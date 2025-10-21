@@ -189,7 +189,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <div class="feature-item"><div class="feature-icon">📊</div><div class="feature-content"><div class="feature-title">تقارير تفصيلية</div><div class="feature-text">تقارير شاملة</div></div></div>
 <div class="feature-item"><div class="feature-icon">📱</div><div class="feature-content"><div class="feature-title">واتساب</div><div class="feature-text">إرسال تلقائي</div></div></div>
 </div>
-<button class="btn-subscribe-main" onclick="app.showPaymentPage()">🚀 اشترك الآن - 35 ريال</button>
+<button class="btn-subscribe-main" onclick="app.showPaymentPage()" data-allow="true">🚀 اشترك الآن - 35 ريال</button>
 <div class="warning-box">
 <span class="warning-icon">⚠️</span>
 <div class="warning-content"><strong>تنبيه:</strong> متبقي <span class="countdown-timer" id="trialDaysLeft">7</span> أيام</div>
@@ -200,7 +200,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <div id="paymentPage" style="display:none;">
 <div class="lock-overlay"></div>
 <div class="payment-container">
-<button class="btn btn-secondary" onclick="app.hidePaymentPage()" style="margin-bottom:20px;">← رجوع</button>
+<button class="btn btn-secondary" onclick="app.hidePaymentPage()" style="margin-bottom:20px;" data-allow="true">← رجوع</button>
 <div class="payment-header" style="text-align:center;margin-bottom:30px;">
 <div style="font-size:60px;margin-bottom:15px;">💳</div>
 <h2 style="color:white;font-size:2rem;margin-bottom:10px;">معلومات الدفع</h2>
@@ -604,11 +604,6 @@ showPage(page){
     if(page==='reports')this.populateReportStudents();
     if(page==='settings')this.loadSettings();
 }
-if(page==='notes')this.loadNotes();
-if(page==='statistics'){this.showSubPage('stats');this.showStatsView('daily');}
-if(page==='reports')this.populateReportStudents();
-if(page==='settings')this.loadSettings();
-}
 
 showSubPage(subPage){
     if(subPage==='delays'||subPage==='absences'){
@@ -634,14 +629,6 @@ showSubPage(subPage){
         if(subPage==='stats') this.showStatsView('daily');
         if(subPage==='levels') this.generateLevels();
     }
-}else if(subPage==='stats'||subPage==='levels'){
-document.querySelectorAll('#statisticsPage > .sub-tabs .sub-tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('#statisticsPage > .sub-page').forEach(p=>p.classList.remove('active'));
-event.target.classList.add('active');
-document.getElementById(subPage+'SubPage').classList.add('active');
-if(subPage==='stats')this.showStatsView('daily');
-if(subPage==='levels')this.generateLevels();
-}
 }
 
 showStatsView(view){
@@ -1112,7 +1099,7 @@ return`
 <div class="student-details">
 <span class="student-detail"><i class="fas fa-graduation-cap"></i>${s.grade} - ${s.class}</span>
 </div>
-${hasNote?`<div style="margin-top:8px;padding:8px;background:#fff3cd;border-radius:6px;font-size:13px;">${this.notes[date][s.id]}</div>`:''}
+ ${hasNote?`<div style="margin-top:8px;padding:8px;background:#fff3cd;border-radius:6px;font-size:13px;">${this.notes[date][s.id]}</div>`:''}
 </div>
 </div>
 `;
@@ -1529,19 +1516,28 @@ checkSubscription(){
     } else {
         document.getElementById('lockScreen').style.display='flex';
     }
-    setTimeout(() => this.applyActionLockState(), 100);
-}`;
-document.getElementById('subscriptionBadge').className='subscription-badge active';
-document.getElementById('lockScreen').style.display='none';
-this.displayActivationCode();
-}else if(daysLeft>0){
-document.getElementById('subscriptionStatus').textContent='فترة تجريبية';
-document.getElementById('subscriptionExpiry').textContent=`متبقي ${daysLeft} أيام`;
-document.getElementById('subscriptionBadge').className='subscription-badge trial';
-document.getElementById('lockScreen').style.display='none';
-}else{
-document.getElementById('lockScreen').style.display='flex';
+    this.applyActionLockState();
 }
+
+applyActionLockState(){
+    // تطبيق حالة القفل على العناصر
+    const isLocked = document.getElementById('lockScreen').style.display === 'flex';
+    
+    // الحصول على جميع العناصر القابلة للنقر
+    const clickableElements = document.querySelectorAll('button, .btn, .nav-item, .sub-tab, .btn-icon, input[type="checkbox"], input[type="radio"]');
+    
+    clickableElements.forEach(element => {
+        // التحقق مما إذا كان العنصر مسموحًا به
+        const isAllowed = element.hasAttribute('data-allow') && element.getAttribute('data-allow') === 'true';
+        
+        if (isLocked && !isAllowed) {
+            // إضافة فئة التعطيل إذا كان النظام مقفول والعنصر غير مسموح به
+            element.classList.add('disabled-action');
+        } else {
+            // إزالة فئة التعطيل في الحالات الأخرى
+            element.classList.remove('disabled-action');
+        }
+    });
 }
 
 displayActivationCode(){
