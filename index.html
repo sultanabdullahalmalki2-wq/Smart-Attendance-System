@@ -75,6 +75,12 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .btn-icon.delete{background:#f45c43;color:white}
 .btn-icon:hover{transform:scale(1.1)}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
+@media (max-width:768px){
+.stats-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+}
+@media (max-width:480px){
+.stats-grid{grid-template-columns:1fr;gap:10px}
+}
 .stat-card{background:white;padding:20px;border-radius:12px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.1);transition:all 0.3s}
 .stat-card:hover{transform:translateY(-5px)}
 .stat-icon{font-size:2.5rem;margin-bottom:10px}
@@ -97,9 +103,9 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .search-input{width:100%;padding:15px 50px 15px 20px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px}
 .search-input:focus{border-color:#667eea}
 .search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#667eea;font-size:20px}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow-y:auto}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow-y:auto;padding:20px 0}
 .modal.active{display:flex}
-.modal-content{background:white;border-radius:20px;padding:30px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;margin:20px}
+.modal-content{background:white;border-radius:20px;padding:30px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;margin:auto}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #f0f0f0}
 .modal-title{font-size:1.5rem;font-weight:700;color:#1a237e}
 .modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:#666;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
@@ -107,7 +113,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .empty-state{text-align:center;padding:60px 20px;color:#666}
 .empty-icon{font-size:4rem;margin-bottom:20px;opacity:0.5}
 .empty-text{font-size:1.2rem;margin-bottom:10px}
-.toast{position:fixed;bottom:30px;right:30px;background:white;padding:15px 20px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:12px;min-width:300px;transform:translateX(400px);transition:transform 0.3s}
+.toast{position:fixed;bottom:30px;right:30px;background:white;padding:15px 20px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.2);z-index:100000;display:flex;align-items:center;gap:12px;min-width:300px;transform:translateX(400px);transition:transform 0.3s}
 .toast.show{transform:translateX(0)}
 .toast-icon{font-size:24px}
 .toast.success{border-right:4px solid #38ef7d}
@@ -125,7 +131,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .subscription-badge.active{border-right:4px solid #4caf50}
 #lockScreen,#paymentPage{position:fixed;top:0;left:0;width:100vw;min-height:100vh;z-index:99999;overflow-y:auto}
 .lock-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(26,35,126,0.95) 0%,rgba(13,71,161,0.95) 100%)}
-.lock-container,.payment-container{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.lock-container,.payment-container{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;padding-top:40px;padding-bottom:40px}
 .lock-header{text-align:center;margin-bottom:30px}
 .lock-icon-main{font-size:70px;margin-bottom:15px}
 .lock-main-title{color:white;font-size:2rem;margin-bottom:10px;font-weight:900}
@@ -162,6 +168,10 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .sync-indicator.syncing{background:#fff3cd}
 .sync-indicator.success{background:#d4edda}
 .sync-indicator.error{background:#f8d7da}
+.sync-indicator i{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.sync-progress{width:100px;height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden;margin-right:10px}
+.sync-progress-bar{height:100%;background:#667eea;transition:width 0.3s}
 .excel-instructions{background:#e3f2fd;padding:15px;border-radius:10px;margin-bottom:15px;border-right:4px solid #2196f3}
 .excel-instructions h4{color:#1976d2;margin-bottom:10px}
 .excel-instructions ul{margin-right:20px;color:#555}
@@ -174,6 +184,12 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 .student-item{flex-direction:column;align-items:start;gap:15px}
 .levels-grid{grid-template-columns:1fr}
 .charts-grid{grid-template-columns:1fr}
+.d-flex.gap-10{justify-content:center}
+.d-flex.gap-10 .btn{flex:1 1 calc(50% - 5px);min-width:120px;max-width:200px;font-size:14px}
+}
+@media (max-width:480px){
+.d-flex.gap-10{flex-direction:column}
+.d-flex.gap-10 .btn{width:100%;max-width:100%}
 }
 .w-100{width:100%}
 .d-flex{display:flex}
@@ -190,6 +206,30 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
     pointer-events: none !important;
     opacity: 0.5 !important;
     cursor: not-allowed !important;
+}
+
+/* استثناء للعناصر المسموح بها */
+.btn:disabled:not([data-allow="true"]), 
+.btn-icon:disabled:not([data-allow="true"]), 
+input:disabled:not([data-allow="true"]), 
+select:disabled:not([data-allow="true"]), 
+textarea:disabled:not([data-allow="true"]) {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+.disabled-action:not([data-allow="true"]) {
+    pointer-events: none !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* إضافة قاعدة جديدة للعناصر المسموح بها */
+[data-allow="true"] {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
 }
 </style>
 </head>
@@ -209,7 +249,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <div class="feature-item"><div class="feature-icon">📱</div><div class="feature-content"><div class="feature-title">واتساب</div><div class="feature-text">إرسال تلقائي</div></div></div>
 </div>
 <button class="btn-subscribe-main" onclick="app.showPaymentPage()" data-allow="true">🚀 اشترك الآن - 35 ريال</button>
-<button class="btn btn-close w-100" onclick="app.closeApplication()" data-allow="true">✕ إغلاق البرنامج</button>
+<button class="btn btn-info w-100" onclick="app.returnToApp()" data-allow="true">← رجوع للبرنامج</button>
 <div class="warning-box">
 <span class="warning-icon">⚠️</span>
 <div class="warning-content"><strong>تنبيه:</strong> متبقي <span class="countdown-timer" id="trialDaysLeft">7</span> أيام</div>
@@ -235,7 +275,15 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <div class="method-content">
 <div class="bank-info">
 <div class="bank-row"><span>الآيبان:</span><span style="font-family:monospace;">SA1234567891234567891234</span></div>
+<div class="bank-row"><span>رقم الحساب:</span><span style="font-family:monospace;">1234567890</span></div>
 <div class="bank-row" style="border:none;"><span>المبلغ:</span><span style="color:#11998e;font-weight:bold;">35 ريال</span></div>
+</div>
+<div style="text-align:center;margin-top:15px;padding:15px;background:white;border-radius:10px;">
+<p style="margin-bottom:10px;font-weight:bold;color:#1a237e;">رمز QR للتحويل السريع</p>
+<div style="width:200px;height:200px;margin:0 auto;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #e0e0e0;">
+<i class="fas fa-qrcode" style="font-size:100px;color:#667eea;"></i>
+</div>
+<p style="margin-top:10px;font-size:12px;color:#666;">امسح الرمز باستخدام تطبيق البنك</p>
 </div>
 </div>
 </div>
@@ -262,6 +310,9 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 
 <div class="sync-indicator" id="syncIndicator" style="display:none;">
 <i class="fas fa-sync"></i>
+<div class="sync-progress">
+<div class="sync-progress-bar" id="syncProgressBar"></div>
+</div>
 <span id="syncText">مزامنة...</span>
 </div>
 
@@ -314,7 +365,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <button class="btn btn-primary" onclick="app.showAddStudentModal()"><i class="fas fa-user-plus"></i>إضافة طالب</button>
 </div>
 
-<div class="excel-instructions">
+<div class="excel-instructions" id="excelInstructions" style="display:none;">
 <h4><i class="fas fa-info-circle"></i> تعليمات استيراد ملف Excel:</h4>
 <ul>
 <li>يجب أن يحتوي الملف على 5 أعمدة بالترتيب التالي:</li>
@@ -335,6 +386,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 <div class="d-flex gap-10" style="margin-bottom:20px;flex-wrap:wrap;">
 <label for="excelFile" class="btn btn-success" style="margin:0;cursor:pointer;"><i class="fas fa-file-excel"></i>استيراد Excel</label>
 <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
+<button class="btn btn-info" onclick="app.toggleExcelInstructions()"><i class="fas fa-question-circle"></i>تعليمات الاستيراد</button>
 <button class="btn btn-primary" onclick="app.exportStudentsExcel()"><i class="fas fa-download"></i>تصدير Excel</button>
 <button class="btn btn-danger" onclick="app.deleteAllStudents()"><i class="fas fa-trash"></i>حذف الكل</button>
 </div>
@@ -683,7 +735,7 @@ body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#667eea 
 const firebaseConfig = {
     apiKey: "AIzaSyD0zfRWvvVJt0qswbY_0W-tbEzcuzi1URw",
     authDomain: "attendancesystem-366b0.firebaseapp.com",
-    databaseURL: "https://attendancesystem-default-rtdb.firebaseio.com",
+    databaseURL: "https://attendancesystem-366b0-default-rtdb.firebaseio.com",
     projectId: "attendancesystem-366b0",
     storageBucket: "attendancesystem-366b0.firebasestorage.app",
     messagingSenderId: "570925561837",
@@ -711,6 +763,17 @@ class AttendanceApp {
             level3: { min: 11, max: 15 },
             level4: { min: 16, max: 999 }
         };
+        
+        // نظام المزامنة المحسن جداً
+        this.syncQueue = [];
+        this.isSyncing = false;
+        this.lastSyncTime = 0;
+        this.syncInProgress = false;
+        this.pendingSync = {};
+        this.syncTimeout = null;
+        this.syncRetryCount = 0;
+        this.maxRetries = 3;
+        
         this.init();
     }
 
@@ -720,6 +783,7 @@ class AttendanceApp {
         this.checkSubscription();
         this.updateUI();
         this.setTodayDate();
+        this.setupSubscriptionInterceptor();
     }
 
     // إنشاء معرف فريد للجهاز
@@ -855,12 +919,251 @@ class AttendanceApp {
         }
     }
 
-    // المزامنة السحابية (يدوية فقط)
-    async syncToCloud() {
+    // Return to app temporarily (will redirect to lock screen on any action)
+    returnToApp() {
+        // Hide lock screen temporarily
+        document.getElementById('lockScreen').style.display = 'none';
+
+        // Check subscription status after a brief moment
+        setTimeout(() => {
+            const now = new Date();
+            const expiry = new Date(this.subscription.expiryDate);
+            const isExpired = now > expiry && !this.subscription.isActivated;
+
+            if (isExpired) {
+                // User will be redirected back on any action
+                this.showToast('يمكنك التصفح، لكن أي عملية ستعيدك لشاشة القفل', 'info');
+            }
+        }, 100);
+    }
+
+    // Setup subscription interceptor to catch all user actions
+    setupSubscriptionInterceptor() {
+        // Intercept all clicks
+        document.addEventListener('click', (e) => {
+            // Skip if clicking on allowed elements
+            const allowedElement = e.target.closest('[data-allow="true"]');
+            if (allowedElement) return;
+
+            // Skip if clicking within lock screen or payment modals
+            const inLockScreen = e.target.closest('#lockScreen');
+            const inPaymentPage = e.target.closest('#paymentPage');
+            if (inLockScreen || inPaymentPage) return;
+
+            // Check if subscription is expired
+            if (this.subscription) {
+                const now = new Date();
+                const expiry = new Date(this.subscription.expiryDate);
+                const isExpired = now > expiry && !this.subscription.isActivated;
+
+                if (isExpired) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    document.getElementById('lockScreen').style.display = 'flex';
+                    this.showToast('انتهت صلاحية الاشتراك', 'error');
+                    return false;
+                }
+            }
+        }, true);
+
+        // Intercept form submissions
+        document.addEventListener('submit', (e) => {
+            if (this.subscription) {
+                const now = new Date();
+                const expiry = new Date(this.subscription.expiryDate);
+                const isExpired = now > expiry && !this.subscription.isActivated;
+
+                if (isExpired) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.getElementById('lockScreen').style.display = 'flex';
+                    this.showToast('انتهت صلاحية الاشتراك', 'error');
+                    return false;
+                }
+            }
+        }, true);
+
+        // Intercept input changes
+        document.addEventListener('change', (e) => {
+            const allowedElement = e.target.closest('[data-allow="true"]');
+            if (allowedElement) return;
+
+            if (this.subscription) {
+                const now = new Date();
+                const expiry = new Date(this.subscription.expiryDate);
+                const isExpired = now > expiry && !this.subscription.isActivated;
+
+                if (isExpired) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.getElementById('lockScreen').style.display = 'flex';
+                    this.showToast('انتهت صلاحية الاشتراك', 'error');
+                    return false;
+                }
+            }
+        }, true);
+    }
+
+    // نظام المزامنة الفائق السرعة
+    async syncToCloud(data = null, priority = false) {
+        // إذا كانت هناك عملية مزامنة جارية وأولوية منخفضة، أضف للطابور
+        if (this.syncInProgress && !priority) {
+            this.syncQueue.push({ data, timestamp: Date.now() });
+            return;
+        }
+
+        // منع المزامنة المتكررة جداً
+        const now = Date.now();
+        if (now - this.lastSyncTime < 3000 && !priority) {
+            this.syncQueue.push({ data, timestamp: Date.now() });
+            return;
+        }
+
+        this.syncInProgress = true;
+        this.lastSyncTime = now;
+        this.syncRetryCount = 0;
+
         try {
-            this.showSyncIndicator('syncing', 'جاري المزامنة...');
+            // المزامنة صامتة: تمت إزالة المؤشر أثناء المزامنة السريعة
+
+            // تحضير البيانات المصغرة
+            const syncData = data || this.prepareSyncData();
+
+            // مزامنة البيانات المصغرة فقط
+            await this.syncCompressedData(syncData);
+
+            // تحديث وقت آخر استخدام
+            await this.db.ref(`trials/${this.deviceId}/lastSeen`).set(new Date().toISOString());
+
+            this.showSyncIndicator('success', 'تمت المزامنة', 100);
+            setTimeout(() => this.hideSyncIndicator(), 1500);
+
+            // معالجة الطابور
+            this.processSyncQueue();
+
+        } catch (error) {
+            console.error('Sync error:', error);
+            this.syncRetryCount++;
             
-            const localData = {
+            if (this.syncRetryCount < this.maxRetries) {
+                // إعادة المحاولة بعد فترة قصيرة
+                setTimeout(() => {
+                    this.syncQueue.push({ data, timestamp: Date.now() });
+                    this.processSyncQueue();
+                }, 1000 * this.syncRetryCount);
+            } else {
+                this.showSyncIndicator('error', 'فشلت المزامنة - حاول مرة أخرى', 0);
+                setTimeout(() => this.hideSyncIndicator(), 3000);
+                this.syncRetryCount = 0;
+            }
+        } finally {
+            this.syncInProgress = false;
+        }
+    }
+
+    prepareSyncData() {
+        // إعداد بيانات مصغرة للمزامنة السريعة
+        return {
+            // فقط البيانات الأساسية
+            studentsCount: this.students.length,
+            lastModified: new Date().toISOString(),
+            // بيانات مصغرة للطلاب (أول 20 طالب فقط)
+            recentStudents: this.students.slice(0, 20).map(s => ({
+                id: s.id,
+                name: s.name,
+                grade: s.grade,
+                class: s.class
+            })),
+            // بيانات اليوم فقط
+            todayData: {
+                date: new Date().toISOString().split('T')[0],
+                delays: this.delays[new Date().toISOString().split('T')[0]] || {},
+                absences: this.absences[new Date().toISOString().split('T')[0]] || {},
+                notes: this.notes[new Date().toISOString().split('T')[0]] || {}
+            },
+            // البيانات الوصفية
+            grades: this.grades,
+            classes: this.classes,
+            absenceLevels: this.absenceLevels
+        };
+    }
+
+    async syncCompressedData(data) {
+        // مزامنة سريعة للبيانات المصغرة
+        const updates = {};
+        
+        // تحديث البيانات الرئيسية
+        updates[`users/${this.deviceId}/summary`] = {
+            studentsCount: data.studentsCount,
+            lastModified: data.lastModified,
+            grades: data.grades,
+            classes: data.classes,
+            absenceLevels: data.absenceLevels
+        };
+
+        // تحديث بيانات اليوم
+        const today = data.todayData.date;
+        updates[`users/${this.deviceId}/daily/${today}`] = {
+            delays: data.todayData.delays,
+            absences: data.todayData.absences,
+            notes: data.todayData.notes
+        };
+
+        // تحديث الطلاب الحديثين
+        updates[`users/${this.deviceId}/recentStudents`] = data.recentStudents;
+
+        // تنفيذ جميع التحديثات دفعة واحدة
+        await this.db.ref().update(updates);
+    }
+
+
+    async syncOnlyChanges(changedData) {
+        // مزامنة انتقائية - البيانات المتغيرة فقط
+        const today = new Date().toISOString().split('T')[0];
+        const updates = {};
+        updates[`users/${this.deviceId}/daily/${today}`] = changedData;
+        await this.db.ref().update(updates);
+    }
+    processSyncQueue() {
+        if (this.syncQueue.length > 0 && !this.syncInProgress) {
+            const nextSync = this.syncQueue.shift();
+            // تجاهل الطلبات القديمة جداً (أكثر من 10 ثواني)
+            if (Date.now() - nextSync.timestamp < 10000) {
+                this.syncToCloud(nextSync.data);
+            }
+        }
+    }
+
+    showSyncIndicator(status, text, progress = 0) {
+        const indicator = document.getElementById('syncIndicator');
+        const syncText = document.getElementById('syncText');
+        const progressBar = document.getElementById('syncProgressBar');
+        
+        indicator.className = `sync-indicator ${status}`;
+        syncText.textContent = text;
+        progressBar.style.width = `${progress}%`;
+        indicator.style.display = 'flex';
+    }
+
+    updateSyncProgress(progress) {
+        const progressBar = document.getElementById('syncProgressBar');
+        const syncText = document.getElementById('syncText');
+        progressBar.style.width = `${progress}%`;
+        syncText.textContent = `مزامنة... ${progress}%`;
+    }
+
+    hideSyncIndicator() {
+        document.getElementById('syncIndicator').style.display = 'none';
+    }
+
+    async forceSync() {
+        // مسح الطابور والمزامنة الفورية للبيانات الكاملة
+        this.syncQueue = [];
+        this.showSyncIndicator('syncing', 'بدء المزامنة الكاملة...', 0);
+        
+        try {
+            const fullData = {
                 students: this.students,
                 delays: this.delays,
                 absences: this.absences,
@@ -871,34 +1174,73 @@ class AttendanceApp {
                 lastSync: new Date().toISOString()
             };
 
-            await this.db.ref(`users/${this.deviceId}/data`).set(localData);
-            
+            // تقسيم البيانات الكبيرة
+            const chunks = this.chunkData(fullData);
+            let completed = 0;
+
+            const totalChunks = chunks.length;
+
+            // عرض مؤشر التقدم مع النسبة المئوية الفعلية
+            for (const chunk of chunks) {
+                await this.db.ref(`users/${this.deviceId}/data/${chunk.path}`).set(chunk.data);
+                completed++;
+                const progress = Math.round((completed / totalChunks) * 100);
+                this.updateSyncProgress(progress);
+
+                // تحديث النص لطمأنة المستخدم
+                this.showSyncIndicator('syncing', `مزامنة... ${completed}/${totalChunks} (${progress}%)`, progress);
+            }
+
             await this.db.ref(`trials/${this.deviceId}/lastSeen`).set(new Date().toISOString());
-            
-            this.showSyncIndicator('success', 'تمت المزامنة');
+
+            this.showSyncIndicator('success', 'تمت المزامنة الكاملة بنجاح ✓', 100);
             setTimeout(() => this.hideSyncIndicator(), 2000);
+            this.showToast('تمت المزامنة الكاملة بنجاح', 'success');
         } catch (error) {
-            console.error('Sync error:', error);
-            this.showSyncIndicator('error', 'فشلت المزامنة');
+            console.error('Full sync error:', error);
+            this.showSyncIndicator('error', 'فشلت المزامنة - حاول مرة أخرى', 0);
+            setTimeout(() => this.hideSyncIndicator(), 3000);
         }
     }
 
-    showSyncIndicator(status, text) {
-        const indicator = document.getElementById('syncIndicator');
-        const syncText = document.getElementById('syncText');
+    chunkData(data) {
+        const chunks = [];
         
-        indicator.className = `sync-indicator ${status}`;
-        syncText.textContent = text;
-        indicator.style.display = 'flex';
-    }
+        // تقسيم الطلاب إلى أجزاء صغيرة جداً (10 طلاب فقط)
+        if (data.students && data.students.length > 10) {
+            const studentChunks = [];
+            for (let i = 0; i < data.students.length; i += 10) {
+                studentChunks.push({
+                    path: `students_chunk_${Math.floor(i / 10)}`,
+                    data: data.students.slice(i, i + 10)
+                });
+            }
+            chunks.push(...studentChunks);
+        } else {
+            chunks.push({ path: 'students', data: data.students || [] });
+        }
 
-    hideSyncIndicator() {
-        document.getElementById('syncIndicator').style.display = 'none';
-    }
+        // البيانات الأخرى مقسمة حسب النوع
+        if (data.delays && Object.keys(data.delays).length > 0) {
+            chunks.push({ path: 'delays', data: data.delays });
+        }
+        if (data.absences && Object.keys(data.absences).length > 0) {
+            chunks.push({ path: 'absences', data: data.absences });
+        }
+        if (data.notes && Object.keys(data.notes).length > 0) {
+            chunks.push({ path: 'notes', data: data.notes });
+        }
 
-    async forceSync() {
-        await this.syncToCloud();
-        this.showToast('تمت المزامنة القسرية', 'success');
+        // البيانات الوصفية الصغيرة
+        const smallData = {
+            grades: data.grades || [],
+            classes: data.classes || [],
+            absenceLevels: data.absenceLevels || this.absenceLevels,
+            lastSync: data.lastSync
+        };
+
+        chunks.push({ path: 'metadata', data: smallData });
+        return chunks;
     }
 
     // تفعيل الاشتراك
@@ -911,11 +1253,13 @@ class AttendanceApp {
             return;
         }
 
+        // أكواد التفعيل الصحيحة - يجب إدخال أحد هذه الأكواد لتفعيل البرنامج
+        // Valid activation codes - One of these codes must be entered to activate the program
         const validCodes = [
-            'SK-2025-001A',
-            'SK-2025-002B',
-            'SK-2025-003C',
-            'SK-DEMO-TEST'
+            'SK-2025-001A',  // كود تفعيل رقم 1 - Activation code #1
+            'SK-2025-002B',  // كود تفعيل رقم 2 - Activation code #2
+            'SK-2025-003C',  // كود تفعيل رقم 3 - Activation code #3
+            'SK-DEMO-TEST'   // كود تجريبي - Demo code
         ];
 
         if (!validCodes.includes(code)) {
@@ -1110,6 +1454,17 @@ class AttendanceApp {
         document.getElementById('studentModal').classList.remove('active');
         this.currentStudentId = null;
     }
+
+
+    toggleExcelInstructions() {
+        const instructions = document.getElementById('excelInstructions');
+        if (instructions.style.display === 'none') {
+            instructions.style.display = 'block';
+        } else {
+            instructions.style.display = 'none';
+        }
+    }
+
 
     async saveStudent(event) {
         event.preventDefault();
@@ -2430,10 +2785,28 @@ class AttendanceApp {
         };
         const data = dataMap[type];
 
+        // Get date range if scope is dateRange
+        let startDate = null;
+        let endDate = null;
+        if (scope === 'dateRange') {
+            startDate = document.getElementById('reportStartDate').value;
+            endDate = document.getElementById('reportEndDate').value;
+        }
+
         let html = '<div>';
+        let foundRecords = false;
+
         Object.keys(data).forEach(date => {
+            // Filter by date range if specified
+            if (startDate && endDate) {
+                if (date < startDate || date > endDate) {
+                    return; // Skip dates outside range
+                }
+            }
+
             const records = data[date];
             if (Object.keys(records).length > 0) {
+                foundRecords = true;
                 html += `<h3 style="color:#667eea;margin:15px 0;">التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}</h3>`;
                 html += '<ul>';
                 Object.keys(records).forEach(studentId => {
@@ -2446,6 +2819,11 @@ class AttendanceApp {
                 html += '</ul>';
             }
         });
+
+        if (!foundRecords) {
+            html += '<p style="text-align:center;color:#999;padding:30px;">لا توجد سجلات في الفترة المحددة</p>';
+        }
+
         html += '</div>';
         return html;
     }
@@ -2568,9 +2946,9 @@ class AttendanceApp {
         localStorage.setItem('classes', JSON.stringify(this.classes));
         localStorage.setItem('absenceLevels', JSON.stringify(this.absenceLevels));
         
-        // المزامنة فقط بعد عمليات الحفظ والحذف والاستيراد
+        // المزامنة السريعة في الخلفية
         if (this.deviceId) {
-            await this.syncToCloud();
+            this.syncToCloud();
         }
     }
 
